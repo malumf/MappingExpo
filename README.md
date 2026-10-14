@@ -1,259 +1,285 @@
-<div align="center">
-<img width="1280" height="640" alt="image" src="https://github.com/user-attachments/assets/5dbde17a-1ac7-4f55-8773-511e18f45753" />
-</div>
 
----
 
 <div align="center">
 
-![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=22&pause=1200&color=39FF14&background=000000&center=true&vCenter=true&width=600&lines=DorkEye+%7C+OSINT+Dorking+Tool;I+don%27t+hack+systems%2C+I+expose+their+secrets)
+![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=22&pause=1200&color=39FF14&background=000000&center=true&vCenter=true&width=700&lines=MappingExpo+%7C+ASM+Defensivo;Mapeamento+de+exposi%C3%A7%C3%A3o+em+PT-BR;Fork+traduzido+e+reenquadrado+do+DorkEye)
 
 </div>
 
-<!-- ── Row 1: Project identity ── -->
+<!-- ── Row 1: Identidade do projeto ── -->
 ![Python](https://img.shields.io/badge/Python-3.9%2B-3670A0?style=flat-square&logo=python&logoColor=ffdd54)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Stable-brightgreen?style=flat-square)
-![Search](https://img.shields.io/badge/Search-DuckDuckGo-FF6600?style=flat-square&logo=duckduckgo&logoColor=white)
-![Version](https://img.shields.io/badge/Version-5.0-brightgreen?style=flat-square)
+![Language](https://img.shields.io/badge/Idioma-PT--BR-blue?style=flat-square)
+![Version](https://img.shields.io/badge/Version-5.0--BR-brightgreen?style=flat-square)
 
-<!-- ── Row 2: Live stats ── -->
-![Repo views](https://komarev.com/ghpvc/?username=xPloits3c&label=DorkEye%20views&color=blue)
-![Stars](https://img.shields.io/github/stars/xPloits3c/DorkEye?style=flat-square)
-![Forks](https://img.shields.io/github/forks/xPloits3c/DorkEye?style=flat-square)
-![Issues](https://img.shields.io/github/issues/xPloits3c/DorkEye?style=flat-square)
-![Last Commit](https://img.shields.io/github/last-commit/xPloits3c/DorkEye?style=flat-square&logo=github)
-
-<!-- ── Row 3: Community ── -->
-
-[![Telegram](https://img.shields.io/badge/Join-Telegram-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/DorkEye)
-
-<img width="980" height="640" alt="image" src="https://github.com/user-attachments/assets/13dea163-578c-41ad-9e2b-497bb373ab77" />
+<!-- ── Row 2: Baseado em ── -->
+[![Baseado em](https://img.shields.io/badge/Baseado%20em-DorkEye-555?style=flat-square)](https://github.com/xPloits3c/DorkEye)
+[![License original](https://img.shields.io/badge/Licen%C3%A7a%20original-MIT-green?style=flat-square)](https://github.com/xPloits3c/DorkEye/blob/main/LICENSE)
 
 ---
 
-## What is DorkEye?
-**DorkEye** is an automated `OSINT DORKING TOOL` that discovers exposed web assets through intelligent search queries.
-- It combines a dork generator driven by YAML templates (`soft` / `medium` / `aggressive` modes), an SQL and XSS testing module, a 13-step autonomous analysis pipeline, an adaptive recursive crawler, and a database port scanner.
-
-- It can identify indexed directories, sensitive files, admin panels, databases, backups, configuration files, credentials, PII data, subdomains, and technology fingerprints — efficiently and with stealth controls.
-
-<img width="1186" height="778" alt="startdev4 9 5" src="https://github.com/user-attachments/assets/82056363-5f7a-4fe8-9aa1-df662e09796b" />
-<img width="1202" height="832" alt="startdev4 9 5_0" src="https://github.com/user-attachments/assets/1f593af6-5908-4f35-b2b9-fe7f89417589" />
-
----
-
-## Why DorkEye
-
-- Bypass CAPTCHA and rate-limiting
-- Advanced, interactive HTML report
-- Maintain anonymity and avoid IP blocking
-- Clean and unfiltered search results
-- Keep dorking for hours — DorkEye won't get banned.
-
-<img width="1437" height="652" alt="564558417-37385827-9112-4efe-aa0a-f8941da0a2d9" src="https://github.com/user-attachments/assets/df21ead3-dd90-4692-9eab-259c6582ae86" />
+> ⚠️ **USO AUTORIZADO APENAS**
+>
+> Esta ferramenta realiza consultas a motores de busca e a alvos externos.
+> Use **somente** em ativos que você possui ou para os quais tem **autorização
+> escrita explícita**. O autor deste fork não se responsabiliza por uso
+> indevido. Consulte a legislação aplicável (**LGPD**, **Marco Civil da
+> Internet**, **CFAA**) antes de qualquer operação.
+>
+> Baseado em [DorkEye](https://github.com/xPloits3c/DorkEye), © I.C.W.T / xPloits3c, sob licença MIT.
+> Fork PT-BR mantido por **Malu F.**, sob licença MIT.
 
 ---
 
-## What's New 🥇
+## 📌 O que é o MappingExpo?
 
-| Feature | Details |
-|---------|---------|
-| 🧙 Wizard | [Interactive guided session — all options](Docs/wizard.md) |
-| ⚙️ Dork Generator | [YAML template modes: `soft` / `medium` / `aggressive`](Docs/dork_generator.md) |
-| 🎯 Direct SQLi-XSS Test | [Test a single URL directly with `-u`](Docs/sqli.md) |
-| 📂 File Re-Processing | [Re-run SQLi/XSS/analysis/crawl on saved result files with `-f`](Docs/cli.md) |
-| 💉 SQL Injection | [5 methods: 105 payloads](Docs/sqli.md) |
-| 💉 XSS Injection | [4 methods: 111 payloads](Docs/xss.md) |
-| 🖥️ Web Console | [Matrix-Style local dashboard via browser `--ui`](Docs/webconsole.md) |
-| 🚪 DB Port Scan | [15 services, no-auth probes, 3 severity levels `--dbscan`](Docs/dbscan.md) |
-| 🤖 Agents Pipeline | [13-step autonomous analysis](Docs/agents.md) |
-| 🛡️ HeaderIntelAgent | [Info leaks, missing security headers, outdated server](Docs/agents.md#headerintelagent) |
-| 🧬 TechFingerprintAgent | [35 technologies detected, CVE dorks generated](Docs/agents.md#techfingerprintagent) |
-| 📧 EmailHarvesterAgent | [Collects and categorizes emails: admin / security / info..](Docs/agents.md#emailharvesteragent) |
-| 🔐 PiiDetectorAgent | [Phone, IBAN, fiscal code, credit card, SSN, DOB](Docs/agents.md#piidetectoragent) |
-| 🌐 SubdomainAgent | [Extracts subdomains and generates `queries`](Docs/agents.md#subdomainharvesteragent) |
-| 🔄 Adaptive Crawl | [Recursive multi-round dorking](Docs/crawler.md) |
-| 🔑 HTTP Fingerprinting | [22 browser/OS profiles — Chrome, Firefox, Safari, mobile, etc.](Docs/fingerprinting.md) |
-| 📊 Output Formats | [HTML interactive report — all saved to `Dump/`](Docs/output_formats.md) |
-| 🗂️ File Categories | [7 auto-detected categories - whitelist / blacklist filtering](Docs/file_categories.md) |
-| 🖥️ Full CLI Reference | [All 38 flags and every possible combination](Docs/cli.md) |
+**MappingExpo** é uma ferramenta de **Gerenciamento de Superfície de Ataque (ASM)** que automatiza a descoberta de ativos expostos na internet, seja por diretórios indexados, arquivos sensíveis, painéis administrativos, dumps de configuração e outros artefatos publicamente acessíveis que representam **risco real** para organizações.
+
+Este projeto é uma versão abrasileirada do [DorkEye](https://github.com/xPloits3c/DorkEye)**, reenquadrado para uso **defensivo** em:
+
+- 🛡️ **CTI (Cyber Threat Intelligence)**
+- 🔍 **ASM (Attack Surface Management)**
+- 📊 **SOC (Security Operations Center)**
+- 🕵️ **DFIR (Digital Forensics and Incident Response)**
+
+> 📎 **Licença MIT preservada. Créditos ao autor original mantidos.**
 
 ---
 
-## Quick Install
+<!-- BANNER 2 — DIVISOR — 1280x200 px -->
+<!-- Substitua abaixo -->
+
+<div align="center">
+<img src="https://via.placeholder.com/1280x200/0D1117/39FF14?text=Recursos+de+ASM+Defensivo" width="1280" height="200" alt="Divisor" />
+</div>
+
+---
+
+
+| Recurso | Descrição |
+|---|---|
+| **Foco defensivo** | Reenquadrado para ASM, CTI e SOC — não para offensive-first |
+| 🇧🇷 **100% em PT-BR** | CLI, mensagens, documentação e relatórios traduzidos |
+|**Documentação clara** | Cada módulo tem doc dedicada (`/Docs/`) |
+|**OPSEC explícito** | Avisos de uso responsável em cada etapa |
+| **Conformidade legal** | Alinhado com LGPD, Marco Civil e boas práticas |
+| **Base sólida** | Herda maturidade técnica do DorkEye original |
+| **MIT License** | Livre para uso, modificação e redistribuição |
+
+---
+
+<!-- BANNER 3 — DEMO (wizard/CLI) — 1280x720 px -->
+<!-- Substitua abaixo com print do seu terminal rodando o wizard -->
+
+<div align="center">
+<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Print+do+Wizard+MappingExpo+em+PT-BR" width="1280" height="720" alt="Wizard MappingExpo PT-BR" />
+</div>
+
+---
+
+## Recursos Principais
+
+| Recurso | Detalhes |
+|---|---|
+| **Assistente interativo** | [Sessão guiada com todas as opções](Docs/wizard.md) |
+| **Gerador de dorks** | [Templates YAML: `soft` / `medium` / `aggressive`](Docs/dork_generator.md) |
+| **Teste direto SQLi/XSS** | [Testa uma URL diretamente com `-u`](Docs/sqli.md) |
+| **Reprocessamento** | [Reexecuta análise em arquivos salvos com `-f`](Docs/cli.md) |
+| **Detecção de SQL Injection** | [5 métodos: 105 payloads](Docs/sqli.md) |
+| **Detecção de XSS** | [4 métodos: 111 payloads](Docs/xss.md) |
+| **Console Web** | [Dashboard local estilo Matrix via browser `--ui`](Docs/webconsole.md) |
+| **Scan de portas de BD** | [15 serviços, probes sem auth, 3 níveis de severidade `--dbscan`](Docs/dbscan.md) |
+| **Pipeline de Agentes** | [Análise autônoma em 13 etapas](Docs/agents.md) |
+| **HeaderIntelAgent** | [Vazamento de info, headers faltando, servidor desatualizado](Docs/agents.md#headerintelagent) |
+| **TechFingerprintAgent** | [35 tecnologias detectadas, dorks de CVE gerados](Docs/agents.md#techfingerprintagent) |
+| **EmailHarvesterAgent** | [Coleta e categoriza emails: admin / security / info...](Docs/agents.md#emailharvesteragent) |
+| **PiiDetectorAgent** | [Telefone, IBAN, CPF, cartão de crédito, SSN, DOB](Docs/agents.md#piidetectoragent) |
+| **SubdomainAgent** | [Extrai subdomínios e gera `queries`](Docs/agents.md#subdomainharvesteragent) |
+| **Crawl adaptativo** | [Dorking recursivo multi-round](Docs/crawler.md) |
+| **HTTP Fingerprinting** | [22 perfis browser/OS — Chrome, Firefox, Safari, mobile, etc.](Docs/fingerprinting.md) |
+| **Formatos de saída** | [Relatório HTML interativo — tudo salvo em `Dump/`](Docs/output_formats.md) |
+| **Categorias de arquivo** | [7 categorias auto-detectadas — filtro whitelist/blacklist](Docs/file_categories.md) |
+| **CLI completo** | [Todas as 38 flags e combinações possíveis](Docs/cli.md) |
+
+---
+
+## 📦 Instalação Rápida
+
 ```bash
-"Update:"
-  sudo apt update
-  sudo apt install -y python3 python3-pip python3-venv git
+# ── Atualizar sistema ──
+sudo apt update
+sudo apt install -y python3 python3-pip python3-venv git
 
-"Git Clone:"
-  git clone https://github.com/xPloits3c/DorkEye.git
-  cd DorkEye
+# ── Clonar o repositório ──
+git clone https://github.com/SEU-USUARIO/MappingExpo-BR.git
+cd MappingExpo-BR
 
-"Create environment:"
-  python3 -m venv dorkeye_env
+# ── Criar ambiente virtual ──
+python3 -m venv mappingexpo_env
 
-"Activate environment:"
-  source dorkeye_env/bin/activate
+# ── Ativar ambiente ──
+source mappingexpo_env/bin/activate
 
-"Install requirements:"
-  pip install -r requirements.txt
+# ── Instalar dependências ──
+pip install -r requirements.txt
 
-"WIZARD MODE:"
-  python3 dorkeye.py --wizard
+# ── Modo Assistente ──
+python3 mappingexpo.py --wizard
 ```
 
-<img width="1175" height="982" alt="dev5 0wiz" src="https://github.com/user-attachments/assets/79253966-b2ed-431e-9d46-aaa8d8297c82" />
+<!-- BANNER 3B — PRINT DO WIZARD — 1280x720 px -->
+<!-- Substitua abaixo com print do wizard em execução -->
+
+<div align="center">
+<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Wizard+MappingExpo+em+a%C3%A7%C3%A3o" width="1280" height="720" alt="Wizard em execução" />
+</div>
 
 ---
 
 ```bash
-"Help:"
-  python3 dorkeye.py -h
+# ── Ajuda ──
+python3 mappingexpo.py -h
 
-"Deactivate environment:"
-  deactivate
+# ── Desativar ambiente ──
+deactivate
 
-"Remove environment:"
-  rm -rf dorkeye_env
+# ── Remover ambiente ──
+rm -rf mappingexpo_env
 ```
----
-
-## Usage 
-
-<img width="727" height="805" alt="dev5 0usage" src="https://github.com/user-attachments/assets/99927171-0c7f-4659-9608-ae554aec518e" />
 
 ---
 
-🔹 # WIZARD Mode
-```bash
-  python3 dorkeye.py --wizard
-```
-🔹 # Basic search
-```bash
-  python3 dorkeye.py -d "inurl:admin" -o results.txt
-```
-🔹 # Dork Generator + Detection
-```bash
-  python3 dorkeye.py --dg=sqli --mode=aggressive --sqli --stealth -o report.json
-```
-🔹 # SQLi + stealth
-```bash
-  python3 dorkeye.py -d "site:example.com .php?id=" --sqli --stealth -o scan.html
-```
-🔹 # Fast scan
-```bash
-  python3 dorkeye.py -d dorks.txt --no-analyze -c 200 -o fast_results.csv
-```
-🔹 # Direct SQLi test on a URL
-```bash
-  python3 dorkeye.py -u "https://target.com/page.php?id=1" --sqli --stealth -o result.json
-```
-🔹 # Re-process a saved result file
-```bash
-  python3 dorkeye.py -f Dump/results.json --sqli --xss --dbscan --analyze -o retest.html
-```
+<!-- BANNER 3C — PRINT DA CLI — 1280x720 px -->
+<!-- Substitua abaixo com print da CLI com --help -->
 
-🔹 # Web Console
-```bash
-  python3 dorkeye.py --ui
-```
-
-<img width="1549" height="609" alt="image" src="https://github.com/user-attachments/assets/aae464c0-3320-4050-b11b-d83c4e3f9c54" />
-
-
-## Examples
-<img width="938" height="832" alt="de-hex" src="https://github.com/user-attachments/assets/da253967-45a7-4249-aed2-9726eaa37b79" />
+<div align="center">
+<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=CLI+MappingExpo+%28--help%29" width="1280" height="720" alt="CLI --help" />
+</div>
 
 ---
 
-## 📁 Project Structure
+## Uso
+
+### 🔹 Modo Assistente
+
+```bash
+python3 mappingexpo.py --wizard
 ```
-DorkEye/
-│ ├── dorkeye.py               ← DorkEye Engine
-│ ├── requirements.txt
-│ ├── http_fingerprints.json
-│ ├── README.md
-│ /Tools/
-│    ├── dork_generator.py     ← Dork Generator Queries
-│    ├── dorkeye_agents.py     ← Agents v3.1 pipeline
-│    ├── dorkeye_patterns.py   ← Shared pattern library
-│    ├── dorkeye_analyze.py    ← Standalone analysis CLI
-│    ├── db_portscan.py   ← Scans exposed database ports
-│    ├── dorkeye_web.py   ← Local web interface
-│    ├── sqli.py     ← 5 Method sqli injection (105 payloads)
-│    └── xss.py     ← 4 Method xss injection (111 payloads)
-│ /Templates/
-│    ├── dorks_templates.yaml
-│    ├── sql.yaml
-│    └── example.yaml
-│ /.github/
-│    ├── CODE_OF_CONDUCT.md
-│    ├── CONTRIBUTING.md
-│    ├── SECURITY.md
-│    ├── pull_request_template.md
-│     /ISSUE_TEMPLATE/
-│        ├── bug_report.md
-│        └── feature_request.md
-│     /workflows
-│        └── claude-dorkeye.yml
-│ /Dump/
-│    ├── *.csv
-│    ├── *.json
-│    ├── *.txt
-│    └── *.html
-│ /Docs/
-│    ├── cli.md
-│    ├── wizard.md
-│    ├── sqli.md
-│    ├── agents.md
-│    ├── crawler.md
-│    ├── fingerprinting.md
-│    ├── output_formats.md
-│    ├── file_categories.md
-│    ├── dork_generator.md
-│    ├── INSTALL.md
-│    ├── REPORT_HTML.md
-│    ├── USAGE.md
-│    └── DDGSEE.md
-│ /Screenshots/
-│    ├── img0
-│    └── img1
+
+### 🔹 Busca básica
+
+```bash
+python3 mappingexpo.py -d "inurl:admin" -o resultados.txt
 ```
+
+### 🔹 Gerador de dorks + Detecção
+
+```bash
+python3 mappingexpo.py --dg=sqli --mode=aggressive --sqli -o relatorio.json
+```
+
+### 🔹 Teste direto de SQLi em URL
+
+```bash
+python3 mappingexpo.py -u "https://alvo.com/pagina.php?id=1" --sqli -o resultado.json
+```
+
+### 🔹 Scan rápido
+
+```bash
+python3 mappingexpo.py -d dorks.txt --no-analyze -c 200 -o rapido.csv
+```
+
+### 🔹 Reprocessar resultado salvo
+
+```bash
+python3 mappingexpo.py -f Dump/resultados.json --sqli --xss --dbscan --analyze -o reavaliacao.html
+```
+
+### 🔹 Console Web
+
+```bash
+python3 mappingexpo.py --ui
+```
+
+<!-- BANNER 3D — PRINT DO CONSOLE WEB — 1280x720 px -->
+<!-- Substitua abaixo com print do dashboard web -->
+
+<div align="center">
+<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Console+Web+MappingExpo" width="1280" height="720" alt="Console Web" />
+</div>
+
+
+
+<!-- BANNER 5 — LEGAL — 1280x300 px -->
+<!-- Substitua abaixo se quiser um aviso legal visual -->
+
+<div align="center">
+<img src="https://via.placeholder.com/1280x300/8B0000/FFFFFF?text=USO+AUTORIZADO+APENAS" width="1280" height="300" alt="Aviso Legal" />
+</div>
+
+## Aviso Legal
+
+**MappingExpo PT-BR é fornecido apenas para fins educacionais e de teste de segurança autorizado.**
+
+Você é o **único responsável** por cumprir todas as leis aplicáveis e por obter **autorização escrita explícita** antes de escanear, testar ou sondar qualquer sistema, domínio ou rede que não seja de sua propriedade.
+
+Os autores e contribuidores **não aceitam qualquer responsabilidade** por uso indevido ou por danos resultantes do uso desta ferramenta.
+
+**Legislação aplicável no Brasil:**
+- **LGPD** — Lei Geral de Proteção de Dados (Lei 13.709/2018)
+- **Marco Civil da Internet** (Lei 12.965/2014)
+- **Lei de Crimes Cibernéticos** (Lei 12.737/2012)
+
+**Uso pretendido:**
+- Descoberta autorizada de superfície de ataque
+- Monitoramento de exposição em ativos próprios
+- Enriquecimento de CTI e apoio a SOC
+- Pesquisa acadêmica em ambiente controlado
+
+**Uso proibido:**
+- Escaneamento de alvos sem autorização
+- Coleta não autorizada de dados pessoais (viola LGPD)
+- Uso em atividades ilegais de qualquer natureza
+
 ---
 
-## Example DorkEye Report
+## Licença e Créditos
 
-![image](https://github.com/user-attachments/assets/28b71d4e-0cb2-478d-a1f2-f49c98f9f8aa)
-<img width="1142" height="730" alt="image" src="https://github.com/user-attachments/assets/1f694bbc-af46-4bec-8654-6ff0b762f199" />
+### Licença MIT
 
----
+Este projeto é distribuído sob a **MIT License**.
 
-## ![WARNING](https://img.shields.io/badge/Legal%20Disclaimer-red)
+```
+MIT License
 
-<img width="1408" height="768" alt="image" src="https://github.com/user-attachments/assets/e3eb4dca-51e9-4d4c-a2e4-afa057564b74" />
+Copyright (c) 2026 I.C.W.T / xPloits3c (projeto original: DorkEye)
+Copyright (c) 2026 [Seu Nome] (fork PT-BR: MappingExpo)
 
-**DorkEye is provided for educational and authorized security-testing purposes only.** You are solely responsible for complying with all applicable laws and for obtaining explicit, written authorization before scanning, testing, or probing any system, domain, or network you do not own. The authors and contributors accept no liability for misuse or for any damage resulting from the use of this tool.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
----
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## 📞 Contact
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
-- **Author:** I.C.W.T / xPloits3c  
-- **Email:** dorkeye@protonmail.com  
-- **Telegram:** https://t.me/DorkEye  
----
+### Créditos
 
-## ⭐ Support
-If you find DorkEye useful, please consider starring the repository 🌟
----
-
-## 📜 License
-MIT License © 2026 I.C.W.T xPloits3c
-
-
-## Contributor
-<a href="https://github.com/xPloits3c/DorkEye/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=xPloits3c/DorkEye" />
-</a>
+- **Projeto original:** [DorkEye](https://github.com/xPloits3c/DorkEye) — © I.C.W.T / xPloits3c
+- **Licença original:** MIT
+- **Este fork:** MappingExpo PT-BR — © [Malu F.]
+- **Licença deste fork:** MIT
+- **Tradução, reframe defensivo e revisão crítica:** [Seu Nome]
