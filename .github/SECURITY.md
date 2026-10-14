@@ -1,31 +1,31 @@
-# Security Policy 🛡️
+# Política de Segurança 🛡️
 
-## Supported Versions
+## Versões Suportadas
 
-We actively provide security updates for the following versions of **DorkEye**:
+Fornecemos ativamente atualizações de segurança para as seguintes versões do **MappingExpo**:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x     | :white_check_mark: |
-| < 1.0   | :x:                |
+| Versão | Suportada          |
+| ------ | ------------------ |
+| 5.x-BR | :white_check_mark: |
+| < 5.0  | :x:                |
 
-## Reporting a Vulnerability
+## Reportando uma Vulnerabilidade
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+**Por favor, não reporte vulnerabilidades de segurança através de issues públicas do GitHub.**
 
-If you discover a potential security jump or vulnerability within DorkEye, we want to fix it as soon as possible. Please report it privately by following these steps:
+Se você descobrir uma potencial falha ou vulnerabilidade de segurança no MappingExpo, queremos corrigi-la o mais rápido possível. Por favor, reporte-a de forma privada seguindo estes passos:
 
-1. **Email us**: Send a detailed report to **[IL TUO INDIRIZZO EMAIL QUI]**.
-2. **Describe the bug**: Include steps to reproduce, the potential impact, and any proof-of-concept (PoC) code.
-3. **Response time**: We will acknowledge your report within 48-72 hours and provide a timeline for a fix.
+1. **Envie um e-mail**: Envie um relatório detalhado para **[SEU EMAIL DE SEGURANÇA]**.
+2. **Descreva o bug**: Inclua passos para reproduzir, o impacto potencial e qualquer código de prova de conceito (PoC).
+3. **Tempo de resposta**: Reconheceremos seu relatório dentro de 48-72 horas e forneceremos um cronograma para a correção.
 
-### What we consider a security vulnerability:
-* Remote Code Execution (RCE) in the tool's logic.
-* Unintended exposure of sensitive user data or API keys.
-* Vulnerabilities in third-party dependencies used by DorkEye.
+### O que consideramos uma vulnerabilidade de segurança:
+* Remote Code Execution (RCE) na lógica da ferramenta.
+* Exposição não intencional de dados sensíveis do usuário ou chaves de API.
+* Vulnerabilidades em dependências de terceiros usadas pelo MappingExpo.
 
-### Disclosure Policy
-We follow a coordinated disclosure policy. Please give us a reasonable amount of time to fix the issue before making any information public.
+### Política de Divulgação
+Seguimos uma política de divulgação coordenada. Por favor, nos dê um tempo razoável para corrigir o problema antes de tornar qualquer informação pública.
 
 ---
-*Thank you for helping keep the DorkEye community safe!*
+*Obrigado por ajudar a manter a comunidade MappingExpo segura!*
