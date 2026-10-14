@@ -34,7 +34,7 @@ Este Código de Conduta se aplica em todos os espaços da comunidade, e também 
 
 ## Aplicação
 
-Casos de comportamento abusivo, de assédio ou de outra forma inaceitável podem ser reportados aos líderes da comunidade responsáveis pela aplicação em **[SEU EMAIL DE CONTATO]**. Todas as reclamações serão revisadas e investigadas prontamente e de forma justa.
+Casos de comportamento abusivo, de assédio ou de outra forma inaceitável podem ser reportados aos líderes da comunidade responsáveis pela aplicação em **whitehat.report@onionmail.org**. Todas as reclamações serão revisadas e investigadas prontamente e de forma justa.
 
 ---
 
