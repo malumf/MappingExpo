@@ -1,38 +1,40 @@
-# Contributing to DorkEye 👁️
+# Contribuindo com o MappingExpo 👁️
 
-First off, thank you for considering contributing to **DorkEye**! It's people like you who make the open-source community such an amazing place to learn, inspire, and create.
+Antes de tudo, obrigado por considerar contribuir com o **MappingExpo**! São pessoas como você que fazem da comunidade open-source um lugar incrível para aprender, inspirar e criar.
 
-To maintain the quality and security of this tool, please take a moment to review these guidelines.
+Para manter a qualidade e a segurança desta ferramenta, reserve um momento para revisar estas diretrizes.
 
 ---
 
-## 🛠️ How Can I Contribute?
+## 🛠️ Como Posso Contribuir?
 
-### Reporting Bugs
-If you find a bug, please help us by [opening an issue](https://github.com/xPloits3c/DorkEye/issues). 
-* Use a clear and descriptive title.
-* Describe the exact steps to reproduce the error.
-* Include details about your environment (OS, Python version, etc.).
+### Reportando Bugs
+Se você encontrar um bug, por favor nos ajude [abrindo uma issue](https://github.com/SEU-USUARIO/MappingExpo-BR/issues).
 
-### Suggesting Enhancements
-Have a great idea for a new Dork or a scanning feature? 
-1. Open an issue to discuss the change you wish to make.
-2. Explain the use case and how it benefits the security community.
+* Use um título claro e descritivo.
+* Descreva os passos exatos para reproduzir o erro.
+* Inclua detalhes sobre seu ambiente (SO, versão do Python, etc.).
+
+### Sugerindo Melhorias
+Tem uma ótima ideia para um novo Dork ou uma funcionalidade de scan?
+
+1. Abra uma issue para discutir a mudança que você deseja fazer.
+2. Explique o caso de uso e como isso beneficia a comunidade de segurança defensiva.
 
 ### Pull Requests
-1. **Fork** the repository and create your branch from `main`.
-2. If you've added code that should be tested, **add tests**.
-3. Ensure the documentation (README) is updated if you changed how the tool works.
-4. Open a **Pull Request** with a clear description of your changes.
+1. Faça **Fork** do repositório e crie sua branch a partir da `main`.
+2. Se você adicionou código que deve ser testado, **adicione testes**.
+3. Garanta que a documentação (README) seja atualizada se você alterou como a ferramenta funciona.
+4. Abra um **Pull Request** com uma descrição clara das suas mudanças.
 
-## 📝 Style Guidelines
+## 📝 Diretrizes de Estilo
 
-* **Keep it Clean**: Use meaningful variable names and follow PEP 8 (for Python) if applicable.
-* **Comments**: Document complex logic so others can understand your thought process.
-* **Commit Messages**: Use concise and descriptive commit messages (e.g., `feat: add new Google Dorks for sensitive files`).
+* **Mantenha Limpo**: Use nomes de variáveis significativos e siga o PEP 8 (para Python) quando aplicável.
+* **Comentários**: Documente lógicas complexas para que outros possam entender seu raciocínio.
+* **Mensagens de Commit**: Use mensagens de commit concisas e descritivas (ex.: `feat: adiciona novos Google Dorks para arquivos sensíveis`).
 
-## ⚖️ License
-By contributing, you agree that your contributions will be licensed under the same [License](LICENSE) that covers the project.
+## ⚖️ Licença
+Ao contribuir, você concorda que suas contribuições serão licenciadas sob a mesma [Licença](LICENSE) que cobre o projeto.
 
 ---
-Thank you for helping make **DorkEye** better for everyone! 🛡️
+Obrigado por ajudar a tornar o **MappingExpo** melhor para todos! 🛡️
