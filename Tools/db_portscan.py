@@ -461,9 +461,9 @@ class DBPortScanAgent:
 
     Uso:
         agent = DBPortScanAgent(timeout=2.0, threads=50)
-        scan_results = agent.run(dorkeye_results)
+        scan_results = agent.run(mappingexpo_results)
 
-    Cada entrada em dorkeye_results precisa ter ao menos a chave 'url'.
+    Cada entrada em mappingexpo_results precisa ter ao menos a chave 'url'.
     Opcionalmente 'title', 'snippet', 'dork' são usados para detecção de hints de porta.
 
     Retorna um DBScanReport com findings por host.

@@ -521,10 +521,10 @@ class FileAnalyzer:
 
 
 # ══════════════════════════════════════════════════════════════
-#  DorkEyeEnhanced
+#  MappingExpo
 # ══════════════════════════════════════════════════════════════
 
-class DorkEyeEnhanced:
+class MappingExpo:
     """Orquestrador principal: buscas de dorks, análise de arquivos, testes SQLi/XSS, persistência de resultados."""
 
     def __init__(self, config: Dict, output_file: str = None):
@@ -2448,29 +2448,29 @@ def run_wizard():
             do_analyze  = _ask_analyze(output)
             crawl_opts  = _ask_crawl()
 
-            dorkeye = DorkEyeEnhanced(config, output)
-            dorks   = dorkeye.process_dorks(dork_input)
+            mappingexpo = MappingExpo(config, output)
+            dorks   = mappingexpo.process_dorks(dork_input)
             console.print(f"\n[bold cyan]┌─[ CARREGADOS {len(dorks)} DORK(S) ][/bold cyan]")
             console.print("[bold cyan]└─>[/bold cyan] Iniciando...\n")
             try:
-                dorkeye.run_search(dorks, count)
+                mappingexpo.run_search(dorks, count)
             except KeyboardInterrupt:
                 console.print("\n[red][!] Busca interrompida.[/red]")
-            dorkeye.print_statistics()
+            mappingexpo.print_statistics()
             if output:
                 console.print(f"\n[bold green][✓] Resultados salvos em: {output}[/bold green]")
-            if do_analyze and dorkeye.results:
-                _run_analyze(dorkeye.results, output)
+            if do_analyze and mappingexpo.results:
+                _run_analyze(mappingexpo.results, output)
             if crawl_opts and dorks:
                 _run_crawl_wizard(dorks, crawl_opts, output or "")
-            if do_dbscan and dorkeye.results:
+            if do_dbscan and mappingexpo.results:
                 console.print(
                     f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(mappingexpo.results)} resultado(s)...\n"
                 )
                 try:
                     _db_wiz = DBPortScanAgent(timeout=2.5, threads=60, ports=None, max_hosts=200)
-                    _db_wiz_report = _db_wiz.run(dorkeye.results)
+                    _db_wiz_report = _db_wiz.run(mappingexpo.results)
                     if _db_wiz_report:
                         _db_wiz_report.print_summary()
                         _dump_dir_wiz  = Path(__file__).parent / "Dump"
@@ -2549,26 +2549,26 @@ def run_wizard():
                 all_dorks.extend(generator.generate(categories=selected_categories, mode=mode))
 
             console.print(f"\n[cyan][*] {len(all_dorks)} dorks gerados (modo: {mode})[/cyan]")
-            dorkeye = DorkEyeEnhanced(config, output)
+            mappingexpo = MappingExpo(config, output)
             try:
-                dorkeye.run_search(all_dorks, 50)
+                mappingexpo.run_search(all_dorks, 50)
             except KeyboardInterrupt:
                 console.print("\n[red][!] Busca interrompida.[/red]")
-            dorkeye.print_statistics()
+            mappingexpo.print_statistics()
             if output:
                 console.print(f"\n[bold green][✓] Resultados salvos em: {output}[/bold green]")
-            if do_analyze and dorkeye.results:
-                _run_analyze(dorkeye.results, output)
+            if do_analyze and mappingexpo.results:
+                _run_analyze(mappingexpo.results, output)
             if crawl_opts and all_dorks:
                 _run_crawl_wizard(all_dorks, crawl_opts, output or "")
-            if do_dbscan and dorkeye.results:
+            if do_dbscan and mappingexpo.results:
                 console.print(
                     f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(mappingexpo.results)} resultado(s)...\n"
                 )
                 try:
                     _db_wiz2 = DBPortScanAgent(timeout=2.5, threads=60, ports=None, max_hosts=200)
-                    _db_wiz2_report = _db_wiz2.run(dorkeye.results)
+                    _db_wiz2_report = _db_wiz2.run(mappingexpo.results)
                     if _db_wiz2_report:
                         _db_wiz2_report.print_summary()
                         _dump_dir_wiz2  = Path(__file__).parent / "Dump"
@@ -2756,7 +2756,7 @@ def main():
         console.print("[yellow][!] mappingexpo_agents.py não encontrado — análise indisponível.[/yellow]")
         _do_analyze = False
 
-    dorkeye = DorkEyeEnhanced(config, output_file)
+    mappingexpo = MappingExpo(config, output_file)
 
     # ── -u / --url: teste direto ───────────────────────────────────────────────
     if getattr(args, "url", None):
@@ -2774,8 +2774,8 @@ def main():
         if not _do_url_sqli and not _do_url_xss:
             console.print("[bold cyan]│[/bold cyan]  [yellow][!] Nenhuma flag de teste — ativando SQLi automaticamente[/yellow]")
             config["sqli_detection"] = True
-            dorkeye.config["sqli_detection"] = True
-            dorkeye.analyzer.config["sqli_detection"] = True
+            mappingexpo.config["sqli_detection"] = True
+            mappingexpo.analyzer.config["sqli_detection"] = True
             _do_url_sqli = True
 
         tests_label = " + ".join(filter(None, ["SQLi" if _do_url_sqli else "", "XSS" if _do_url_xss else ""]))
@@ -2787,8 +2787,8 @@ def main():
             "snippet":   "",
             "dork":      "",
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "extension": dorkeye.analyzer.get_file_extension(target_url),
-            "category":  dorkeye.analyzer.categorize_url(target_url),
+            "extension": mappingexpo.analyzer.get_file_extension(target_url),
+            "category":  mappingexpo.analyzer.categorize_url(target_url),
         }
 
         if _do_url_sqli:
@@ -2816,12 +2816,12 @@ def main():
                         _param  = _t.get("parameter", "")
                         _p_str  = f" [parâmetro: {_param}]" if _param else ""
                         console.print(f"[bold yellow]│[/bold yellow]    [dim]↳ método: [yellow]{_method}[/yellow]{_p_str}  evidência: [italic]{_rich_escape(_ev[:120])}[/italic][/dim]")
-                dorkeye.stats["sqli_vulnerable"] += 1
+                mappingexpo.stats["sqli_vulnerable"] += 1
             else:
                 console.print(f"[bold yellow]│[/bold yellow]  [green][✓] SAFE[/green]  {_rich_escape(target_url)}")
             if _waf:
                 console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] WAF detectado: {_waf}[/yellow]")
-                dorkeye.stats["waf_detected"] += 1
+                mappingexpo.stats["waf_detected"] += 1
             console.print(f"[bold yellow]└─>[/bold yellow]  {_msg}")
 
         if _do_url_xss:
@@ -2844,7 +2844,7 @@ def main():
                     console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] Não testado — {_xmsg}[/yellow]")
                 elif _xvuln:
                     console.print(f"[bold yellow]│[/bold yellow]  [bold yellow][!] VULNERABLE ({_xconf}) [{_xtypes}][/bold yellow]  {_rich_escape(target_url)}")
-                    dorkeye.stats["xss_vulnerable"] += 1
+                    mappingexpo.stats["xss_vulnerable"] += 1
                 else:
                     console.print(f"[bold yellow]│[/bold yellow]  [green][✓] SAFE[/green]  {_rich_escape(target_url)}")
                 if _xwaf:
@@ -2854,8 +2854,8 @@ def main():
                 console.print("[yellow][!] xss.py não encontrado — teste XSS pulado.[/yellow]")
 
         if output_file:
-            dorkeye.results.append(_entry)
-            dorkeye.save_results()
+            mappingexpo.results.append(_entry)
+            mappingexpo.save_results()
             console.print(f"\n[bold green][✓] Resultado salvo → Dump/{output_file}[/bold green]")
         return
 
@@ -2879,22 +2879,22 @@ def main():
         console.print("[bold cyan]└─>[/bold cyan] Processando...\n")
 
         for _r in _loaded:
-            _h = dorkeye._hash_url(_r.get("url", ""))
-            dorkeye.url_hashes.add(_h)
+            _h = mappingexpo._hash_url(_r.get("url", ""))
+            mappingexpo.url_hashes.add(_h)
 
         if (_do_sqli or _do_xss) and _loaded:
-            _analyzed = dorkeye.analyze_results(_loaded)
-            dorkeye.results = _analyzed
+            _analyzed = mappingexpo.analyze_results(_loaded)
+            mappingexpo.results = _analyzed
         else:
-            dorkeye.results = _loaded
+            mappingexpo.results = _loaded
 
-        dorkeye.print_statistics()
+        mappingexpo.print_statistics()
 
         if output_file:
-            dorkeye.save_results()
+            mappingexpo.save_results()
             console.print(f"\n[bold green][✓] Resultados salvos → Dump/{output_file}[/bold green]")
 
-        if _do_analyze and dorkeye.results and _ANALYZE_AVAILABLE:
+        if _do_analyze and mappingexpo.results and _ANALYZE_AVAILABLE:
             ts         = datetime.now().strftime("%Y%m%d_%H%M%S")
             fmt        = args.analyze_fmt
             report_out = args.analyze_out
@@ -2910,24 +2910,24 @@ def main():
                 "analyze_out":           report_out,
             })()
             try:
-                _result_f = _run_agents_pipeline(results=dorkeye.results, llm_plugin=None, args=_analyze_args_f)
+                _result_f = _run_agents_pipeline(results=mappingexpo.results, llm_plugin=None, args=_analyze_args_f)
                 if _result_f.get("report_path"):
                     console.print(f"[bold green][✓] Relatório de análise → {_result_f['report_path']}[/bold green]")
             except Exception as _fae:
                 console.print(f"[yellow][Analyzer] Erro: {_fae}[/yellow]")
 
         if _do_crawl and _ANALYZE_AVAILABLE:
-            _seed_dorks = list({r.get("dork", "") for r in dorkeye.results if r.get("dork")})
+            _seed_dorks = list({r.get("dork", "") for r in mappingexpo.results if r.get("dork")})
             if not _seed_dorks:
-                _seed_dorks = [r.get("url", "") for r in dorkeye.results[:10]]
+                _seed_dorks = [r.get("url", "") for r in mappingexpo.results[:10]]
             try:
                 _crawl_out_f = run_crawl(seed_dorks=_seed_dorks, args=args, target="")
                 if _crawl_out_f.get("results"):
-                    _existing_urls = {r.get("url") for r in dorkeye.results}
+                    _existing_urls = {r.get("url") for r in mappingexpo.results}
                     _new_crawl     = [r for r in _crawl_out_f["results"] if r.get("url") not in _existing_urls]
-                    dorkeye.results.extend(_new_crawl)
+                    mappingexpo.results.extend(_new_crawl)
                     if output_file:
-                        dorkeye.save_results()
+                        mappingexpo.save_results()
                     console.print(f"\n[bold green][Crawl] Concluído — +{len(_new_crawl)} novo(s) resultado(s)[/bold green]")
             except Exception as _fce:
                 console.print(f"[yellow][Crawl] Erro: {_fce}[/yellow]")
@@ -2935,12 +2935,12 @@ def main():
         if _do_dbscan:
             if not _DBSCAN_AVAILABLE:
                 console.print("[yellow][!] db_portscan.py não encontrado em Tools/ — DBScan indisponível.[/yellow]")
-            elif not dorkeye.results:
+            elif not mappingexpo.results:
                 console.print("[yellow][DBScan] Nenhum resultado para escanear.[/yellow]")
             else:
                 console.print(
                     f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(mappingexpo.results)} resultado(s)...\n"
                 )
                 try:
                     _db_agent = DBPortScanAgent(
@@ -2949,7 +2949,7 @@ def main():
                         ports     = getattr(args, "dbscan_ports",     None),
                         max_hosts = getattr(args, "dbscan_max_hosts", 200),
                     )
-                    _db_report = _db_agent.run(dorkeye.results)
+                    _db_report = _db_agent.run(mappingexpo.results)
                     if _db_report:
                         _db_report.print_summary()
                         # CORREÇÃO: output_file é apenas um nome de arquivo; devemos
@@ -2975,19 +2975,19 @@ def main():
         dorks = all_dorks
         console.print(f"[cyan][*] {len(dorks)} dorks gerados (modo: {args.mode})[/cyan]")
     else:
-        dorks = dorkeye.process_dorks(args.dork)
+        dorks = mappingexpo.process_dorks(args.dork)
 
     console.print(f"[bold cyan]┌─[ CARREGADOS {len(dorks)} DORK(S) ][/bold cyan]")
     console.print(f"[bold cyan]└─>[/bold cyan] Iniciando...\n")
 
     try:
-        dorkeye.run_search(dorks, args.count)
+        mappingexpo.run_search(dorks, args.count)
     except KeyboardInterrupt:
         console.print("\n[red][!] Busca interrompida pelo usuário![/red]")
 
-    dorkeye.print_statistics()
+    mappingexpo.print_statistics()
 
-    if _do_analyze and dorkeye.results and _ANALYZE_AVAILABLE:
+    if _do_analyze and mappingexpo.results and _ANALYZE_AVAILABLE:
         ts         = datetime.now().strftime("%Y%m%d_%H%M%S")
         fmt        = args.analyze_fmt
         report_out = args.analyze_out
@@ -3003,7 +3003,7 @@ def main():
             "analyze_out":           report_out,
         })()
         try:
-            result = _run_agents_pipeline(results=dorkeye.results, llm_plugin=None, args=_analyze_args)
+            result = _run_agents_pipeline(results=mappingexpo.results, llm_plugin=None, args=_analyze_args)
             if result.get("report_path"):
                 console.print(f"[bold green][✓] Relatório de análise → {result['report_path']}[/bold green]")
         except Exception as _ae:
@@ -3016,11 +3016,11 @@ def main():
             try:
                 crawl_out = run_crawl(seed_dorks=dorks, args=args, target="")
                 if crawl_out.get("results"):
-                    existing_urls  = {r.get("url") for r in dorkeye.results}
+                    existing_urls  = {r.get("url") for r in mappingexpo.results}
                     new_from_crawl = [r for r in crawl_out["results"] if r.get("url") not in existing_urls]
-                    dorkeye.results.extend(new_from_crawl)
-                    if dorkeye.output_file:
-                        dorkeye.save_results()
+                    mappingexpo.results.extend(new_from_crawl)
+                    if mappingexpo.output_file:
+                        mappingexpo.save_results()
                     console.print(
                         f"\n[bold green][Crawl] Concluído — "
                         f"{crawl_out['rounds']} rodada(s) | "
@@ -3036,12 +3036,12 @@ def main():
                 "[yellow][!] db_portscan.py não encontrado em Tools — "
                 "copie o arquivo para DorkEye/Tools/ e tente novamente.[/yellow]"
             )
-        elif not dorkeye.results:
+        elif not mappingexpo.results:
             console.print("[yellow][DBScan] Nenhum resultado para escanear.[/yellow]")
         else:
             console.print(
                 f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
-                f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
+                f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(mappingexpo.results)} resultado(s)...\n"
             )
             try:
                 _db_agent = DBPortScanAgent(
@@ -3050,7 +3050,7 @@ def main():
                     ports     = getattr(args, "dbscan_ports",     None),
                     max_hosts = getattr(args, "dbscan_max_hosts", 200),
                 )
-                _db_report = _db_agent.run(dorkeye.results)
+                _db_report = _db_agent.run(mappingexpo.results)
                 if _db_report:
                     _db_report.print_summary()
                     # CORREÇÃO: output_file é apenas um nome de arquivo; devemos
@@ -3068,7 +3068,7 @@ def main():
                 console.print(f"[yellow][DBScan] Erro: {_rich_escape(str(_dbe))}[/yellow]")
     # ─────────────────────────────────────────────────────────────────────────
 
-    if dorkeye.output_file:
+    if mappingexpo.output_file:
         console.print(f"\n[bold green][✓] Resultados salvos → Dump/{output_file}[/bold green]")
     else:
         console.print(f"\n[dim][~] Nenhum arquivo de saída especificado.[/dim]")

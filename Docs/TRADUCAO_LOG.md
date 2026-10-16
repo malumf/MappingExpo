@@ -542,6 +542,15 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Verificações** (todas PASSARAM): py_compile ×9 (SyntaxWarning preexistente `\s` xss.py L1270 — conhecida da Fase 1) · resolução estática de imports: todos os módulos locais resolvem em disco (llm_plugin permitido ausente) · zero imports dorkeye* restantes · residual dorkeye no código = 169 refs (aguardam E/F/G)
 - **Pendências da camada A**: Docs/README ainda referenciam nomes antigos (corrigidos na camada G)
 
+## 2026-10-16 — CAMADA B: classe MappingExpo + identificadores (commit fase-3b)
+- **Backups**: `.traducao_backup/mappingexpo.py.20261016_132046.pre_f3_b.bak`, `db_portscan.py.20261016_132046.pre_f3_b.bak`
+- **Diff aprovado**: 61 linhas — `class DorkEyeEnhanced` → `class MappingExpo` (5×: comentário de seção L524, def L527, 3 instanciações) · variável de instância `dorkeye` → `mappingexpo` (57×, regex `\bdorkeye\b` case-sensitive — preserva `dorkeye_crawl_`/`dorkeye_dbscan.json` p/ camada E) · `dorkeye_results` → `mappingexpo_results` (2 docstrings, db_portscan L464/466)
+- **Verificações** (todas PASSARAM, 15 checks):
+  - py_compile ×2 — SINTAXE OK
+  - **Prova AST-rename**: AST do backup com NodeTransformer (DorkEyeEnhanced→MappingExpo, dorkeye→mappingexpo) == AST do arquivo atual — dumps idênticos (360.046 chars) — nada além dos renomes mudou
+  - Contagens: DorkEyeEnhanced==0 · `\bdorkeye\b`==0 · `\bMappingExpo\b`==6 (5 renames + L2607 marca camada A) · `\bmappingexpo\b`==57 · total case-insensitive==63
+  - Integridade das 6 linhas comprimidas na exibição (L2913/2920/2922/2926/3006/3019) — completas no arquivo real, sem "..." literal; contagem total de "..." idêntica ao backup (27)
+
 
 
 
