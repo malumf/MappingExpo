@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Web Console for DorkEye Project
+Web Console para o DorkEye Project
 
 """
 
@@ -17,7 +17,7 @@ try:
 except ImportError:
     _FLASK = False
 
-# ── Logger (server-side only — never forwarded to HTTP clients) ───────────────
+# ── Logger (somente servidor — nunca encaminhado a clientes HTTP) ───────────────
 _LOG = logging.getLogger('dorkeye_web')
 if not _LOG.handlers:
     _h = logging.StreamHandler()
@@ -28,11 +28,11 @@ _LOG.setLevel(logging.DEBUG)
 
 def _safe_err(e: Exception, context: str = '') -> str:
     """
-    Log the full exception server-side (console visible to operator),
-    return ONLY the exception *class name* to the HTTP client.
+    Registra a exceção completa no servidor (console visível ao operador),
+    retorna APENAS o *nome da classe* da exceção ao cliente HTTP.
 
-    This prevents stack traces, file paths and internal details
-    from leaking via API responses (CWE-209 / CWE-497).
+    Isto evita que stack traces, paths de arquivo e detalhes internos
+    vazem via respostas da API (CWE-209 / CWE-497).
     """
     _LOG.error('[%s] %s: %s\n%s', context, type(e).__name__, e, traceback.format_exc())
     return type(e).__name__
@@ -133,13 +133,13 @@ JOBS = JobManager()
 
 def _normalize_output(out: str, default_prefix: str) -> tuple:
     """
-    Returns (cmd_arg, ui_filename).
+    Retorna (cmd_arg, ui_filename).
 
-    cmd_arg     — passed to dorkeye.py as -o.
-                  File name only (without Dump/ prefix):
-                  dorkeye.py adds Dump/ internally.
-    ui_filename — relative to DUMP_DIR; used by the route /dump/<ui_filename>
-                  is shown in the Results section.
+    cmd_arg     — passado ao dorkeye.py como -o.
+                  Apenas o nome do arquivo (sem o prefixo Dump/):
+                  o dorkeye.py adiciona Dump/ internamente.
+    ui_filename — relativo a DUMP_DIR; usado pela rota /dump/<ui_filename> e
+                  exibido na seção Results.
     """
     if not out:
         ts  = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -270,7 +270,7 @@ def build_file_cmd(d: dict) -> tuple:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  Dump browser helpers
+#  Auxiliares do navegador de Dump
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _fmt_size(b: int) -> str:
@@ -292,7 +292,7 @@ def list_dump_files() -> dict:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  DorkGenerator helper
+#  Auxiliar do DorkGenerator
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _get_dork_generator():
@@ -317,14 +317,14 @@ def _resolve_template(tpl_str: str):
     safe_name = Path(tpl_str).name
 
     if not safe_name.lower().endswith('.yaml'):
-        _LOG.warning('[_resolve_template] rejected non-yaml name: %r', safe_name)
+        _LOG.warning('[_resolve_template] nome não-yaml rejeitado: %r', safe_name)
         return [preferred] if preferred.exists() else all_yaml
 
     p = TEMPLATES_DIR / safe_name
     try:
         p.resolve().relative_to(TEMPLATES_DIR.resolve())
     except ValueError:
-        _LOG.warning('[_resolve_template] path traversal attempt rejected: %r', tpl_str)
+        _LOG.warning('[_resolve_template] tentativa de path traversal rejeitada: %r', tpl_str)
         return [preferred] if preferred.exists() else all_yaml
 
     if p.exists():
@@ -333,7 +333,7 @@ def _resolve_template(tpl_str: str):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  Flask app
+#  App Flask
 # ══════════════════════════════════════════════════════════════════════════════
 
 def create_app(port: int) -> 'Flask':
@@ -359,7 +359,7 @@ def create_app(port: int) -> 'Flask':
     @app.route('/api/jobs/<jid>')
     def api_job_detail(jid):
         job = JOBS.get(jid)
-        if not job: return jsonify({'error':'not found'}), 404
+        if not job: return jsonify({'error':'não encontrado'}), 404
         d = job.to_dict()
         d['lines'] = [{'t':t,'l':l} for t,l in job.since()]
         return jsonify(d)
@@ -367,7 +367,7 @@ def create_app(port: int) -> 'Flask':
     @app.route('/api/jobs/<jid>', methods=['DELETE'])
     def api_job_kill(jid):
         job = JOBS.get(jid)
-        if not job: return jsonify({'error':'not found'}), 404
+        if not job: return jsonify({'error':'não encontrado'}), 404
         job.kill()
         return jsonify({'ok':True,'status':job.status})
 
@@ -375,7 +375,7 @@ def create_app(port: int) -> 'Flask':
     def api_stream(jid):
         job = JOBS.get(jid)
         if not job:
-            return Response(f'data: {json.dumps({"error":"not found"})}\n\n', mimetype='text/event-stream')
+            return Response(f'data: {json.dumps({"error":"não encontrado"})}\n\n', mimetype='text/event-stream')
         def generate():
             last_ts = 0.0
             while True:
@@ -405,12 +405,12 @@ def create_app(port: int) -> 'Flask':
                        if d.get('dg') else ('Scan: '+dork_val[:55]).rstrip())
             elif jtype == 'urltest':
                 cmd, out = build_urltest_cmd(d)
-                lbl = 'URLTest: ' + d.get('url','')[:55]
+                lbl = 'Teste de URL: ' + d.get('url','')[:55]
             elif jtype == 'file':
                 cmd, out = build_file_cmd(d)
-                lbl = 'FileMode: ' + d.get('file','')[:50]
+                lbl = 'Modo arquivo: ' + d.get('file','')[:50]
             else:
-                return jsonify({'error':f'Unknown type: {jtype}'}), 400
+                return jsonify({'error':f'Tipo desconhecido: {jtype}'}), 400
             jid = JOBS.spawn(cmd, lbl, output_file=out)
             return jsonify({'job_id':jid,'label':lbl,'output':out})
         except Exception as e:
@@ -450,7 +450,7 @@ def create_app(port: int) -> 'Flask':
             tpl_files = _resolve_template(d.get('templates',''))
             cat = d.get('category','all'); mode = d.get('mode','soft')
             if not tpl_files:
-                return jsonify({'error':f'Nessun file .yaml trovato in Templates/.','dorks':[]})
+                return jsonify({'error':f'Nenhum arquivo .yaml encontrado em Templates/.','dorks':[]})
             dorks=[]; loaded=[]; missing=[]
             for tf in tpl_files:
                 if tf.exists():
@@ -461,13 +461,13 @@ def create_app(port: int) -> 'Flask':
                 else:
                     missing.append(tf.name)
             if not loaded:
-                return jsonify({'error':f'Template non trovati: {missing}.','dorks':[]})
+                return jsonify({'error':f'Templates não encontrados: {missing}.','dorks':[]})
             dorks = list(dict.fromkeys(dorks))[:limit]
-            warn  = (f' | template mancanti: {missing}') if missing else ''
+            warn  = (f' | templates ausentes: {missing}') if missing else ''
             return jsonify({'dorks':dorks,'count':len(dorks),'loaded':loaded,
                             'warning':warn.strip() if warn else None})
         except Exception as e:
-            # FIX #41: log full exception server-side, expose only class name
+            # FIX #41: registra a exceção completa no servidor, expõe apenas o nome da classe
             return jsonify({'error': _safe_err(e, 'api_dg_preview'), 'dorks':[]})
 
     @app.route('/api/dorkgen/export', methods=['POST'])
@@ -491,21 +491,21 @@ def create_app(port: int) -> 'Flask':
                             headers={'Content-Disposition':f'attachment; filename="{fname}"'})
         except Exception as e:
             err_type = _safe_err(e, 'api_dg_export')
-            return Response(f'Export error: {err_type}', status=500)
+            return Response(f'Erro no export: {err_type}', status=500)
 
     return app
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  HTML TEMPLATE
+#  TEMPLATE HTML
 # ══════════════════════════════════════════════════════════════════════════════
 
 _HTML_TEMPLATE = r"""<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DorkEye | Web Console</title>
+<title>DorkEye | Console Web</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -640,194 +640,194 @@ input[type=number]{-moz-appearance:textfield}
 <div id="hdr">
   <div id="logo">DORK<span> EYE</span></div>
   <div class="vbadge">v5.0</div><div class="pulse"></div>
-  <div class="vbadge">WEB CONSOLE</div>
+  <div class="vbadge">CONSOLE WEB</div>
   <div id="hdr-r">
-    <span id="aj-badge">⚡ <b id="ajc">0</b> RUNNING</span>
+    <span id="aj-badge">⚡ <b id="ajc">0</b> EM EXECUÇÃO</span>
     <span id="sclock"></span>
   </div>
 </div>
 <div id="main">
 <div id="sb">
-  <div class="nav active" data-s="dashboard" onclick="nav(this)"><span>◈</span> Dashboard</div>
-  <div class="nav" data-s="scan"    onclick="nav(this)"><span>◉</span> New Scan</div>
-  <div class="nav" data-s="urltest" onclick="nav(this)"><span>◎</span> URL Tester</div>
+  <div class="nav active" data-s="dashboard" onclick="nav(this)"><span>◈</span> Painel</div>
+  <div class="nav" data-s="scan"    onclick="nav(this)"><span>◉</span> Novo Scan</div>
+  <div class="nav" data-s="urltest" onclick="nav(this)"><span>◎</span> Testador de URL</div>
   <div class="nav" data-s="dorkgen" onclick="nav(this)"><span>⊞</span> Dork Gen</div>
   <div class="nav" data-s="jobs"    onclick="nav(this)"><span>▣</span> Jobs <span class="nbadge" id="jnb">0</span></div>
-  <div class="nav" data-s="results" onclick="nav(this)"><span>◧</span> Results <span class="nbadge" id="rnb">0</span></div>
+  <div class="nav" data-s="results" onclick="nav(this)"><span>◧</span> Resultados <span class="nbadge" id="rnb">0</span></div>
   <div id="sb-ft">DorkEye Web<br><b>127.0.0.1:{{ port }}</b></div>
 </div>
 <div id="cnt">
 <!-- DASHBOARD -->
 <div class="sec active" id="sec-dashboard">
-  <div class="phdr"><h1>[ DASHBOARD ]</h1><p>OSINT DORKING CONSOLE — LOCAL SESSION</p></div>
+  <div class="phdr"><h1>[ DASHBOARD ]</h1><p>CONSOLE DE DORKING OSINT — SESSÃO LOCAL</p></div>
   <div class="cg">
-    <div class="card"><div class="clbl">Active Jobs</div><div class="cval" id="dc-a">0</div><div class="csub">running</div></div>
-    <div class="card"><div class="clbl">Total Jobs</div><div class="cval" id="dc-t">0</div><div class="csub">this session</div></div>
-    <div class="card"><div class="clbl">Result Files</div><div class="cval" id="dc-f">0</div><div class="csub">in Dump/</div></div>
-    <div class="card"><div class="clbl">Dump Size</div><div class="cval" id="dc-s" style="font-size:20px;margin-top:8px">—</div><div class="csub">disk usage</div></div>
+    <div class="card"><div class="clbl">Jobs ativos</div><div class="cval" id="dc-a">0</div><div class="csub">em execução</div></div>
+    <div class="card"><div class="clbl">Jobs totais</div><div class="cval" id="dc-t">0</div><div class="csub">nesta sessão</div></div>
+    <div class="card"><div class="clbl">Arquivos de resultado</div><div class="cval" id="dc-f">0</div><div class="csub">in Dump/</div></div>
+    <div class="card"><div class="clbl">Tamanho do Dump</div><div class="cval" id="dc-s" style="font-size:20px;margin-top:8px">—</div><div class="csub">uso de disco</div></div>
   </div>
   <div class="qa">
-    <div class="qab" onclick="nav(qs('[data-s=scan]'))"><div class="qai">🔍</div><div class="qal">New Scan</div></div>
-    <div class="qab" onclick="nav(qs('[data-s=urltest]'))"><div class="qai">🎯</div><div class="qal">URL Test</div></div>
+    <div class="qab" onclick="nav(qs('[data-s=scan]'))"><div class="qai">🔍</div><div class="qal">Novo Scan</div></div>
+    <div class="qab" onclick="nav(qs('[data-s=urltest]'))"><div class="qai">🎯</div><div class="qal">Teste de URL</div></div>
     <div class="qab" onclick="nav(qs('[data-s=dorkgen]'))"><div class="qai">⚙️</div><div class="qal">Dork Gen</div></div>
-    <div class="qab" onclick="nav(qs('[data-s=scan]'));setTimeout(()=>{ctgl('s-db','dba');if(!on('t-db'))tog(qs('#t-db'))},120)"><div class="qai">🗄</div><div class="qal">DB Scan</div></div>
-    <div class="qab" onclick="nav(qs('[data-s=results]'))"><div class="qai">📂</div><div class="qal">Results</div></div>
+    <div class="qab" onclick="nav(qs('[data-s=scan]'));setTimeout(()=>{ctgl('s-db','dba');if(!on('t-db'))tog(qs('#t-db'))},120)"><div class="qai">🗄</div><div class="qal">Scan de DB</div></div>
+    <div class="qab" onclick="nav(qs('[data-s=results]'))"><div class="qai">📂</div><div class="qal">Resultados</div></div>
   </div>
-  <div style="font-size:11px;color:var(--g3);letter-spacing:1.5px;margin-bottom:9px">RECENT JOBS</div>
-  <table class="tbl"><thead><tr><th>ID</th><th>Label</th><th>Status</th><th>Started</th><th></th></tr></thead>
+  <div style="font-size:11px;color:var(--g3);letter-spacing:1.5px;margin-bottom:9px">JOBS RECENTES</div>
+  <table class="tbl"><thead><tr><th>ID</th><th>Label</th><th>Status</th><th>Iniciado</th><th></th></tr></thead>
   <tbody id="djt"></tbody></table>
 </div>
 <!-- NEW SCAN -->
 <div class="sec" id="sec-scan">
-  <div class="phdr"><h1>[ NEW SCAN ]</h1><p>CONFIGURE AND LAUNCH A DORKING SESSION</p></div>
+  <div class="phdr"><h1>[ NOVO SCAN ]</h1><p>CONFIGURE E INICIE UMA SESSÃO DE DORKING</p></div>
   <div class="fs">
-    <div class="fst">◈ TARGET</div>
+    <div class="fst">◈ ALVO</div>
     <div class="fr"><div class="fg" style="grid-column:1/-1">
-      <label>Dork string or path to .txt file with dorks (one per line)</label>
+      <label>String de dork ou path para arquivo .txt com dorks (um por linha)</label>
       <textarea id="s-dork" rows="3" placeholder="site:example.com filetype:pdf&#10;OR /path/to/dorks.txt"></textarea>
     </div></div>
     <div class="fr">
-      <div class="fg"><label>Max results per dork (-c)</label><input type="number" id="s-count" value="50" min="1" max="500"></div>
-      <div class="fg"><label>Output file (-o) — default: auto .html</label><input type="text" id="s-output" placeholder="e.g. results.html"></div>
+      <div class="fg"><label>Máx. resultados por dork (-c)</label><input type="number" id="s-count" value="50" min="1" max="500"></div>
+      <div class="fg"><label>Arquivo de saída (-o) — padrão: auto .html</label><input type="text" id="s-output" placeholder="e.g. results.html"></div>
     </div>
   </div>
   <div class="fs">
-    <div class="fst">◉ MODE &amp; OPTIONS</div>
-    <div class="fr"><div class="fg"><label>Search mode (--mode)</label>
-      <select id="s-mode"><option value="soft">soft — minimal dorks</option><option value="medium">medium — moderate</option><option value="aggressive" selected>aggressive — full</option></select>
+    <div class="fst">◉ MODO &amp; E OPÇÕES</div>
+    <div class="fr"><div class="fg"><label>Modo de busca (--mode)</label>
+      <select id="s-mode"><option value="soft">soft — dorks mínimos</option><option value="medium">medium — moderado</option><option value="aggressive" selected>aggressive — completo</option></select>
     </div></div>
     <div class="tr" style="margin-bottom:10px">
       <div class="tgl" id="t-st"  onclick="tog(this)"><div class="td"></div>Stealth</div>
-      <div class="tgl" id="t-sq"  onclick="tog(this)"><div class="td"></div>SQLi Detection</div>
-      <div class="tgl" id="t-xs"  onclick="tog(this)"><div class="td"></div>XSS Detection</div>
-      <div class="tgl" id="t-na"  onclick="tog(this)"><div class="td"></div>Skip Analysis</div>
-      <div class="tgl" id="t-nf"  onclick="tog(this)"><div class="td"></div>No Fingerprint</div>
+      <div class="tgl" id="t-sq"  onclick="tog(this)"><div class="td"></div>Detecção de SQLi</div>
+      <div class="tgl" id="t-xs"  onclick="tog(this)"><div class="td"></div>Detecção de XSS</div>
+      <div class="tgl" id="t-na"  onclick="tog(this)"><div class="td"></div>Pular análise</div>
+      <div class="tgl" id="t-nf"  onclick="tog(this)"><div class="td"></div>Sem fingerprint</div>
     </div>
-    <div class="fr"><div class="fg"><label>XSS type (--xss-type)</label>
+    <div class="fr"><div class="fg"><label>Tipo de XSS (--xss-type)</label>
       <select id="s-xst"><option value="all">all</option><option value="reflected">reflected</option><option value="stored">stored</option><option value="dom">dom</option></select>
     </div></div>
   </div>
   <div class="fs">
-    <div class="ctg" onclick="ctgl('s-dg','dga')"><span id="dga">▶</span> ⊞ DORK GENERATOR (--dg)</div>
+    <div class="ctg" onclick="ctgl('s-dg','dga')"><span id="dga">▶</span> ⊞ GERADOR DE DORKS (--dg)</div>
     <div class="cb" id="s-dg">
-      <div class="tr" style="margin-bottom:10px"><div class="tgl" id="t-dg" onclick="tog(this);loadSCats()"><div class="td"></div>Enable DorkGen</div></div>
+      <div class="tr" style="margin-bottom:10px"><div class="tgl" id="t-dg" onclick="tog(this);loadSCats()"><div class="td"></div>Ativar DorkGen</div></div>
       <div class="fr">
         <div class="fg"><label>Templates (--templates)</label><select id="s-tpl" onchange="loadSCats()"><option value="">default</option><option value="all">all</option></select></div>
-        <div class="fg"><label>Category (--dg=CAT)</label><select id="s-dcat"><option value="all">all</option></select></div>
-        <div class="fg"><label>Max combos (--dg-max)</label><input type="number" id="s-dgmax" value="800" min="10" max="10000"></div>
+        <div class="fg"><label>Categoria (--dg=CAT)</label><select id="s-dcat"><option value="all">all</option></select></div>
+        <div class="fg"><label>Máx. combinações (--dg-max)</label><input type="number" id="s-dgmax" value="800" min="10" max="10000"></div>
       </div>
     </div>
   </div>
   <div class="fs">
-    <div class="ctg" onclick="ctgl('s-fl','fla')"><span id="fla">▶</span> ◧ FILTERS</div>
+    <div class="ctg" onclick="ctgl('s-fl','fla')"><span id="fla">▶</span> ◧ FILTROS</div>
     <div class="cb" id="s-fl">
       <div class="fr">
-        <div class="fg"><label>Blacklist — space-separated (--blacklist)</label><input type="text" id="s-bl" placeholder="ads.tracker.io bad.domain.com"></div>
-        <div class="fg"><label>Whitelist — space-separated (--whitelist)</label><input type="text" id="s-wl" placeholder="target.com"></div>
+        <div class="fg"><label>Blacklist — separada por espaços (--blacklist)</label><input type="text" id="s-bl" placeholder="ads.tracker.io bad.domain.com"></div>
+        <div class="fg"><label>Whitelist — separada por espaços (--whitelist)</label><input type="text" id="s-wl" placeholder="target.com"></div>
       </div>
-      <div class="fr"><div class="fg"><label>Config file (--config)</label><input type="text" id="s-cfg" placeholder="dorkeye_config.yaml"></div></div>
+      <div class="fr"><div class="fg"><label>Arquivo de config (--config)</label><input type="text" id="s-cfg" placeholder="dorkeye_config.yaml"></div></div>
     </div>
   </div>
   <div class="fs">
-    <div class="ctg" onclick="ctgl('s-an','ana')"><span id="ana">▶</span> 🔬 ANALYSIS PIPELINE (--analyze)</div>
+    <div class="ctg" onclick="ctgl('s-an','ana')"><span id="ana">▶</span> 🔬 PIPELINE DE ANÁLISE (--analyze)</div>
     <div class="cb" id="s-an">
       <div class="tr" style="margin-bottom:10px">
-        <div class="tgl" id="t-an" onclick="tog(this)"><div class="td"></div>Enable Analyze</div>
-        <div class="tgl" id="t-af" onclick="tog(this)"><div class="td"></div>Fetch Pages</div>
+        <div class="tgl" id="t-an" onclick="tog(this)"><div class="td"></div>Ativar análise</div>
+        <div class="tgl" id="t-af" onclick="tog(this)"><div class="td"></div>Buscar páginas</div>
       </div>
       <div class="fr">
-        <div class="fg"><label>Max fetch (--analyze-fetch-max)</label><input type="number" id="s-afm" value="20" min="1" max="200"></div>
-        <div class="fg"><label>Report format (--analyze-fmt)</label>
+        <div class="fg"><label>Máx. fetch (--analyze-fetch-max)</label><input type="number" id="s-afm" value="20" min="1" max="200"></div>
+        <div class="fg"><label>Formato do relatório (--analyze-fmt)</label>
           <select id="s-afmt"><option value="html">html</option><option value="md">markdown</option><option value="json">json</option><option value="txt">txt</option></select></div>
-        <div class="fg"><label>Analysis output (--analyze-out)</label><input type="text" id="s-ao" placeholder="auto-generated"></div>
+        <div class="fg"><label>Saída da análise (--analyze-out)</label><input type="text" id="s-ao" placeholder="auto-generated"></div>
       </div>
     </div>
   </div>
   <div class="fs">
-    <div class="ctg" onclick="ctgl('s-cr','cra')"><span id="cra">▶</span> 🕸 ADAPTIVE CRAWL (--crawl)</div>
+    <div class="ctg" onclick="ctgl('s-cr','cra')"><span id="cra">▶</span> 🕸 CRAWL ADAPTATIVO (--crawl)</div>
     <div class="cb" id="s-cr">
       <div class="tr" style="margin-bottom:10px">
-        <div class="tgl" id="t-cr"  onclick="tog(this)"><div class="td"></div>Enable Crawl</div>
+        <div class="tgl" id="t-cr"  onclick="tog(this)"><div class="td"></div>Ativar crawl</div>
         <div class="tgl" id="t-crs" onclick="tog(this)"><div class="td"></div>Crawl Stealth</div>
-        <div class="tgl" id="t-crr" onclick="tog(this)"><div class="td"></div>Crawl Report</div>
+        <div class="tgl" id="t-crr" onclick="tog(this)"><div class="td"></div>Relatório do crawl</div>
       </div>
       <div class="fr">
-        <div class="fg"><label>Rounds (--crawl-rounds)</label><input type="number" id="s-crr" value="4" min="1" max="20"></div>
-        <div class="fg"><label>Max results (--crawl-max)</label><input type="number" id="s-crm" value="300" min="10" max="5000"></div>
-        <div class="fg"><label>Per dork (--crawl-per-dork)</label><input type="number" id="s-crp" value="20" min="1" max="100"></div>
-        <div class="fg"><label>Crawl output (--crawl-out)</label><input type="text" id="s-cro" placeholder="auto-generated"></div>
+        <div class="fg"><label>Rodadas (--crawl-rounds)</label><input type="number" id="s-crr" value="4" min="1" max="20"></div>
+        <div class="fg"><label>Máx. resultados (--crawl-max)</label><input type="number" id="s-crm" value="300" min="10" max="5000"></div>
+        <div class="fg"><label>Por dork (--crawl-per-dork)</label><input type="number" id="s-crp" value="20" min="1" max="100"></div>
+        <div class="fg"><label>Saída do crawl (--crawl-out)</label><input type="text" id="s-cro" placeholder="auto-generated"></div>
       </div>
     </div>
   </div>
   <div class="fs">
-    <div class="ctg" onclick="ctgl('s-db','dba')"><span id="dba">▶</span> 🗄 DB PORT SCAN (--dbscan)</div>
+    <div class="ctg" onclick="ctgl('s-db','dba')"><span id="dba">▶</span> 🗄 VARREDURA DE PORTAS DB (--dbscan)</div>
     <div class="cb" id="s-db">
-      <div class="tr" style="margin-bottom:10px"><div class="tgl" id="t-db" onclick="tog(this)"><div class="td"></div>Enable DB Scan</div></div>
+      <div class="tr" style="margin-bottom:10px"><div class="tgl" id="t-db" onclick="tog(this)"><div class="td"></div>Ativar scan de DB</div></div>
       <div class="fr">
-        <div class="fg"><label>Timeout sec (--dbscan-timeout)</label><input type="number" id="s-dbt" value="2.5" min="0.5" max="30" step="0.5"></div>
+        <div class="fg"><label>Timeout (s) (--dbscan-timeout)</label><input type="number" id="s-dbt" value="2.5" min="0.5" max="30" step="0.5"></div>
         <div class="fg"><label>Threads/host (--dbscan-threads)</label><input type="number" id="s-dbth" value="60" min="1" max="200"></div>
-        <div class="fg"><label>Max hosts (--dbscan-max-hosts)</label><input type="number" id="s-dbmh" value="200" min="1" max="1000"></div>
+        <div class="fg"><label>Máx. hosts (--dbscan-max-hosts)</label><input type="number" id="s-dbmh" value="200" min="1" max="1000"></div>
       </div>
     </div>
   </div>
   <div class="btnr">
-    <button class="btn pri" onclick="runScan()">▶ LAUNCH SCAN</button>
-    <button class="btn" onclick="resetScan()">↺ RESET FORM</button>
+    <button class="btn pri" onclick="runScan()">▶ INICIAR SCAN</button>
+    <button class="btn" onclick="resetScan()">↺ LIMPAR FORMULÁRIO</button>
   </div>
   <div id="scan-fb" style="margin-top:10px"></div>
 </div>
 <!-- URL TESTER -->
 <div class="sec" id="sec-urltest">
-  <div class="phdr"><h1>[ URL TESTER ]</h1><p>DIRECT VULNERABILITY TEST ON A SPECIFIC TARGET</p></div>
+  <div class="phdr"><h1>[ TESTADOR DE URL ]</h1><p>TESTE DIRETO DE VULNERABILIDADE EM UM ALVO ESPECÍFICO</p></div>
   <div class="fs">
-    <div class="fst">◎ TARGET URL</div>
-    <div class="fr"><div class="fg" style="grid-column:1/-1"><label>Target URL (-u)</label>
+    <div class="fst">◎ URL DO ALVO</div>
+    <div class="fr"><div class="fg" style="grid-column:1/-1"><label>URL do alvo (-u)</label>
       <input type="text" id="u-url" placeholder="https://target.com/page.php?id=1">
     </div></div>
     <div class="tr" style="margin-bottom:10px">
-      <div class="tgl" id="t-usq" onclick="tog(this)"><div class="td"></div>SQLi Test</div>
-      <div class="tgl" id="t-uxs" onclick="tog(this)"><div class="td"></div>XSS Test</div>
+      <div class="tgl" id="t-usq" onclick="tog(this)"><div class="td"></div>Teste de SQLi</div>
+      <div class="tgl" id="t-uxs" onclick="tog(this)"><div class="td"></div>Teste de XSS</div>
       <div class="tgl" id="t-ust" onclick="tog(this)"><div class="td"></div>Stealth</div>
     </div>
     <div class="fr">
-      <div class="fg"><label>XSS type</label>
+      <div class="fg"><label>Tipo de XSS</label>
         <select id="u-xst"><option value="all">all</option><option value="reflected">reflected</option><option value="stored">stored</option><option value="dom">dom</option></select></div>
-      <div class="fg"><label>Output file (-o)</label><input type="text" id="u-out" placeholder="url_test.html"></div>
+      <div class="fg"><label>Arquivo de saída (-o)</label><input type="text" id="u-out" placeholder="url_test.html"></div>
     </div>
   </div>
-  <div class="btnr"><button class="btn pri" onclick="runURL()">▶ RUN TEST</button></div>
+  <div class="btnr"><button class="btn pri" onclick="runURL()">▶ EXECUTAR TESTE</button></div>
   <div id="url-fb" style="margin-top:10px"></div>
 </div>
 <!-- DORK GENERATOR -->
 <div class="sec" id="sec-dorkgen">
-  <div class="phdr"><h1>[ DORK GENERATOR ]</h1><p>PREVIEW AND EXPORT DORK COMBINATIONS WITHOUT RUNNING A SCAN</p></div>
+  <div class="phdr"><h1>[ GERADOR DE DORKS ]</h1><p>PRÉ-VISUALIZE E EXPORTE COMBINAÇÕES DE DORKS SEM EXECUTAR UM SCAN</p></div>
   <div class="fs">
-    <div class="fst">⊞ GENERATOR SETTINGS</div>
+    <div class="fst">⊞ CONFIGURAÇÕES DO GERADOR</div>
     <div class="fr">
       <div class="fg"><label>Templates</label><select id="dg-tpl" onchange="loadDGCats()"><option value="">default</option><option value="all">all</option></select></div>
-      <div class="fg"><label>Category</label><select id="dg-cat"><option value="all">all</option></select></div>
-      <div class="fg"><label>Mode</label><select id="dg-mode"><option value="soft">soft</option><option value="medium">medium</option><option value="aggressive">aggressive</option></select></div>
-      <div class="fg"><label>Max combos</label><input type="number" id="dg-max" value="800" min="10" max="10000"></div>
+      <div class="fg"><label>Categoria</label><select id="dg-cat"><option value="all">all</option></select></div>
+      <div class="fg"><label>Modo</label><select id="dg-mode"><option value="soft">soft</option><option value="medium">medium</option><option value="aggressive">aggressive</option></select></div>
+      <div class="fg"><label>Máx. combinações</label><input type="number" id="dg-max" value="800" min="10" max="10000"></div>
     </div>
   </div>
   <div class="btnr" style="margin-bottom:12px">
-    <button class="btn pri" onclick="previewDorks()">⊞ PREVIEW</button>
-    <button class="btn blu" onclick="exportDorks()">↓ EXPORT TXT</button>
+    <button class="btn pri" onclick="previewDorks()">⊞ PRÉ-VISUALIZAR</button>
+    <button class="btn blu" onclick="exportDorks()">↓ EXPORTAR TXT</button>
   </div>
   <div id="dg-stats" style="font-size:11px;color:var(--g3);margin-bottom:8px"></div>
   <div id="dgpl"></div>
 </div>
 <!-- JOBS -->
 <div class="sec" id="sec-jobs">
-  <div class="shr"><h1>[ JOBS ]</h1><button class="btn ml" onclick="refreshJobs()">↺ REFRESH</button></div>
+  <div class="shr"><h1>[ JOBS ]</h1><button class="btn ml" onclick="refreshJobs()">↺ ATUALIZAR</button></div>
   <table class="tbl">
-    <thead><tr><th>ID</th><th>Label</th><th>Status</th><th>Started</th><th>Ended</th><th>Output</th><th>Actions</th></tr></thead>
+    <thead><tr><th>ID</th><th>Label</th><th>Status</th><th>Iniciado</th><th>Término</th><th>Saída</th><th>Ações</th></tr></thead>
     <tbody id="jbt"></tbody>
   </table>
 </div>
 <!-- RESULTS -->
 <div class="sec" id="sec-results">
-  <div class="shr"><h1>[ RESULTS ]</h1><button class="btn ml" onclick="refreshResults()">↺ REFRESH</button></div>
+  <div class="shr"><h1>[ RESULTADOS ]</h1><button class="btn ml" onclick="refreshResults()">↺ ATUALIZAR</button></div>
   <div id="rlist"></div>
 </div>
 </div>
@@ -840,8 +840,8 @@ input[type=number]{-moz-appearance:textfield}
     <span id="tjl" style="margin-left:8px"></span>
     <span id="tsts"></span>
     <div id="ta" onclick.stop="void(0)" style="display:flex;gap:5px">
-      <button class="btn sm" onclick="copyTerm(event)">COPY</button>
-      <button class="btn sm" onclick="clearTerm(event)">CLEAR</button>
+      <button class="btn sm" onclick="copyTerm(event)">COPIAR</button>
+      <button class="btn sm" onclick="clearTerm(event)">LIMPAR</button>
       <button class="btn sm dan" id="kbtn" style="display:none" onclick="killJob(event)">KILL</button>
     </div>
   </div>
@@ -856,8 +856,8 @@ input[type=number]{-moz-appearance:textfield}
       <div id="trm-prog-info"></div>
     </div>
     <div id="tb-log">
-      <div class="tl t-d">DorkEye Web Console — Ready.</div>
-      <div class="tl t-d">Launch a scan or select a job to stream output here.</div>
+      <div class="tl t-d">Console Web DorkEye — Pronto.</div>
+      <div class="tl t-d">Inicie um scan ou selecione um job para ver a saída aqui.</div>
       <span class="tcur"></span>
     </div>
   </div>
@@ -929,11 +929,11 @@ let _aJob=null,_es=null,_tex=false,_lts=0;
 function colorLine(l){
   if(!l)return'<span class="tl t-d"> </span>';
   let cls='t-ok';
-  if(/\[!\]|VULNERABLE|CRITICAL|error/i.test(l))cls='t-e';
-  else if(/\[~\]|WARNING|WAF|skipping/i.test(l))cls='t-w';
-  else if(/\[✓\]|SAFE| saved |done|completed/i.test(l))cls='t-ok';
-  else if(/\[\*\]|Searching|Analyz|Loading|Starting/i.test(l))cls='t-i';
-  else if(/potential|found|vuln|payload/i.test(l))cls='t-e';
+  if(/\[!\]|VULNERABLE|CRITICAL|error|Erro/i.test(l))cls='t-e';
+  else if(/\[~\]|WARNING|WAF|skipping|Pulando|pulad|Interrompid/i.test(l))cls='t-w';
+  else if(/\[✓\]|SAFE| saved |done|completed|salvo|salvos|Concluíd/i.test(l))cls='t-ok';
+  else if(/\[\*\]|Searching|Analyz|Loading|Starting|Buscando|Analisando|Carregando|Iniciando|Processando/i.test(l))cls='t-i';
+  else if(/potential|found|vuln|payload|potencial|encontrad/i.test(l))cls='t-e';
   else if(/\[ Open\s*\]/i.test(l))cls='t-ok';
   else if(/\[ Closed\s*\]/i.test(l))cls='t-e';
   else if(/DBScan|db.port|portscan/i.test(l))cls='t-i';
@@ -989,7 +989,7 @@ function updKill(jid){
 function killJob(e){
   if(e)e.stopPropagation();
   const jid=qs('#kbtn')._jid||_aJob;if(!jid)return;
-  fetch('/api/jobs/'+jid,{method:'DELETE'}).then(()=>{qs('#kbtn').style.display='none';appendLines([{t:Date.now()/1e3,l:'[~] Kill signal sent.'}]);});
+  fetch('/api/jobs/'+jid,{method:'DELETE'}).then(()=>{qs('#kbtn').style.display='none';appendLines([{t:Date.now()/1e3,l:'[~] Sinal de kill enviado.'}]);});
 }
 let _jobs={};
 function refreshJobs(){
@@ -1004,7 +1004,7 @@ function refreshJobs(){
 }
 function renderJobs(jobs){
   const tb=qs('#jbt');
-  if(!jobs.length){tb.innerHTML='<tr><td colspan="7" style="color:var(--g5);padding:14px">No jobs this session.</td></tr>';return;}
+  if(!jobs.length){tb.innerHTML='<tr><td colspan="7" style="color:var(--g5);padding:14px">Nenhuma job nesta sessão.</td></tr>';return;}
   tb.innerHTML=jobs.map(j=>`<tr>
     <td class="mono">${j.id}</td>
     <td class="uc" style="max-width:230px">${esc(j.label)}</td>
@@ -1014,14 +1014,14 @@ function renderJobs(jobs){
     <td class="mono" style="color:var(--g5);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(j.output_file)}">${esc(j.output_file)||'—'}</td>
     <td style="white-space:nowrap">
       <button class="btn sm" onclick="attachJob('${j.id}','${esc(j.label).replace(/'/g,"\\'")}')">TERM</button>
-      ${j.output_file&&j.output_file.endsWith('.html')?`<a class="btn sm blu" href="/dump/${j.output_file}" target="_blank">VIEW</a>`:''}
+      ${j.output_file&&j.output_file.endsWith('.html')?`<a class="btn sm blu" href="/dump/${j.output_file}" target="_blank">VER</a>`:''}
       ${j.status==='running'?`<button class="btn sm dan" onclick="fetch('/api/jobs/${j.id}',{method:'DELETE'}).then(()=>refreshJobs())">KILL</button>`:''}
     </td>
   </tr>`).join('');
 }
 function renderDashJobs(jobs){
   const tb=qs('#djt');
-  if(!jobs.length){tb.innerHTML='<tr><td colspan="5" style="color:var(--g5);padding:14px">No jobs yet. Launch a scan to begin.</td></tr>';return;}
+  if(!jobs.length){tb.innerHTML='<tr><td colspan="5" style="color:var(--g5);padding:14px">Nenhuma job ainda. Inicie um scan para começar.</td></tr>';return;}
   tb.innerHTML=jobs.map(j=>`<tr>
     <td class="mono">${j.id}</td>
     <td class="uc">${esc(j.label)}</td>
@@ -1034,25 +1034,25 @@ function refreshResults(){
   fetch('/api/dump').then(r=>r.json()).then(d=>{
     qs('#dc-f').textContent=d.files.length;qs('#dc-s').textContent=d.total_size_str;qs('#rnb').textContent=d.files.length;
     const el=qs('#rlist');
-    if(!d.files.length){el.innerHTML='<div style="color:var(--g5);padding:14px;font-size:11px">No result files found in Dump/.</div>';return;}
+    if(!d.files.length){el.innerHTML='<div style="color:var(--g5);padding:14px;font-size:11px">Nenhum arquivo de resultado encontrado em Dump/.</div>';return;}
     el.innerHTML=d.files.map(f=>`<div class="fi">
       <span style="font-size:14px;color:var(--g4)">${f.name.endsWith('.html')?'📄':f.name.endsWith('.json')?'📋':'📁'}</span>
       <span class="fn" onclick="openR('${f.name}')">${esc(f.name)}</span>
       <span class="fsz">${f.size_str}</span><span class="fdt">${f.mtime}</span>
-      <button class="btn sm" onclick="fileMode('${f.name}')">FILE MODE</button>
-      <a class="btn sm blu" href="/dump/${f.name}" download>↓ DL</a>
-      ${f.name.endsWith('.html')?`<a class="btn sm" href="/dump/${f.name}" target="_blank">OPEN</a>`:''}
+      <button class="btn sm" onclick="fileMode('${f.name}')">MODO ARQUIVO</button>
+      <a class="btn sm blu" href="/dump/${f.name}" download>↓ BAIXAR</a>
+      ${f.name.endsWith('.html')?`<a class="btn sm" href="/dump/${f.name}" target="_blank">ABRIR</a>`:''}
     </div>`).join('');
   });
 }
 function openR(f){if(f.endsWith('.html'))window.open('/dump/'+f,'_blank');}
 function fileMode(f){
   fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'file',file:'Dump/'+f})})
-  .then(r=>r.json()).then(d=>{if(d.job_id){attachJob(d.job_id,'FileMode: '+f);nav(qs('[data-s=jobs]'));refreshJobs();}});
+  .then(r=>r.json()).then(d=>{if(d.job_id){attachJob(d.job_id,'Modo arquivo: '+f);nav(qs('[data-s=jobs]'));refreshJobs();}});
 }
 function runScan(){
   const dork=qs('#s-dork').value.trim();
-  if(!dork&&!on('t-dg')){fb('scan-fb','Enter a dork string or enable DorkGen.','warn');return;}
+  if(!dork&&!on('t-dg')){fb('scan-fb','Digite uma string de dork ou ative o DorkGen.','warn');return;}
   const p={type:'scan',dork,count:+qs('#s-count').value||50,output:qs('#s-output').value.trim(),
     mode:qs('#s-mode').value,stealth:on('t-st'),sqli:on('t-sq'),xss:on('t-xs'),
     xss_type:qs('#s-xst').value,no_analyze:on('t-na'),no_fingerprint:on('t-nf'),
@@ -1067,17 +1067,17 @@ function runScan(){
     dbscan_timeout:+qs('#s-dbt').value||2.5,dbscan_threads:+qs('#s-dbth').value||60,
     dbscan_max_hosts:+qs('#s-dbmh').value||200};
   post('/api/run',p,d=>{
-    if(d.job_id){attachJob(d.job_id,d.label);fb('scan-fb','Job '+d.job_id+' started!','ok');setTimeout(()=>{nav(qs('[data-s=jobs]'));refreshJobs();},250);}
-    else fb('scan-fb',d.error||'Error launching job.','err');
+    if(d.job_id){attachJob(d.job_id,d.label);fb('scan-fb','Job '+d.job_id+' iniciada!','ok');setTimeout(()=>{nav(qs('[data-s=jobs]'));refreshJobs();},250);}
+    else fb('scan-fb',d.error||'Erro ao lançar a job.','err');
   });
 }
 function runURL(){
   const url=qs('#u-url').value.trim();
-  if(!url){fb('url-fb','Enter a URL.','warn');return;}
+  if(!url){fb('url-fb','Digite uma URL.','warn');return;}
   const p={type:'urltest',url,sqli:on('t-usq'),xss:on('t-uxs'),xss_type:qs('#u-xst').value,stealth:on('t-ust'),output:qs('#u-out').value.trim()};
   post('/api/run',p,d=>{
-    if(d.job_id){attachJob(d.job_id,d.label);fb('url-fb','Job '+d.job_id+' started!','ok');setTimeout(()=>{nav(qs('[data-s=jobs]'));refreshJobs();},250);}
-    else fb('url-fb',d.error||'Error.','err');
+    if(d.job_id){attachJob(d.job_id,d.label);fb('url-fb','Job '+d.job_id+' iniciada!','ok');setTimeout(()=>{nav(qs('[data-s=jobs]'));refreshJobs();},250);}
+    else fb('url-fb',d.error||'Erro.','err');
   });
 }
 function resetScan(){
@@ -1102,13 +1102,13 @@ function loadSCats(){
 }
 function previewDorks(){
   const p={templates:qs('#dg-tpl').value,category:qs('#dg-cat').value,mode:qs('#dg-mode').value,max:+qs('#dg-max').value||800};
-  qs('#dgpl').innerHTML='<div class="t-d" style="padding:8px">Generating...</div>';qs('#dg-stats').textContent='';
+  qs('#dgpl').innerHTML='<div class="t-d" style="padding:8px">Gerando...</div>';qs('#dg-stats').textContent='';
   post('/api/dorkgen/preview',p,d=>{
     if(d.error){qs('#dg-stats').textContent='';
-      qs('#dgpl').innerHTML=`<div class="t-e" style="padding:8px;line-height:1.6"><b style="color:var(--red)">! Error</b><br><br>${esc(d.error)}<br><br><span style="color:var(--g5);font-size:10px">Verifica che Templates/ esista nella root e contenga file .yaml</span></div>`;return;}
-    if(!d.dorks||d.dorks.length===0){qs('#dg-stats').textContent='Generated: 0 dorks';
-      qs('#dgpl').innerHTML=`<div class="t-w" style="padding:8px;line-height:1.6"><b>Nessun dork generato.</b><br>Template: ${esc((d.loaded||[]).join(', ')||'nessuno')}<br>Prova mode diverso o categoria diversa.</div>`;return;}
-    let stats='Generated: '+d.count+' dorks | mode: '+p.mode+(d.count>200?' — showing first 200':'');
+      qs('#dgpl').innerHTML=`<div class="t-e" style="padding:8px;line-height:1.6"><b style="color:var(--red)">! Erro</b><br><br>${esc(d.error)}<br><br><span style="color:var(--g5);font-size:10px">Verifique se Templates/ existe na root e contém arquivos .yaml</span></div>`;return;}
+    if(!d.dorks||d.dorks.length===0){qs('#dg-stats').textContent='Gerados: 0 dorks';
+      qs('#dgpl').innerHTML=`<div class="t-w" style="padding:8px;line-height:1.6"><b>Nenhum dork gerado.</b><br>Template: ${esc((d.loaded||[]).join(', ')||'nenhum')}<br>Tente um mode diferente ou uma categoria diferente.</div>`;return;}
+    let stats='Gerados: '+d.count+' dorks | mode: '+p.mode+(d.count>200?' — exibindo os primeiros 200':'');
     if(d.warning)stats+=' | '+d.warning;
     qs('#dg-stats').textContent=stats;
     qs('#dgpl').innerHTML=d.dorks.slice(0,200).map(dk=>`<div class="de">${esc(dk)}</div>`).join('');
@@ -1150,7 +1150,7 @@ poll();
 
 def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
     if not _FLASK:
-        print('\n[!] Flask is not installed.\n    Run:  pip install flask\n')
+        print('\n[!] Flask não está instalado.\n    Execute:  pip install flask\n')
         sys.exit(1)
     DUMP_DIR.mkdir(parents=True, exist_ok=True)
     port = find_free_port(start_port)
@@ -1162,12 +1162,12 @@ def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
     print(f'  ██║  ██║██║   ██║██╔══██╗██╔═██╗ ██╔══╝    ╚██╔╝  ██╔══╝  ')
     print(f'  ██████╔╝╚██████╔╝██║  ██║██║  ██╗███████╗   ██║   ███████╗')
     print(f'  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝')
-    print(f'\n  [ WEB CONSOLE ]\n')
+    print(f'\n  [ CONSOLE WEB ]\n')
     print(f'  ▸ URL   →  {url}')
-    print(f'  ▸ Port  →  {port}{"  (auto-selected)" if port != start_port else ""}')
-    print(f'  ▸ Root  →  {ROOT}')
+    print(f'  ▸ Porta →  {port}{"  (selecionada automaticamente)" if port != start_port else ""}')
+    print(f'  ▸ Raiz  →  {ROOT}')
     print(f'  ▸ Dump  →  {DUMP_DIR}')
-    print(f'\n  Press Ctrl+C to stop the server.\n')
+    print(f'\n  Pressione Ctrl+C para parar o servidor.\n')
     if not no_browser:
         def _open():
             time.sleep(1.1)
@@ -1183,7 +1183,7 @@ def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
             app.run(host='127.0.0.1', port=port, debug=False, use_reloader=False, threaded=True)
         except (KeyboardInterrupt, SystemExit): pass
         finally:
-            print('\n  [!] Server stopped. Port released.\n'); sys.exit(0)
+            print('\n  [!] Servidor parado. Porta liberada.\n'); sys.exit(0)
     srv = _make_server('127.0.0.1', port, app, threaded=True)
     srv.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
@@ -1191,7 +1191,7 @@ def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
     except (KeyboardInterrupt, SystemExit): pass
     finally:
         srv.server_close()
-        print('\n  [!] Server stopped. Port released.\n'); sys.exit(0)
+        print('\n  [!] Servidor parado. Porta liberada.\n'); sys.exit(0)
 
 
 if __name__ == '__main__':

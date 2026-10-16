@@ -1,9 +1,9 @@
 # Author: script by xPloits3c / DorkEye
-# Use permitted only on assets you own or with explicit authorization.
+# Uso permitido apenas em ativos que você possui ou com autorização explícita.
 
 variables:
   domain:
-    - example.com   # replace with your own domain
+    - example.com   # substitua pelo seu próprio domínio
 
   sqli_errors:
     - "SQL syntax"
@@ -26,7 +26,7 @@ variables:
 
 templates:
 
-  # SOFT MODE: basic SQL error discovery
+  # MODO SOFT: descoberta básica de erros SQL
   sqli_surface:
     mode: soft
     dorks:
@@ -35,7 +35,7 @@ templates:
       - 'site:{domain} intext:{sqli_errors}'
 
 
-  # MEDIUM MODE: typical SQL injection indicators
+  # MODO MEDIUM: indicadores típicos de SQL injection
   sqli_discovery:
     mode: medium
     dorks:
@@ -45,7 +45,7 @@ templates:
       - 'site:{domain} inurl:{param}'
 
 
-  # AGGRESSIVE MODE: exposed SQL errors and stack traces
+  # MODO AGGRESSIVE: erros SQL expostos e stack traces
   sqli_exposed:
     mode: aggressive
     dorks:

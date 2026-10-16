@@ -1,9 +1,9 @@
 # Author: script by xPloits3c / DorkEye
-# Use permitted only on assets you own or with explicit authorization.
+# Uso permitido apenas em ativos que você possui ou com autorização explícita.
 
 variables:
   domain:
-    - example.com # replace with your own domain
+    - example.com # substitua pelo seu próprio domínio
 
   param:
     - cv

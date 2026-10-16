@@ -2,45 +2,45 @@
 DorkEye Agents
 Post-search analysis pipeline for DorkEye Project+
 
-Agents are invoked AFTER DorkEye has completed the search.
-They do not interfere with the search flow — they work on already collected results.
+Os agentes são invocados DEPOIS que o DorkEye conclui a busca.
+Eles não interferem no fluxo de busca — trabalham sobre resultados já coletados.
 
-Pipeline (activated with --analyze):
+Pipeline (ativado com --analyze):
 
-1. TriageAgent             — classifies results by OSINT priority (+ sqli/accessible bonus)
-2. PageFetchAgent          — downloads HIGH/CRITICAL pages (retry, UA rotation, saves headers)
-3. SecurityAgent [NEW]     — threat detection: phishing, malware, exploits, obfuscation
-4. HeaderIntelAgent        — analyses response headers: info leaks, missing security headers
-5. TechFingerprintAgent    — detects CMS, frameworks, JS/server versions from content
-6. SecretsAgent            — regex scan for secrets/credentials + hash detection + severity
-7. PiiDetectorAgent        — detects PII: email, phone, IBAN, CF, CC, SSN, DOB
-8. EmailHarvesterAgent     — collects and categorises emails from all results
-9. SubdomainHarvesterAgent — extracts subdomains and generates dorks for DorkCrawler
-10. ReportAgent            — report HTML/MD/JSON with all new sections (incl. security)
-11. DorkCrawlerAgent       — adaptive recursive crawl (fed by TechFP + SubHarvest)
-12. DBScan                 — Agent database port scan (open ports)
-13. LLM Analysis           — All triaged results | `analysis` dict optional — requires dorkeye_llm_plugin.py
+1. TriageAgent             — classifica resultados por prioridade OSINT (+ bônus sqli/acessível)
+2. PageFetchAgent          — baixa páginas HIGH/CRITICAL (retry, rotação de UA, salva headers)
+3. SecurityAgent [NOVO]    — detecção de ameaças: phishing, malware, exploits, ofuscação
+4. HeaderIntelAgent        — analisa headers de resposta: vazamentos de info, security headers ausentes
+5. TechFingerprintAgent    — detecta CMS, frameworks, versões de JS/servidor a partir do conteúdo
+6. SecretsAgent            — scan regex por segredos/credenciais + detecção de hash + severidade
+7. PiiDetectorAgent        — detecta PII: e-mail, telefone, IBAN, CF, CC, SSN, DOB
+8. EmailHarvesterAgent     — coleta e categoriza e-mails de todos os resultados
+9. SubdomainHarvesterAgent — extrai subdomínios e gera dorks para o DorkCrawler
+10. ReportAgent            — relatório HTML/MD/JSON com todas as seções novas (incl. segurança)
+11. DorkCrawlerAgent       — crawl recursivo adaptativo (alimentado por TechFP + SubHarvest)
+12. DBScan                 — scan de portas de banco de dados do agente (portas abertas)
+13. Análise LLM            — Todos os resultados triados | dict `analysis` opcional — requer dorkeye_llm_plugin.py
 
-SecurityAgent operates as a middleware — it hooks into BOTH:
+O SecurityAgent opera como middleware — faz hook em AMBOS:
 
-- The scanning flow (automatic, via security_scan_hook)
-- The --analyze flow (on-demand, as pipeline step 3)
+- O fluxo de scan (automático, via security_scan_hook)
+- O fluxo --analyze (sob demanda, como etapa 3 do pipeline)
 
-CLI usage:
+Uso via CLI:
 python dorkeye.py --dg=all --analyze -o results.json
 python dorkeye.py -d dorks.txt --analyze --analyze-fetch --analyze-fmt=html
 
-# Security-specific flags:
+# Flags específicos de segurança:
 python dorkeye.py --dg=all --analyze --security-mode=active --security-quarantine
 python dorkeye.py --dg=all --analyze --no-security   # disable agent
 
-Standalone usage (from results file):
+Uso standalone (a partir de arquivo de resultados):
 python dorkeye_agents.py results.json --analyze-fmt=html --analyze-out=report.html
 
-Author: xPloits3c | DorkEye Project
+Autor: xPloits3c | DorkEye Project
 """
 
-# FIX #1: dunder mangling from copy/paste (**future** → __future__)
+# FIX #1: dunder mangling de copy/paste (**future** → __future__)
 from __future__ import annotations
 
 import hashlib
@@ -60,14 +60,14 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 import requests
 
-# ── Optional DB Port Scanner ──────────────────────────────────────────────────
+# ── Scanner de Portas DB opcional ──────────────────────────────────────────────────
 try:
     from db_portscan import DBPortScanAgent as _DBPortScanAgent, save_dbscan_report as _save_dbscan
     _DBSCAN_OK = True
 except ImportError:
     _DBSCAN_OK = False
 
-# ── Rich console ──────────────────────────────────────────────────────────────
+# ── Console Rich ──────────────────────────────────────────────────────────────
 
 try:
     from rich.console import Console
@@ -91,7 +91,7 @@ except ImportError:
         print(f"\n[{title}]\n{body}")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PATTERN LIBRARY — imported from dorkeye_patterns.py
+# BIBLIOTECA DE PADRÕES — importada de dorkeye_patterns.py
 # ══════════════════════════════════════════════════════════════════════════════
 
 from dorkeye_patterns import (
@@ -109,13 +109,13 @@ from dorkeye_patterns import (
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
-# BASE AGENT
+# AGENTE BASE
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _safe_json_local(raw: str, expected_type: type = dict):
     """
-    Robust JSON parser — standalone, no external dependencies.
-    Handles: markdown fences, trailing commas, extra text around JSON.
+    Parser JSON robusto — standalone, sem dependências externas.
+    Lida com: markdown fences, vírgulas finais, texto extra ao redor do JSON.
     """
     import re as _re
     text = _re.sub(r"`(?:json)?\s*", "", raw).replace("`", "").strip()
@@ -146,19 +146,19 @@ def _safe_json_local(raw: str, expected_type: type = dict):
 
 class BaseAgent(ABC):
     """
-    Base class for all DorkEye agents.
-    Works without LLM (plugin=None) — agents use regex by default.
-    If plugin is provided, LLM steps are activated as enhancements.
+    Classe base para todos os agentes do DorkEye.
+    Funciona sem LLM (plugin=None) — agentes usam regex por padrão.
+    Se um plugin for fornecido, as etapas de LLM são ativadas como melhorias.
     """
 
     def __init__(self, plugin=None, name: str = "Agent"):
-        self.plugin = plugin   # None = autonomous mode (no LLM)
+        self.plugin = plugin   # None = modo autônomo (sem LLM)
         self.name   = name
 
     def _call_llm(self, prompt: str, max_tokens: int = 700) -> str:
-        """Calls the LLM if available, otherwise raises RuntimeError."""
+        """Chama o LLM se disponível, caso contrário levanta RuntimeError."""
         if not self.plugin:
-            raise RuntimeError(f"[{self.name}] LLM not available — falling back to regex mode")
+            raise RuntimeError(f"[{self.name}] LLM não disponível — caindo no modo regex")
         return self.plugin._call(
             prompt,
             max_tokens=max_tokens,
@@ -168,16 +168,16 @@ class BaseAgent(ABC):
 
     @property
     def has_llm(self) -> bool:
-        """True if the LLM plugin is active and available."""
+        """True se o plugin de LLM está ativo e disponível."""
         return self.plugin is not None
 
     def _safe_json(self, raw: str, expected_type: type = dict):
-        """Robust JSON parser — does not depend on dorkeye_llm_plugin."""
+        """Parser JSON robusto — não depende de dorkeye_llm_plugin."""
         return _safe_json_local(raw, expected_type=expected_type)
 
     @staticmethod
     def _label(score: int) -> str:
-        """Delegates to dorkeye_patterns.label_from_score() — single source of truth."""
+        """Delega para dorkeye_patterns.label_from_score() — fonte única de verdade."""
         return label_from_score(score)
 
     @abstractmethod
@@ -185,19 +185,19 @@ class BaseAgent(ABC):
         pass
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TRIAGE AGENT
+# AGENTE DE TRIAGE
 # ══════════════════════════════════════════════════════════════════════════════
 
 class TriageAgent(BaseAgent):
     """
-    Classifies each result by OSINT priority.
+    Classifica cada resultado por prioridade OSINT.
 
-    Step 1 — Regex pre-scoring (always, without LLM): 0-50 points
-    Step 2 — LLM scoring (optional, batch_size results at a time): 0-100 points
-    Final score = max(regex*2, llm_score)
+    Etapa 1 — Pré-pontuação por regex (sempre, sem LLM): 0-50 pontos
+    Etapa 2 — Pontuação por LLM (opcional, batch_size resultados por vez): 0-100 pontos
+    Pontuação final = max(regex*2, llm_score)
 
-    Adds to each result: triage_score (0-100), triage_label, triage_reason.
-    Sorts by descending score.
+    Adiciona a cada resultado: triage_score (0-100), triage_label, triage_reason.
+    Ordena por pontuação decrescente.
     """
 
     def __init__(self, plugin=None, batch_size: int = 15):
@@ -209,25 +209,25 @@ class TriageAgent(BaseAgent):
             return results
 
         _log(
-            f"[{self.name}] Triaging {len(results)} results "
+            f"[{self.name}] Triando {len(results)} resultados "
             f"(LLM: {'on' if use_llm and self.plugin else 'off'})...",
             style="bold cyan"
         )
 
-        # Step 1: regex pre-scoring
+        # Etapa 1: pré-pontuação por regex
         for r in results:
             bonus, reasons = self._regex_score(r)
             r["_rx_bonus"]   = bonus
             r["_rx_reasons"] = reasons
 
-        # Step 2: optional LLM scoring
+        # Etapa 2: pontuação por LLM (opcional)
         if use_llm and self.plugin:
             batches = [results[i:i+self.batch_size] for i in range(0, len(results), self.batch_size)]
             for b_idx, batch in enumerate(batches, 1):
-                _log(f"[{self.name}] LLM scoring batch {b_idx}/{len(batches)}...", style="dim")
+                _log(f"[{self.name}] Pontuação LLM lote {b_idx}/{len(batches)}...", style="dim")
                 self._llm_score_batch(batch, b_idx)
 
-        # Compute final score and clean up temporary fields
+        # Calcula a pontuação final e limpa campos temporários
         for r in results:
             if "triage_score" not in r:
                 bonus = r.get("_rx_bonus", 0)
@@ -239,7 +239,7 @@ class TriageAgent(BaseAgent):
 
         results.sort(key=lambda x: x.get("triage_score", 0), reverse=True)
 
-        # Summary
+        # Resumo
         counts = {l: 0 for l in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "SKIP")}
         for r in results:
             lbl = r.get("triage_label", "LOW")
@@ -287,7 +287,7 @@ class TriageAgent(BaseAgent):
                 r["triage_label"]  = self._label(final)
                 r["triage_reason"] = str(entry.get("reason", "LLM scored"))[:120]
         except Exception as e:
-            _log(f"[{self.name}] LLM batch {b_idx} failed: {e}", style="yellow")
+            _log(f"[{self.name}] Lote LLM {b_idx} falhou: {e}", style="yellow")
 
     @staticmethod
     def _regex_score(result: dict) -> Tuple[int, List[str]]:
@@ -302,7 +302,7 @@ class TriageAgent(BaseAgent):
                 bonus += pts
                 reasons.append(hint)
 
-        # ── Runtime bonus from data already present in result (v4.8) ─────────────
+        # ── Bônus de runtime a partir de dados já presentes no resultado (v4.8) ─────────────
         sqli = result.get("sqli_test", {})
         if sqli.get("vulnerable"):
             conf = sqli.get("overall_confidence", "")
@@ -320,7 +320,7 @@ class TriageAgent(BaseAgent):
             bonus += 8
             reasons.append("accessible:200")
 
-        # Number of GET parameters — more parameters = larger attack surface
+        # Número de parâmetros GET — mais parâmetros = maior superfície de ataque
         url = result.get("url", "")
         if "?" in url:
             try:
@@ -335,22 +335,22 @@ class TriageAgent(BaseAgent):
             except Exception:
                 pass
 
-        return min(bonus, 60), reasons  # cap raised to 60 (was 50)
+        return min(bonus, 60), reasons  # limite aumentado para 60 (era 50)
 
     def get_by_label(self, results: List[dict], *labels: str) -> List[dict]:
         labels_set = {l.upper() for l in labels}
         return [r for r in results if r.get("triage_label", "").upper() in labels_set]
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PAGE FETCH AGENT
+# AGENTE DE FETCH DE PÁGINAS
 # ══════════════════════════════════════════════════════════════════════════════
 
 class _ScriptStyleStripper(_HTMLParser):
-    """HTMLParser that safely removes <script> and <style> blocks.
+    """HTMLParser que remove blocos <script> e <style> de forma segura.
 
-    Replaces the bypassable regex (CWE-20/116/185/186) with the parser
-    built-in that correctly handles all syntactically valid variants
-    of closing tags (e.g. </script  >, </SCRIPT\n>, etc.).
+    Substitui a regex bypassável (CWE-20/116/185/186) pelo parser
+    embutido, que lida corretamente com todas as variantes sintáticas válidas
+    de tags de fechamento (ex.: </script  >, </SCRIPT\n>, etc.).
     """
 
     def __init__(self):
@@ -383,16 +383,16 @@ class _ScriptStyleStripper(_HTMLParser):
         return "".join(self._parts)
 
 
-# Fallback regex — used ONLY if HTMLParser raises an exception on HTML
-# that is severely malformed. This is NOT the primary path.
+# Regex de fallback — usada SOMENTE se o HTMLParser levantar uma exceção em HTML
+# severamente malformado. Este NÃO é o caminho principal.
 #
 # FIX CWE-20/116/185/186 ("Bad HTML filtering regexp"):
-# - Opening : `(?:[^>]*)` unchanged (handles attributes without unquoted `>`)
-# - Closing : replaced `\s*>` with `[^>]*>` to cover browser-accepted variants
-#   like `</script anything>` or `</  script  foo>` (spaces after `</`
-#   handled by `\s*` added before tag name).
-# This path is intentionally a last-resort: the primary path uses
-# _ScriptStyleStripper (built-in HTMLParser) which is immune to these variants.
+# - Abertura : `(?:[^>]*)` inalterada (lida com atributos sem `>` não quotado)
+# - Fechamento: `s*>` substituído por `[^>]*>` para cobrir variantes aceitas
+#   por navegadores como `</script anything>` ou `</  script  foo>`
+#   (espaços após `</` tratados por `\s*` adicionado antes do nome da tag).
+# Este caminho é intencionalmente um último recurso: o caminho principal usa
+# _ScriptStyleStripper (HTMLParser embutido), que é imune a essas variantes.
 _SCRIPT_STYLE_RE_FALLBACK = re.compile(  # noqa: S608
     r"<(?:script|style)(?:[^>]*)>[\s\S]*?</\s*(?:script|style)[^>]*>",
     re.IGNORECASE,
@@ -400,7 +400,7 @@ _SCRIPT_STYLE_RE_FALLBACK = re.compile(  # noqa: S608
 
 
 def _strip_page_content(text: str) -> str:
-    """Removes script/style tags using HTMLParser, then strips remaining HTML tags."""
+    """Remove tags script/style usando HTMLParser, depois remove as tags HTML restantes."""
     stripper = _ScriptStyleStripper()
     try:
         stripper.feed(text)
@@ -413,21 +413,21 @@ def _strip_page_content(text: str) -> str:
     return text
 
 
-# Local aliases for compatibility with existing references in the code
+# Aliases locais para compatibilidade com referências existentes no código
 _FETCH_UA        = _FETCH_UA_SHARED
 _SKIP_EXTENSIONS = _SKIP_EXTENSIONS_SHARED
 
 
 class PageFetchAgent(BaseAgent):
     """
-    Downloads the real HTML content of HIGH and CRITICAL pages.
+    Baixa o conteúdo HTML real das páginas HIGH e CRITICAL.
 
-    Instead of analysing DDG snippets (100-200 characters, often useless),
-    this agent downloads the real HTML/text of the page to give the
-    SecretsAgent concrete material to work with.
+    Em vez de analisar snippets do DDG (100-200 caracteres, frequentemente inúteis),
+    este agente baixa o HTML/texto real da página para dar ao
+    SecretsAgent material concreto com o qual trabalhar.
 
-    Adds 'page_content' (str) to each processed result.
-    Respects rate limiting with a small delay between fetches.
+    Adiciona 'page_content' (str) a cada resultado processado.
+    Respeita rate limiting com um pequeno delay entre fetches.
     """
 
     def __init__(
@@ -450,9 +450,9 @@ class PageFetchAgent(BaseAgent):
 
     def run(self, results: List[dict]) -> List[dict]:
         """
-        Downloads the content of priority pages.
-        Modifies results in-place by adding 'page_content'.
-        Returns the updated list.
+        Baixa o conteúdo das páginas prioritárias.
+        Modifica results in-place adicionando 'page_content'.
+        Retorna a lista atualizada.
         """
         _label_rank = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "SKIP": 0}
         min_rank    = _label_rank.get(self.min_label.upper(), 3)
@@ -464,11 +464,11 @@ class PageFetchAgent(BaseAgent):
         ][:self.max_pages]
 
         if not targets:
-            _log(f"[{self.name}] No pages to download (min_label={self.min_label}).", style="dim")
+            _log(f"[{self.name}] Nenhuma página para baixar (min_label={self.min_label}).", style="dim")
             return results
 
         _log(
-            f"[{self.name}] Fetching {len(targets)} pages "
+            f"[{self.name}] Buscando {len(targets)} páginas "
             f"(max={self.max_pages}, timeout={self.timeout}s)...",
             style="bold cyan"
         )
@@ -479,22 +479,22 @@ class PageFetchAgent(BaseAgent):
             if not url:
                 continue
 
-            # Skip binary / non-text extensions
+            # Pula extensões binárias / não-texto
             ext = Path(urlparse(url).path).suffix.lower()
             if ext in _SKIP_EXTENSIONS:
                 r["page_content"] = ""
-                _log(f"[{self.name}] Skip {ext}: {url[:60]}", style="dim")
+                _log(f"[{self.name}] Pula {ext}: {url[:60]}", style="dim")
                 continue
 
             content = self._fetch(url)
             r["page_content"] = content
-            # Save raw headers for HeaderIntelAgent
+            # Salva headers brutos para o HeaderIntelAgent
             if self._last_headers:
                 r["response_headers"] = self._last_headers
                 r["fetch_status"]     = self._last_status
                 self._last_headers    = {}
                 self._last_status     = 0
-            status = f"+{len(content)}c" if content else "failed"
+            status = f"+{len(content)}c" if content else "falhou"
             _log(f"[{self.name}] [{r.get('triage_label','?')}] {status} — {url[:70]}", style="dim")
             fetched += 1
 
@@ -503,14 +503,14 @@ class PageFetchAgent(BaseAgent):
 
         ok_count = sum(1 for r in targets if r.get("page_content"))
         _log(
-            f"[{self.name}] Completed: {ok_count}/{len(targets)} pages downloaded.",
+            f"[{self.name}] Concluído: {ok_count}/{len(targets)} páginas baixadas.",
             style="green"
         )
         return results
 
     def _fetch(self, url: str) -> str:
-        """Downloads and returns the page text (truncated to max_chars).
-        v4.8: retry max 2, UA rotation, saves response_headers in result.
+        """Baixa e retorna o texto da página (truncado em max_chars).
+        v4.8: máximo de 2 retries, rotação de UA, salva response_headers no resultado.
         """
         import random as _random
         last_exc = None
@@ -534,7 +534,7 @@ class PageFetchAgent(BaseAgent):
                 if resp.status_code >= 400:
                     return ""
 
-                # Read at most max_chars*3 bytes
+                # Lê no máximo max_chars*3 bytes
                 raw = b""
                 for chunk in resp.iter_content(chunk_size=4096):
                     raw += chunk
@@ -545,7 +545,7 @@ class PageFetchAgent(BaseAgent):
                 if "text" not in content_type and "json" not in content_type:
                     return ""
 
-                # Save raw headers in _fetch_meta (will be used by HeaderIntelAgent)
+                # Salva headers brutos em _fetch_meta (serão usados pelo HeaderIntelAgent)
                 self._last_headers = dict(resp.headers)
                 self._last_status  = resp.status_code
 
@@ -559,33 +559,33 @@ class PageFetchAgent(BaseAgent):
                     time.sleep(1.5 * (attempt + 1))
                 continue
 
-        _log(f"[{self.name}] Fetch failed after 3 attempts: {url[:60]} — {last_exc}", style="dim")
+        _log(f"[{self.name}] Fetch falhou após 3 tentativas: {url[:60]} — {last_exc}", style="dim")
         return ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SECURITY AGENT — Threat detection middleware
+# AGENTE DE SEGURANÇA — Middleware de detecção de ameaças
 # ══════════════════════════════════════════════════════════════════════════════
 #
-# Operates as a pipeline middleware that hooks into BOTH flows:
-# 1. Scanning flow  → security_scan_hook(url, content, headers)
-# 2. --analyze flow → SecurityAgent.run(results) as pipeline step 3
+# Opera como middleware do pipeline com hook em AMBOS os fluxos:
+# 1. Fluxo de scan  → security_scan_hook(url, content, headers)
+# 2. Fluxo --analyze → SecurityAgent.run(results) como etapa 3 do pipeline
 #
-# Detection categories:
-# - phishing:           brand impersonation, credential harvesting, redirects
-# - malware:            JS code execution, obfuscated payloads, droppers
-# - exploit:            reverse shells, SQLi, XXE, SSTI, deserialization
-# - obfuscation:        hex/unicode escaping, base64 chains, high entropy
-# - suspicious_pattern: hidden iframes, missing security headers, executables
+# Categorias de detecção:
+# - phishing:           impersonação de marca, coleta de credenciais, redirects
+# - malware:            execução de código JS, payloads ofuscados, droppers
+# - exploit:            reverse shells, SQLi, XXE, SSTI, desserialização
+# - obfuscation:        escape hex/unicode, cadeias base64, alta entropia
+# - suspicious_pattern: iframes ocultos, security headers ausentes, executáveis
 #
-# Threat scoring uses a weighted model (not simple sum):
-# 50% from worst single indicator
-# 30% from average of remaining
-# 20% accumulation bonus (capped at +30)
+# A pontuação de ameaça usa um modelo ponderado (não soma simples):
+# 50% do pior indicador único
+# 30% da média dos demais
+# 20% de bônus de acumulação (limitado a +30)
 # ══════════════════════════════════════════════════════════════════════════════
 
 _SECURITY_AGENT_VERSION = "1.0.0"
 
-# Threat score thresholds
+# Limiares de pontuação de ameaça
 _THRESHOLD_SAFE       = 15
 _THRESHOLD_SUSPICIOUS = 40
 _THRESHOLD_DANGEROUS  = 70
@@ -593,7 +593,7 @@ _THRESHOLD_CRITICAL   = 90
 
 
 class ThreatLevel(Enum):
-    """Threat level assigned to a result."""
+    """Nível de ameaça atribuído a um resultado."""
     CLEAN      = auto()
     LOW        = auto()
     SUSPICIOUS = auto()
@@ -630,18 +630,18 @@ class ThreatLevel(Enum):
 
 @dataclass
 class ThreatIndicator:
-    """Single detected threat indicator."""
+    """Indicador de ameaça único detectado."""
     category:    str          # phishing | malware | exploit | obfuscation | suspicious_pattern
-    description: str          # Human-readable description
-    severity:    int          # 1-100 contribution to the threat score
-    evidence:    str = ""     # Pattern/snippet that triggered detection
-    cwe_id:      str = ""     # Optional CWE reference (e.g. CWE-79)
-    mitre_id:    str = ""     # Optional MITRE ATT&CK (e.g. T1566)
+    description: str          # Descrição legível por humanos
+    severity:    int          # Contribuição de 1-100 para a pontuação de ameaça
+    evidence:    str = ""     # Padrão/snippet que disparou a detecção
+    cwe_id:      str = ""     # Referência CWE opcional (ex.: CWE-79)
+    mitre_id:    str = ""     # MITRE ATT&CK opcional (ex.: T1566)
 
 
 @dataclass
 class SecurityVerdict:
-    """Final security verdict for a result."""
+    """Veredito final de segurança para um resultado."""
     url:              str
     threat_level:     ThreatLevel
     threat_score:     int
@@ -659,14 +659,14 @@ class SecurityVerdict:
         return d
 
     def to_report_line(self) -> str:
-        """Compact line for report/console output."""
+        """Linha compacta para relatório/saída de console."""
         return (
-            f"{self.threat_level.badge} │ Score: {self.threat_score:3d}/100 │ "
-            f"Indicators: {len(self.indicators)} │ {self.url[:80]}"
+            f"{self.threat_level.badge} │ Pontuação: {self.threat_score:3d}/100 │ "
+            f"Indicadores: {len(self.indicators)} │ {self.url[:80]}"
         )
 
 
-# ── Security Pattern Database ────────────────────────────────────────────────
+# ── Banco de Padrões de Segurança ────────────────────────────────────────────────
 
 class _SecurityPatternDB:
     """
@@ -851,7 +851,7 @@ class _SecurityPatternDB:
 # ── Security Analyzer Modules ────────────────────────────────────────────────
 
 class _URLSecurityAnalyzer:
-    """Analyses URLs for phishing and malicious redirect indicators."""
+    """Analisa URLs em busca de indicadores de phishing e redirect malicioso."""
 
     _KNOWN_SAFE_DOMAINS: Set[str] = {
         "google.com", "github.com", "stackoverflow.com",
@@ -878,38 +878,38 @@ class _URLSecurityAnalyzer:
             parsed = urlparse(url)
         except Exception:
             indicators.append(ThreatIndicator(
-                category="phishing", description="Malformed URL — not parseable",
+                category="phishing", description="URL malformada — não parseável",
                 severity=30, evidence=url[:200],
             ))
             return indicators
 
-        # Scheme check
+        # Verificação de scheme
         if parsed.scheme not in ("http", "https", ""):
             indicators.append(ThreatIndicator(
-                category="phishing", description=f"Unusual URL scheme: {parsed.scheme}",
+                category="phishing", description=f"Scheme de URL incomum: {parsed.scheme}",
                 severity=25, evidence=parsed.scheme,
             ))
         if parsed.scheme == "http":
             indicators.append(ThreatIndicator(
-                category="suspicious_pattern", description="Unencrypted HTTP connection",
+                category="suspicious_pattern", description="Conexão HTTP não criptografada",
                 severity=10, evidence=url[:100],
             ))
 
-        # Abnormal URL length
+        # Comprimento anormal de URL
         if len(url) > 250:
             indicators.append(ThreatIndicator(
-                category="phishing", description=f"Unusually long URL ({len(url)} chars)",
+                category="phishing", description=f"URL incomumente longa ({len(url)} chars)",
                 severity=15, evidence=url[:100] + "...",
             ))
 
         hostname = parsed.hostname or ""
 
-        # Subdomain stacking
+        # Empilhamento de subdomínios
         subdomain_parts = hostname.split(".")
         if len(subdomain_parts) > 4:
             indicators.append(ThreatIndicator(
                 category="phishing",
-                description=f"Subdomain stacking ({len(subdomain_parts)} levels)",
+                description=f"Empilhamento de subdomínios ({len(subdomain_parts)} níveis)",
                 severity=25, evidence=hostname, cwe_id="CWE-451",
             ))
 
@@ -918,14 +918,14 @@ class _URLSecurityAnalyzer:
             if char in self._CONFUSABLES:
                 indicators.append(ThreatIndicator(
                     category="phishing",
-                    description="Homoglyph character in domain (typosquatting)",
+                    description="Caractere homoglyph no domínio (typosquatting)",
                     severity=45,
-                    evidence=f"'{char}' → '{self._CONFUSABLES[char]}' in {hostname}",
+                    evidence=f"'{char}' → '{self._CONFUSABLES[char]}' em {hostname}",
                     cwe_id="CWE-451",
                 ))
                 break
 
-        # Open redirect params
+        # Parâmetros de open redirect
         params = parse_qs(parsed.query)
         for param_name in params:
             if param_name.lower() in self._REDIRECT_PARAMS:
@@ -933,12 +933,12 @@ class _URLSecurityAnalyzer:
                 if val.startswith(("http://", "https://", "//")):
                     indicators.append(ThreatIndicator(
                         category="phishing",
-                        description=f"Open redirect via parameter '{param_name}'",
+                        description=f"Open redirect via parâmetro '{param_name}'",
                         severity=30, evidence=f"{param_name}={val[:80]}",
                         cwe_id="CWE-601",
                     ))
 
-        # Pattern database (skip brand impersonation on known-safe domains)
+        # Banco de padrões (pula brand impersonation em domínios conhecidos como seguros)
         base_domain = ".".join(hostname.rsplit(".", 2)[-2:]) if hostname else ""
         is_safe = base_domain in self._KNOWN_SAFE_DOMAINS
 
@@ -955,7 +955,7 @@ class _URLSecurityAnalyzer:
 
 
 class _ContentSecurityAnalyzer:
-    """Analyses HTTP content (HTML/JS/text) for malicious scripts."""
+    """Analisa conteúdo HTTP (HTML/JS/texto) em busca de scripts maliciosos."""
 
     def __init__(self, max_content_length: int = 5 * 1024 * 1024):
         self.max_content_length = max_content_length
@@ -967,7 +967,7 @@ class _ContentSecurityAnalyzer:
 
         analysis_content = content[:self.max_content_length]
 
-        # Scan all pattern groups
+        # Escaneia todos os grupos de padrões
         for pattern_group in (
             _SecurityPatternDB.MALWARE_CONTENT,
             _SecurityPatternDB.BACKEND_EXPLOIT,
@@ -986,19 +986,19 @@ class _ContentSecurityAnalyzer:
                         cwe_id=cwe,
                     ))
 
-        # Entropy analysis (detects encoded payloads)
+        # Análise de entropia (detecta payloads codificados)
         high_entropy_blocks = self._find_high_entropy_blocks(analysis_content)
         if high_entropy_blocks:
             indicators.append(ThreatIndicator(
                 category="obfuscation",
-                description=f"Detected {len(high_entropy_blocks)} high-entropy blocks "
-                            f"(possible encoded payload)",
+                description=f"Detectados {len(high_entropy_blocks)} blocos de alta entropia "
+                            f"(possível payload codificado)",
                 severity=min(30 + len(high_entropy_blocks) * 5, 60),
-                evidence=f"Blocks: {len(high_entropy_blocks)}, "
-                         f"max entropy: {max(e for _, e in high_entropy_blocks):.2f}",
+                evidence=f"Blocos: {len(high_entropy_blocks)}, "
+                         f"entropia máx.: {max(e for _, e in high_entropy_blocks):.2f}",
             ))
 
-        # Hidden iframe detection
+        # Detecção de iframe oculto
         iframe_re = re.compile(
             r"<iframe[^>]*(?:style\s*=\s*['\"][^'\"]*"
             r"(?:display\s*:\s*none|visibility\s*:\s*hidden|"
@@ -1009,8 +1009,8 @@ class _ContentSecurityAnalyzer:
         if iframe_re.search(analysis_content):
             indicators.append(ThreatIndicator(
                 category="malware",
-                description="Hidden iframe (hidden/zero-size) — possible injection",
-                severity=45, evidence="Hidden iframe detected", cwe_id="CWE-829",
+                description="Iframe oculto (hidden/zero-size) — possível injeção",
+                severity=45, evidence="Iframe oculto detectado", cwe_id="CWE-829",
             ))
 
         return indicators
@@ -1019,7 +1019,7 @@ class _ContentSecurityAnalyzer:
     def _find_high_entropy_blocks(
         content: str, block_size: int = 256, threshold: float = 4.5,
     ) -> List[Tuple[int, float]]:
-        """Finds text blocks with high Shannon entropy."""
+        """Encontra blocos de texto com alta entropia de Shannon."""
         high_blocks: List[Tuple[int, float]] = []
         for i in range(0, min(len(content), 100_000), block_size):
             block = content[i:i + block_size]
@@ -1039,7 +1039,7 @@ class _ContentSecurityAnalyzer:
 
 
 class _HeaderSecurityAnalyzer:
-    """Analyses HTTP response headers for security anomalies."""
+    """Analisa headers de resposta HTTP em busca de anomalias de segurança."""
 
     def analyze(self, headers: Dict[str, str]) -> List[ThreatIndicator]:
         indicators: List[ThreatIndicator] = []
@@ -1048,7 +1048,7 @@ class _HeaderSecurityAnalyzer:
 
         normalized = {k.lower(): v for k, v in headers.items()}
 
-        # Suspicious patterns
+        # Padrões suspeitos
         for header_name, patterns in _SecurityPatternDB.SUSPICIOUS_HEADERS.items():
             value = normalized.get(header_name, "")
             if value:
@@ -1059,7 +1059,7 @@ class _HeaderSecurityAnalyzer:
                             severity=sev, evidence=f"{header_name}: {value[:100]}",
                         ))
 
-        # Missing security headers (aggregated)
+        # Security headers ausentes (agregados)
         sec_hdrs = {
             "x-frame-options": 5, "content-security-policy": 5,
             "x-content-type-options": 5, "strict-transport-security": 5,
@@ -1068,9 +1068,9 @@ class _HeaderSecurityAnalyzer:
         if len(missing) >= 3:
             indicators.append(ThreatIndicator(
                 category="suspicious_pattern",
-                description=f"Missing {len(missing)}/4 standard security headers",
+                description=f"{len(missing)}/4 security headers padrão ausentes",
                 severity=10 + len(missing) * 3,
-                evidence="Missing: " + ", ".join(missing),
+                evidence="Ausentes: " + ", ".join(missing),
             ))
 
         return indicators
@@ -1078,17 +1078,17 @@ class _HeaderSecurityAnalyzer:
 
 class SecurityAgent(BaseAgent):
     """
-    DorkEye security agent — detects phishing, malware, exploits
-    and obfuscated payloads in scan results.
+    Agente de segurança do DorkEye — detecta phishing, malware, exploits
+    e payloads ofuscados nos resultados do scan.
 
-    Two modes:
-      - active:  analyses, tags AND blocks DANGEROUS/CRITICAL results
-      - passive: analyses and tags only (default in --analyze pipeline)
+    Dois modos:
+      - active:  analisa, marca E bloqueia resultados DANGEROUS/CRITICAL
+      - passive: apenas analisa e marca (padrão no pipeline --analyze)
 
-    Integration in the --analyze pipeline:
-      Adds 'security_verdict' (dict) to every processed result.
+    Integração no pipeline --analyze:
+      Adiciona 'security_verdict' (dict) a cada resultado processado.
 
-    Integration in the scanning flow (standalone hook):
+    Integração no fluxo de scan (hook standalone):
       from dorkeye_agents import security_scan_hook
       verdict = security_scan_hook(url, content, headers)
       if verdict.blocked:
@@ -1111,7 +1111,7 @@ class SecurityAgent(BaseAgent):
         self._content_analyzer = _ContentSecurityAnalyzer()
         self._header_analyzer  = _HeaderSecurityAnalyzer()
 
-        # Stats
+        # Estatísticas
         self._stats: Dict[str, int] = {
             "total_scanned": 0, "clean": 0, "low": 0,
             "suspicious": 0, "dangerous": 0, "critical": 0, "blocked": 0,
@@ -1121,24 +1121,24 @@ class SecurityAgent(BaseAgent):
         if quarantine_dir:
             os.makedirs(quarantine_dir, exist_ok=True)
 
-    # ── Pipeline entry point (--analyze flow) ─────────────────────────────────
+    # ── Entry point do pipeline (fluxo --analyze) ─────────────────────────────────
 
     def run(self, results: List[dict]) -> List[dict]:
         """
-        Scans all results in the --analyze pipeline.
-        Adds 'security_verdict' (dict) to each result.
-        In mode='active', sets result['security_blocked']=True for DANGEROUS/CRITICAL.
+        Escaneia todos os resultados no pipeline --analyze.
+        Adiciona 'security_verdict' (dict) a cada resultado.
+        Em mode='active', define result['security_blocked']=True para DANGEROUS/CRITICAL.
         """
         candidates = [
             r for r in results
             if r.get("url") and r.get("triage_label", "SKIP") != "SKIP"
         ]
         if not candidates:
-            _log(f"[{self.name}] No results to scan.", style="dim")
+            _log(f"[{self.name}] Nenhum resultado para escanear.", style="dim")
             return results
 
         _log(
-            f"[{self.name}] Security scan on {len(candidates)} results "
+            f"[{self.name}] Scan de segurança em {len(candidates)} resultados "
             f"(mode={'🛡️ ACTIVE' if self.mode == 'active' else '👁️ PASSIVE'})...",
             style="bold cyan"
         )
@@ -1166,13 +1166,13 @@ class SecurityAgent(BaseAgent):
                 )
 
         _log(
-            f"[{self.name}] Completed: {self._stats['total_scanned']} scanned, "
-            f"{threats_found} threats, {blocked_count} blocked.",
+            f"[{self.name}] Concluído: {self._stats['total_scanned']} escaneados, "
+            f"{threats_found} ameaças, {blocked_count} bloqueados.",
             style="bold green" if threats_found == 0 else "bold red"
         )
         return results
 
-    # ── Single-result scan (usable from both flows) ───────────────────────────
+    # ── Scan de resultado único (usável em ambos os fluxos) ───────────────────────────
 
     def scan_single(
         self,
@@ -1182,35 +1182,35 @@ class SecurityAgent(BaseAgent):
         content_type: str = "",
     ) -> SecurityVerdict:
         """
-        Analyses a single result.
+        Analisa um único resultado.
 
-        Callable from both the --analyze pipeline (via self.run)
-        and the scanning flow (via security_scan_hook).
+        Chamável tanto do pipeline --analyze (via self.run)
+        quanto do fluxo de scan (via security_scan_hook).
         """
         start_time = time.monotonic()
         all_indicators: List[ThreatIndicator] = []
 
-        # Phase 1: URL analysis
+        # Fase 1: análise de URL
         all_indicators.extend(self._url_analyzer.analyze(url))
 
-        # Phase 2: Content analysis
+        # Fase 2: análise de conteúdo
         if content:
             all_indicators.extend(
                 self._content_analyzer.analyze(content, content_type)
             )
 
-        # Phase 3: Header analysis
+        # Fase 3: análise de headers
         if headers:
             all_indicators.extend(self._header_analyzer.analyze(headers))
 
-        # Phase 4: Threat score
+        # Fase 4: pontuação de ameaça
         threat_score = self._calculate_threat_score(all_indicators)
         threat_level = ThreatLevel.from_score(threat_score)
 
-        # Phase 5: Block decision
+        # Fase 5: decisão de bloqueio
         blocked = (self.mode == "active" and threat_level.should_block)
 
-        # Phase 6: Content hash
+        # Fase 6: hash do conteúdo
         content_hash = ""
         if content:
             content_hash = hashlib.sha256(
@@ -1225,7 +1225,7 @@ class SecurityAgent(BaseAgent):
             summary=self._generate_summary(all_indicators, threat_level),
         )
 
-        # Update stats
+        # Atualiza estatísticas
         self._stats["total_scanned"] += 1
         self._stats[threat_level.name.lower()] = (
             self._stats.get(threat_level.name.lower(), 0) + 1
@@ -1238,13 +1238,13 @@ class SecurityAgent(BaseAgent):
         if self.on_threat_callback and threat_score > _THRESHOLD_SAFE:
             self.on_threat_callback(verdict)
 
-        # Quarantine
+        # Quarentena
         if blocked and self.quarantine_dir and content:
             self._quarantine(verdict, content)
 
         return verdict
 
-    # ── Stats and reporting ───────────────────────────────────────────────────
+    # ── Estatísticas e relatórios ───────────────────────────────────────────────────
 
     @property
     def stats(self) -> Dict[str, int]:
@@ -1255,15 +1255,15 @@ class SecurityAgent(BaseAgent):
         return list(self._verdicts)
 
     def get_threats_above(self, level: ThreatLevel) -> List[SecurityVerdict]:
-        """Returns all verdicts above a given threat level."""
+        """Retorna todos os vereditos acima de um dado nível de ameaça."""
         order = list(ThreatLevel)
         threshold_idx = order.index(level)
         return [v for v in self._verdicts if order.index(v.threat_level) >= threshold_idx]
 
     def generate_console_report(self) -> str:
-        """Text report for Rich console output."""
+        """Relatório em texto para saída no console Rich."""
         lines = [
-            f"  Total scanned:  {self._stats['total_scanned']:>6}",
+            f"  Total escaneado: {self._stats['total_scanned']:>6}",
             f"  🟢 Clean:       {self._stats.get('clean', 0):>6}",
             f"  🟡 Low:         {self._stats.get('low', 0):>6}",
             f"  🟠 Suspicious:  {self._stats.get('suspicious', 0):>6}",
@@ -1283,7 +1283,7 @@ class SecurityAgent(BaseAgent):
         return "\n".join(lines)
 
     def generate_html_section(self) -> str:
-        """HTML snippet for integration in ReportAgent's HTML output."""
+        """Snippet HTML para integração na saída HTML do ReportAgent."""
         threat_colors = {
             "CLEAN": "#00c853", "LOW": "#ffd600", "SUSPICIOUS": "#ff9100",
             "DANGEROUS": "#ff1744", "CRITICAL": "#d50000",
@@ -1313,25 +1313,25 @@ class SecurityAgent(BaseAgent):
         if not rows:
             return ""
         return (
-            '<table><tr><th>Level</th><th>Score</th>'
-            '<th>URL</th><th>Indicators</th><th>Status</th></tr>'
+            '<table><tr><th>Nível</th><th>Pontuação</th>'
+            '<th>URL</th><th>Indicadores</th><th>Status</th></tr>'
             + "".join(rows) + '</table>'
         )
 
     def reset(self):
-        """Reset stats and verdicts for a new session."""
+        """Redefine estatísticas e vereditos para uma nova sessão."""
         self._stats = {k: 0 for k in self._stats}
         self._verdicts.clear()
 
-    # ── Private methods ───────────────────────────────────────────────────────
+    # ── Métodos privados ───────────────────────────────────────────────────────
 
     @staticmethod
     def _calculate_threat_score(indicators: List[ThreatIndicator]) -> int:
         """
-        Weighted threat score:
-          50% from worst single indicator
-          30% from average of remaining
-          20% accumulation bonus (capped at +30)
+        Pontuação de ameaça ponderada:
+          50% do pior indicador único
+          30% da média dos demais
+          20% de bônus de acumulação (limitado a +30)
         """
         if not indicators:
             return 0
@@ -1350,14 +1350,14 @@ class SecurityAgent(BaseAgent):
         indicators: List[ThreatIndicator], threat_level: ThreatLevel,
     ) -> str:
         if not indicators:
-            return "No threat indicators detected."
+            return "Nenhum indicador de ameaça detectado."
         categories: Dict[str, int] = {}
         for ind in indicators:
             categories[ind.category] = categories.get(ind.category, 0) + 1
         parts = [f"{cat}: {n}" for cat, n in sorted(categories.items(), key=lambda x: -x[1])]
         return (
             f"{threat_level.badge} — "
-            f"{len(indicators)} indicators ({', '.join(parts)})"
+            f"{len(indicators)} indicadores ({', '.join(parts)})"
         )
 
     def _quarantine(self, verdict: SecurityVerdict, content: str) -> None:
@@ -1377,22 +1377,22 @@ class SecurityAgent(BaseAgent):
         try:
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
-            _log(f"[{self.name}] Quarantined: {filepath}", style="dim")
+            _log(f"[{self.name}] Em quarentena: {filepath}", style="dim")
         except OSError as e:
-            _log(f"[{self.name}] Quarantine failed: {e}", style="yellow")
+            _log(f"[{self.name}] Falha na quarentena: {e}", style="yellow")
 
 
-# ── Security Agent integration hooks (scanning flow) ─────────────────────────
+# ── Hooks de integração do Security Agent (fluxo de scan) ─────────────────────────
 
 _global_security_agent: Optional[SecurityAgent] = None
 
 
 def get_security_agent(**kwargs) -> SecurityAgent:
     """
-    Returns the global SecurityAgent singleton.
-    Callable from any DorkEye module.
+    Retorna o singleton global do SecurityAgent.
+    Chamável de qualquer módulo do DorkEye.
 
-    Usage:
+    Uso:
         from dorkeye_agents import get_security_agent
         agent = get_security_agent(mode="active")
         verdict = agent.scan_single(url, content)
@@ -1404,7 +1404,7 @@ def get_security_agent(**kwargs) -> SecurityAgent:
 
 
 def reset_security_agent() -> None:
-    """Resets the global singleton (for new scan sessions)."""
+    """Redefine o singleton global (para novas sessões de scan)."""
     global _global_security_agent
     if _global_security_agent:
         _global_security_agent.reset()
@@ -1414,15 +1414,15 @@ def security_scan_hook(
     url: str, content: str = "", headers: Optional[Dict[str, str]] = None,
 ) -> SecurityVerdict:
     """
-    Quick hook for inline integration in the scanning flow.
+    Hook rápido para integração inline no fluxo de scan.
 
-    Usage in dorkeye.py (scanning loop):
+    Uso no dorkeye.py (loop de scan):
         from dorkeye_agents import security_scan_hook
         verdict = security_scan_hook(result_url, response_text, resp_headers)
         if verdict.blocked:
             continue  # skip malicious result
 
-    Usage in --analyze flow:
+    Uso no fluxo --analyze:
         verdict = security_scan_hook(url, fetched_content)
         report_data["security"] = verdict.to_dict()
     """
@@ -1430,27 +1430,27 @@ def security_scan_hook(
     return agent.scan_single(url, content, headers)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SECRETS AGENT
+# AGENTE DE SEGREDOS
 # ══════════════════════════════════════════════════════════════════════════════
 
-# _censor imported as _censor_shared from dorkeye_patterns — local alias
+# _censor importado como _censor_shared de dorkeye_patterns — alias local
 def _censor(value: str, visible: int = 4) -> str:
     return _censor_shared(value, show=visible)
 
 
 class SecretsAgent(BaseAgent):
     """
-    Analyses the real page content (page_content) looking for
-    credentials, API keys, DB connections, and other sensitive data.
+    Analisa o conteúdo real da página (page_content) em busca de
+    credenciais, chaves de API, conexões de banco de dados e outros dados sensíveis.
 
-    Works in two phases:
-      1. Regex scan (fast, no LLM) — finds known patterns with high confidence
-      2. LLM scan (optional) — contextual analysis for ambiguous or hidden patterns
+    Funciona em duas fases:
+      1. Scan regex (rápido, sem LLM) — encontra padrões conhecidos com alta confiança
+      2. Scan LLM (opcional) — análise contextual para padrões ambíguos ou ocultos
 
-    Content analysis priority:
-      page_content (real downloaded content) > snippet (DDG snippet)
+    Prioridade de análise de conteúdo:
+      page_content (conteúdo real baixado) > snippet (snippet do DDG)
 
-    Adds 'secrets' (list) to each result with findings.
+    Adiciona 'secrets' (lista) a cada resultado com achados.
     """
 
     def __init__(self, plugin=None, use_llm: bool = True, max_content: int = 6000):
@@ -1460,8 +1460,8 @@ class SecretsAgent(BaseAgent):
 
     def run(self, results: List[dict]) -> List[dict]:
         """
-        Scans all results that have available content.
-        Returns the list with 'secrets' populated.
+        Escaneia todos os resultados que têm conteúdo disponível.
+        Retorna a lista com 'secrets' populado.
         """
         candidates = [
             r for r in results
@@ -1470,11 +1470,11 @@ class SecretsAgent(BaseAgent):
         ]
 
         if not candidates:
-            _log(f"[{self.name}] No content available to scan.", style="dim")
+            _log(f"[{self.name}] Nenhum conteúdo disponível para escanear.", style="dim")
             return results
 
         _log(
-            f"[{self.name}] Secrets scan on {len(candidates)} results "
+            f"[{self.name}] Scan de segredos em {len(candidates)} resultados "
             f"(LLM: {'on' if self.use_llm else 'off'})...",
             style="bold cyan"
         )
@@ -1487,11 +1487,11 @@ class SecretsAgent(BaseAgent):
 
             findings: List[dict] = []
 
-            # Phase 1: regex scan
+            # Fase 1: scan regex
             regex_hits = self._regex_scan(content, url)
             findings.extend(regex_hits)
 
-            # Phase 2: LLM scan (only if LLM active and content rich enough)
+            # Fase 2: scan LLM (apenas se LLM ativo e conteúdo rico o suficiente)
             if self.use_llm and len(content) > 100:
                 llm_hits = self._llm_scan(content, url)
                 existing_values = {f.get("value", "") for f in findings}
@@ -1503,12 +1503,12 @@ class SecretsAgent(BaseAgent):
                 r["secrets"] = findings
                 total_found += len(findings)
                 _log(
-                    f"[{self.name}] {len(findings)} secret(s) → [{r.get('triage_label','?')}] {url[:65]}",
+                    f"[{self.name}] {len(findings)} segredo(s) → [{r.get('triage_label','?')}] {url[:65]}",
                     style="bold red"
                 )
 
         _log(
-            f"[{self.name}] Scan complete: {total_found} total secrets found.",
+            f"[{self.name}] Scan concluído: {total_found} segredos no total.",
             style="bold green" if total_found == 0 else "bold red"
         )
         return results
@@ -1575,19 +1575,19 @@ class SecretsAgent(BaseAgent):
                     results.append(item)
             return results
         except Exception as e:
-            _log(f"[{self.name}] LLM scan error ({url[:50]}): {e}", style="yellow")
+            _log(f"[{self.name}] Erro no scan LLM ({url[:50]}): {e}", style="yellow")
             return []
 
 # ══════════════════════════════════════════════════════════════════════════════
-# REPORT AGENT
+# AGENTE DE RELATÓRIO
 # ══════════════════════════════════════════════════════════════════════════════
 
 class ReportAgent(BaseAgent):
     """
-    Generates the final report for the analysis session.
+    Gera o relatório final da sessão de análise.
 
-    Input: triaged results with secrets, optional LLM analysis
-    Output: HTML file (dark theme), Markdown, or JSON
+    Entrada: resultados triados com segredos, análise LLM opcional
+    Saída: arquivo HTML (tema escuro), Markdown ou JSON
     """
 
     def __init__(self, plugin=None):
@@ -1602,7 +1602,7 @@ class ReportAgent(BaseAgent):
         fmt:         str             = "html",
         extra:       Optional[dict]  = None,
     ) -> str:
-        _log(f"[{self.name}] Generating report (fmt={fmt})...", style="bold cyan")
+        _log(f"[{self.name}] Gerando relatório (fmt={fmt})...", style="bold cyan")
 
         analysis  = analysis or {}
         extra     = extra    or {}
@@ -1621,9 +1621,9 @@ class ReportAgent(BaseAgent):
             output_path = self._fix_ext(output_path, fmt)
             try:
                 Path(output_path).write_text(content, encoding="utf-8")
-                _log(f"[{self.name}] Report saved: {output_path}", style="bold green")
+                _log(f"[{self.name}] Relatório salvo: {output_path}", style="bold green")
             except IOError as e:
-                _log(f"[{self.name}] Save error: {e}", style="red")
+                _log(f"[{self.name}] Erro ao salvar: {e}", style="red")
 
         return content
 
@@ -1640,21 +1640,21 @@ class ReportAgent(BaseAgent):
         sec_threats = extra.get("security_threats", [])
 
         lines = [
-            "# DorkEye Analysis Report",
-            f"\n> {now}  |  Target: `{target or 'N/A'}`  |  DorkEye v4.8 + Agents v3.1\n",
+            "# DorkEye — Relatório de Análise",
+            f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  DorkEye v4.8 + Agents v3.1\n",
             "---\n",
-            "## Summary\n",
-            analysis.get("summary", "_No LLM analysis available._"),
+            "## Resumo\n",
+            analysis.get("summary", "_Análise LLM não disponível._"),
             "\n---\n",
-            "## Metrics\n",
-            "| Label | Count |",
+            "## Métricas\n",
+            "| Label | Total |",
             "|-------|-------|",
             f"| 🔴 CRITICAL | {counts['CRITICAL']} |",
             f"| 🟠 HIGH     | {counts['HIGH']} |",
             f"| 🟡 MEDIUM   | {counts['MEDIUM']} |",
             f"| 🟢 LOW      | {counts['LOW']} |",
             f"| **TOTAL**   | **{len(results)}** |",
-            f"| **SECRETS** | **{len(secrets)}** |",
+            f"| **SEGREDOS** | **{len(secrets)}** |",
             f"| **PII**     | **{len(pii)}** |",
             f"| **EMAILS**  | **{len(emails)}** |",
             "",
@@ -1663,11 +1663,11 @@ class ReportAgent(BaseAgent):
         if sec_stats:
             lines += [
                 "\n---\n",
-                "## 🛡️ Security Agent Report\n",
-                f"Scanned: {sec_stats.get('total_scanned', 0)} | "
-                f"Blocked: {sec_stats.get('blocked', 0)} | "
-                f"Mode: {sec_stats.get('mode', 'passive').upper()}\n",
-                "| Level | Count |",
+                "## 🛡️ Relatório do Security Agent\n",
+                f"Escaneados: {sec_stats.get('total_scanned', 0)} | "
+                f"Bloqueados: {sec_stats.get('blocked', 0)} | "
+                f"Modo: {sec_stats.get('mode', 'passive').upper()}\n",
+                "| Nível | Total |",
                 "|-------|-------|",
                 f"| 🟢 Clean      | {sec_stats.get('clean', 0)} |",
                 f"| 🟡 Low        | {sec_stats.get('low', 0)} |",
@@ -1678,8 +1678,8 @@ class ReportAgent(BaseAgent):
             ]
         if sec_threats:
             lines += [
-                "\n### Threats Detected\n",
-                "| Score | Level | URL | Categories |",
+                "\n### Ameaças Detectadas\n",
+                "| Pontuação | Nível | URL | Categorias |",
                 "|-------|-------|-----|------------|",
             ]
             for t in sec_threats[:30]:
@@ -1692,16 +1692,16 @@ class ReportAgent(BaseAgent):
                 )
 
         if top:
-            lines += ["\n---\n", "## Top Findings — CRITICAL & HIGH\n",
-                      "| Score | Label | URL | Reason |", "|-------|-------|-----|--------|"]
+            lines += ["\n---\n", "## Principais Achados — CRITICAL & HIGH\n",
+                      "| Pontuação | Label | URL | Motivo |", "|-------|-------|-----|--------|"]
             for r in top[:25]:
                 lines.append(
                     f"| {r.get('triage_score',0)} | **{r.get('triage_label','')}** "
                     f"| `{r.get('url','')[:75]}` | {r.get('triage_reason','')[:60]} |"
                 )
         if secrets:
-            lines += ["\n---\n", f"## Secrets Found ({len(secrets)})\n",
-                      "| Type | Severity | Detection | Value | Source |",
+            lines += ["\n---\n", f"## Segredos Encontrados ({len(secrets)})\n",
+                      "| Tipo | Severidade | Detecção | Valor | Origem |",
                       "|------|----------|-----------|-------|--------|"]
             for s in secrets:
                 lines.append(
@@ -1709,28 +1709,28 @@ class ReportAgent(BaseAgent):
                     f"| `{s.get('value','?')}` | {s.get('source','?')[:60]} |"
                 )
         if pii:
-            lines += ["\n---\n", f"## PII Detected ({len(pii)})\n",
-                      "| Type | Value | Source |", "|------|-------|--------|"]
+            lines += ["\n---\n", f"## PII Detectado ({len(pii)})\n",
+                      "| Tipo | Valor | Origem |", "|------|-------|--------|"]
             for p in pii[:50]:
                 lines.append(f"| {p.get('type','?')} | `{p.get('value','?')}` | {p.get('source','?')[:60]} |")
         if emails:
-            lines += ["\n---\n", f"## Emails Harvested ({len(emails)})\n",
-                      "| Category | Email | Source |", "|----------|-------|--------|"]
+            lines += ["\n---\n", f"## E-mails Coletados ({len(emails)})\n",
+                      "| Categoria | E-mail | Origem |", "|----------|-------|--------|"]
             for e in emails[:50]:
                 lines.append(f"| {e.get('category','?')} | `{e.get('email','?')}` | {e.get('source','?')[:60]} |")
         if subs:
-            lines += ["\n---\n", "## Subdomains Found\n"]
+            lines += ["\n---\n", "## Subdomínios Encontrados\n"]
             for bd, sub_list in subs.items():
                 lines.append(f"**{bd}**: {', '.join(sub_list[:20])}")
         if pats:
-            lines += ["\n---\n", "## Detected Patterns\n"] + [f"- {p}" for p in pats]
+            lines += ["\n---\n", "## Padrões Detectados\n"] + [f"- {p}" for p in pats]
         if recs:
-            lines += ["\n---\n", "## Recommendations\n"] + [f"- {r}" for r in recs]
+            lines += ["\n---\n", "## Recomendações\n"] + [f"- {r}" for r in recs]
 
         lines += [
             "\n---\n",
-            f"## All Results ({len(results)})\n",
-            "| Score | Label | URL | Title |",
+            f"## Todos os Resultados ({len(results)})\n",
+            "| Pontuação | Label | URL | Título |",
             "|-------|-------|-----|-------|",
         ]
         for r in results:
@@ -1826,8 +1826,8 @@ class ReportAgent(BaseAgent):
             return f"<h2>{title}</h2><div class='card'>{content}</div>"
 
         return f"""<!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8">
-<title>DorkEye Agents Report — {target or 'Session'}</title>
+<html lang="pt-BR"><head><meta charset="UTF-8">
+<title>DorkEye Agents — Relatório — {target or 'Sessão'}</title>
 <style>
 :root{{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--text:#c9d1d9;--acc:#58a6ff;--brd:#30363d}}
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -1850,31 +1850,31 @@ code{{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:12px}}
 ul{{padding-left:18px}}li{{margin:3px 0}}
 footer{{margin-top:36px;font-size:11px;color:#8b949e;text-align:center}}
 </style></head><body>
-<h1>&#128065; DorkEye Report</h1>
-<div class="meta">Generated: {now} &nbsp;|&nbsp; Target: <code>{target or 'N/A'}</code> &nbsp;|&nbsp; DorkEye Project</div>
-{'<h2>Summary</h2><div class="card">'+summary+'</div>' if summary else ''}
-<h2>Metrics</h2>
+<h1>&#128065; DorkEye — Relatório</h1>
+<div class="meta">Gerado: {now} &nbsp;|&nbsp; Alvo: <code>{target or 'N/A'}</code> &nbsp;|&nbsp; DorkEye Project</div>
+{'<h2>Resumo</h2><div class="card">'+summary+'</div>' if summary else ''}
+<h2>Métricas</h2>
 <div class="metrics">
   <div class="metric"><div class="num" style="color:#ff4444">{counts['CRITICAL']}</div><div class="lbl">CRITICAL</div></div>
   <div class="metric"><div class="num" style="color:#ff8800">{counts['HIGH']}</div><div class="lbl">HIGH</div></div>
   <div class="metric"><div class="num" style="color:#ffcc00">{counts['MEDIUM']}</div><div class="lbl">MEDIUM</div></div>
   <div class="metric"><div class="num" style="color:#44cc44">{counts['LOW']}</div><div class="lbl">LOW</div></div>
   <div class="metric"><div class="num">{len(results)}</div><div class="lbl">TOTAL</div></div>
-  <div class="metric"><div class="num" style="color:#ff4444">{len(secrets)}</div><div class="lbl">SECRETS</div></div>
+  <div class="metric"><div class="num" style="color:#ff4444">{len(secrets)}</div><div class="lbl">SEGREDOS</div></div>
   <div class="metric"><div class="num" style="color:#ff8800">{len(pii)}</div><div class="lbl">PII</div></div>
   <div class="metric"><div class="num" style="color:#58a6ff">{len(emails)}</div><div class="lbl">EMAILS</div></div>
 </div>
 {section('🛡️ Security Agent', sec_metrics_html + sec_html, bool(sec_html or sec_stats))}
-{section('Top Findings — CRITICAL &amp; HIGH', '<table><tr><th>Score</th><th>Label</th><th>URL</th><th>Reason</th></tr>'+rows_top+'</table>', bool(top))}
-{section(f'Secrets Found ({len(secrets)})', '<table><tr><th>Type</th><th>Severity</th><th>Detection</th><th>Value</th><th>Source</th></tr>'+rows_sec+'</table>', bool(secrets))}
-{section(f'PII Detected ({len(pii)})', '<table><tr><th>Type</th><th>Value</th><th>Description</th><th>Source</th></tr>'+rows_pii+'</table>', bool(pii))}
-{section(f'Emails Harvested ({len(emails)})', '<table><tr><th>Category</th><th>Email</th><th>Source</th></tr>'+rows_email+'</table>', bool(emails))}
-{section('Subdomains Found', '<table><tr><th>Base Domain</th><th>Subdomains</th></tr>'+rows_subs+'</table>', bool(subs))}
-{section(f'CVE / Follow-up Dorks ({len(cve_d)})', '<table><tr><th>Dork</th></tr>'+rows_cve+'</table>', bool(cve_d))}
-{'<h2>Patterns</h2><div class="card"><ul>'+pats_html+'</ul></div>' if pats else ''}
-{'<h2>Recommendations</h2><div class="card"><ul>'+recs_html+'</ul></div>' if recs else ''}
-<h2>All Results ({len(results)})</h2>
-<div class="card"><table><tr><th>Score</th><th>Label</th><th>URL</th><th>Title</th></tr>{rows_all}</table></div>
+{section('Principais Achados — CRITICAL &amp; HIGH', '<table><tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Motivo</th></tr>'+rows_top+'</table>', bool(top))}
+{section(f'Segredos Encontrados ({len(secrets)})', '<table><tr><th>Tipo</th><th>Severidade</th><th>Detecção</th><th>Valor</th><th>Origem</th></tr>'+rows_sec+'</table>', bool(secrets))}
+{section(f'PII Detectado ({len(pii)})', '<table><tr><th>Tipo</th><th>Valor</th><th>Descrição</th><th>Origem</th></tr>'+rows_pii+'</table>', bool(pii))}
+{section(f'E-mails Coletados ({len(emails)})', '<table><tr><th>Categoria</th><th>E-mail</th><th>Origem</th></tr>'+rows_email+'</table>', bool(emails))}
+{section('Subdomínios Encontrados', '<table><tr><th>Domínio Base</th><th>Subdomínios</th></tr>'+rows_subs+'</table>', bool(subs))}
+{section(f'CVE / Dorks de Follow-up ({len(cve_d)})', '<table><tr><th>Dork</th></tr>'+rows_cve+'</table>', bool(cve_d))}
+{'<h2>Padrões</h2><div class="card"><ul>'+pats_html+'</ul></div>' if pats else ''}
+{'<h2>Recomendações</h2><div class="card"><ul>'+recs_html+'</ul></div>' if recs else ''}
+<h2>Todos os Resultados ({len(results)})</h2>
+<div class="card"><table><tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Título</th></tr>{rows_all}</table></div>
 <footer>DorkEye Project | Agents v3.1 &mdash; {now}</footer>
 </body></html>"""
 
@@ -1914,16 +1914,16 @@ footer{{margin-top:36px;font-size:11px;color:#8b949e;text-align:center}}
         return str(p) if p.suffix.lower() == wanted else str(p.with_suffix(wanted))
 
 # ══════════════════════════════════════════════════════════════════════════════
-# HEADER INTEL AGENT
+# AGENTE DE HEADER INTEL
 # ══════════════════════════════════════════════════════════════════════════════
 
 _SECURITY_HEADERS_REQUIRED = {
-    "strict-transport-security": "HSTS absent — MITM risk",
-    "content-security-policy":   "CSP absent — XSS risk",
-    "x-frame-options":           "Clickjacking protection absent",
-    "x-content-type-options":    "MIME sniffing protection absent",
-    "referrer-policy":           "Referrer-Policy absent",
-    "permissions-policy":        "Permissions-Policy absent",
+    "strict-transport-security": "HSTS ausente — risco de MITM",
+    "content-security-policy":   "CSP ausente — risco de XSS",
+    "x-frame-options":           "Proteção contra clickjacking ausente",
+    "x-content-type-options":    "Proteção contra MIME sniffing ausente",
+    "referrer-policy":           "Referrer-Policy ausente",
+    "permissions-policy":        "Permissions-Policy ausente",
 }
 
 _INFO_LEAK_HEADERS = [
@@ -1941,15 +1941,15 @@ _OUTDATED_VERSION_RE = re.compile(
 
 class HeaderIntelAgent(BaseAgent):
     """
-    Analyses HTTP response headers saved by PageFetchAgent.
+    Analisa headers de resposta HTTP salvos pelo PageFetchAgent.
 
-    For each result with 'response_headers' detects:
-      - Info leaks: Server, X-Powered-By, software versions
-      - Missing security headers: HSTS, CSP, X-Frame-Options, etc.
-      - Outdated software versions in header values
+    Para cada resultado com 'response_headers' detecta:
+      - Vazamentos de info: Server, X-Powered-By, versões de software
+      - Security headers ausentes: HSTS, CSP, X-Frame-Options etc.
+      - Versões de software desatualizadas em valores de header
 
-    Adds 'header_intel' (dict) to each processed result.
-    Does not perform HTTP requests — works on already present data.
+    Adiciona 'header_intel' (dict) a cada resultado processado.
+    Não faz requests HTTP — trabalha sobre dados já presentes.
     """
 
     def __init__(self, plugin=None):
@@ -1958,10 +1958,10 @@ class HeaderIntelAgent(BaseAgent):
     def run(self, results: List[dict]) -> List[dict]:
         candidates = [r for r in results if r.get("response_headers")]
         if not candidates:
-            _log(f"[{self.name}] No headers available — run with --analyze-fetch.", style="dim")
+            _log(f"[{self.name}] Nenhum header disponível — rode com --analyze-fetch.", style="dim")
             return results
 
-        _log(f"[{self.name}] Analysing headers for {len(candidates)} results...", style="bold cyan")
+        _log(f"[{self.name}] Analisando headers de {len(candidates)} resultados...", style="bold cyan")
 
         total_findings = 0
         for r in candidates:
@@ -1972,11 +1972,11 @@ class HeaderIntelAgent(BaseAgent):
                 total_findings += n
                 _log(
                     f"[{self.name}] [{r.get('triage_label','?')}] "
-                    f"{n} finding(s) → {r.get('url','')[:65]}",
+                    f"{n} achado(s) → {r.get('url','')[:65]}",
                     style="yellow"
                 )
 
-        _log(f"[{self.name}] Completed: {total_findings} total header finding(s).", style="bold green")
+        _log(f"[{self.name}] Concluído: {total_findings} achado(s) de header no total.", style="bold green")
         return results
 
     def _analyze(self, headers: dict, url: str) -> dict:
@@ -1992,7 +1992,7 @@ class HeaderIntelAgent(BaseAgent):
             val = headers_lc.get(h, "")
             if val:
                 entry = {"header": h, "value": val[:120]}
-                # Check for outdated versions
+                # Verifica versões desatualizadas
                 m = _OUTDATED_VERSION_RE.search(val)
                 if m:
                     entry["version"] = m.group(0)
@@ -2004,41 +2004,41 @@ class HeaderIntelAgent(BaseAgent):
                 intel["missing_security"].append({"header": h, "reason": reason})
 
         if headers_lc.get("x-debug") or headers_lc.get("x-debug-token"):
-            intel["info_leaks"].append({"header": "x-debug", "value": "debug headers exposed"})
+            intel["info_leaks"].append({"header": "x-debug", "value": "headers de debug expostos"})
         if headers_lc.get("x-cache-debug"):
             intel["info_leaks"].append({"header": "x-cache-debug", "value": headers_lc["x-cache-debug"][:80]})
 
         return intel
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TECH FINGERPRINT AGENT
+# AGENTE DE TECH FINGERPRINT
 # ══════════════════════════════════════════════════════════════════════════════
 
 # FIX #3: * → _ (naming error from copy/paste)
 _TECH_SIGNATURES: List[Tuple[re.Pattern, str, str]] = [
     # CMS
     (re.compile(r"wp-content|wp-json|wordpress",                        re.I), "WordPress",     "cms"),
-    # FIX #4 regex logico: "option=com*" → "option=com_\w*"
+    # FIX #4 regex lógica: "option=com*" → "option=com_\w*"
     (re.compile(r"joomla|option=com_\w*",                               re.I), "Joomla",        "cms"),
     (re.compile(r"drupal|sites/default",                                re.I), "Drupal",         "cms"),
     (re.compile(r"magento|mage/|varien/",                               re.I), "Magento",        "cms"),
     (re.compile(r"prestashop|modules/paypal",                           re.I), "PrestaShop",     "cms"),
     (re.compile(r"typo3|fileadmin/",                                    re.I), "TYPO3",          "cms"),
     (re.compile(r"shopify",                                             re.I), "Shopify",        "cms"),
-    # FIX #5 minore: "wix.com" → "wix\.com"
+    # FIX #5 menor: "wix.com" → "wix\.com"
     (re.compile(r"wix\.com|wixstatic",                                  re.I), "Wix",            "cms"),
     # Framework
     (re.compile(r"laravel|artisan|eloquent",                            re.I), "Laravel",        "framework"),
-    # FIX #6 minore: "wsgi.py|manage.py" → "wsgi\.py|manage\.py"
+    # FIX #6 menor: "wsgi.py|manage.py" → "wsgi\.py|manage\.py"
     (re.compile(r"django|wsgi\.py|manage\.py",                         re.I), "Django",         "framework"),
     (re.compile(r"rails|ruby on rails|action_controller",              re.I), "Rails",          "framework"),
     (re.compile(r"flask|werkzeug",                                      re.I), "Flask",          "framework"),
-    # FIX #7 minore: "express.js" → "express\.js"
+    # FIX #7 menor: "express.js" → "express\.js"
     (re.compile(r"express\.js|expressjs",                               re.I), "Express.js",     "framework"),
-    # FIX #2 critico: "*next/static" → "_next/static" + "next.js" → "next\.js"
+    # FIX #2 crítico: "*next/static" → "_next/static" + "next.js" → "next\.js"
     (re.compile(r"next\.js|_next/static",                               re.I), "Next.js",        "framework"),
     (re.compile(r"nuxt|nuxtjs",                                         re.I), "Nuxt.js",        "framework"),
-    # JS Libraries (con versione)
+    # Bibliotecas JS (com versão)
     (re.compile(r"jquery[/-](\d+\.\d+\.\d+)",                          re.I), "jQuery",         "js_lib"),
     (re.compile(r"react(?:\.min)?\.js|react-dom",                      re.I), "React",          "js_lib"),
     (re.compile(r"vue(?:\.min)?\.js|vue@\d",                           re.I), "Vue.js",         "js_lib"),
@@ -2061,9 +2061,9 @@ _TECH_SIGNATURES: List[Tuple[re.Pattern, str, str]] = [
     (re.compile(r"kubernetes|k8s",                                      re.I), "Kubernetes",     "devops"),
     (re.compile(r"elasticsearch",                                       re.I), "Elasticsearch",  "devops"),
     # DB panels
-    # FIX #8 regex logico: "pma*" → "pma_"
+    # FIX #8 regex lógica: "pma*" → "pma_"
     (re.compile(r"phpmyadmin|pma_",                                     re.I), "phpMyAdmin",     "db_panel"),
-    # FIX #9 minore: "adminer.php" → "adminer\.php"
+    # FIX #9 menor: "adminer.php" → "adminer\.php"
     (re.compile(r"adminer\.php|adminer/",                               re.I), "Adminer",        "db_panel"),
     (re.compile(r"pgadmin",                                             re.I), "pgAdmin",        "db_panel"),
 ]
@@ -2088,16 +2088,16 @@ _TECH_CVE_DORK_TEMPLATES: Dict[str, List[str]] = {
 
 class TechFingerprintAgent(BaseAgent):
     """
-    Detects technologies used by the target from page_content + response_headers.
+    Detecta tecnologias usadas pelo alvo a partir de page_content + response_headers.
 
-    For each result with available content:
-      - Identifies CMS, frameworks, JS libraries, servers, languages
-      - Attempts to extract specific versions
-      - Produces 'tech_fingerprint' (dict) and adds targeted CVE dorks
-        to feed DorkCrawlerAgent in the next round
+    Para cada resultado com conteúdo disponível:
+      - Identifica CMS, frameworks, bibliotecas JS, servidores, linguagens
+      - Tenta extrair versões específicas
+      - Produz 'tech_fingerprint' (dict) e adiciona dorks de CVE direcionados
+        para alimentar o DorkCrawlerAgent na próxima rodada
 
-    Adds 'tech_fingerprint' to each processed result.
-    Also returns 'cve_dorks' (List[str]) in the return value.
+    Adiciona 'tech_fingerprint' a cada resultado processado.
+    Também retorna 'cve_dorks' (List[str]) no valor de retorno.
     """
 
     def __init__(self, plugin=None):
@@ -2109,10 +2109,10 @@ class TechFingerprintAgent(BaseAgent):
             if r.get("page_content") or r.get("response_headers") or r.get("snippet")
         ]
         if not candidates:
-            _log(f"[{self.name}] No content available.", style="dim")
+            _log(f"[{self.name}] Nenhum conteúdo disponível.", style="dim")
             return results
 
-        _log(f"[{self.name}] Fingerprinting {len(candidates)} results...", style="bold cyan")
+        _log(f"[{self.name}] Fingerprinting de {len(candidates)} resultados...", style="bold cyan")
 
         total_techs = 0
         for r in candidates:
@@ -2133,7 +2133,7 @@ class TechFingerprintAgent(BaseAgent):
                     style="cyan"
                 )
 
-        _log(f"[{self.name}] Completed: {total_techs} technologies detected.", style="bold green")
+        _log(f"[{self.name}] Concluído: {total_techs} tecnologias detectadas.", style="bold green")
         return results
 
     def _fingerprint(self, text: str, url: str) -> dict:
@@ -2151,7 +2151,7 @@ class TechFingerprintAgent(BaseAgent):
             if m and name not in seen:
                 seen.add(name)
                 entry: dict = {"name": name, "category": category}
-                # Try to extract the version from the capture group
+                # Tenta extrair a versão do grupo de captura
                 if m.lastindex:
                     entry["version"] = m.group(1)
                 fp["techs"].append(entry)
@@ -2163,7 +2163,7 @@ class TechFingerprintAgent(BaseAgent):
         return fp
 
     def get_all_cve_dorks(self, results: List[dict]) -> List[str]:
-        """Collects all generated CVE dorks — to be passed to DorkCrawlerAgent."""
+        """Coleta todos os dorks de CVE gerados — a serem passados ao DorkCrawlerAgent."""
         dorks: List[str] = []
         seen: set = set()
         for r in results:
@@ -2174,7 +2174,7 @@ class TechFingerprintAgent(BaseAgent):
         return dorks
 
 # ══════════════════════════════════════════════════════════════════════════════
-# EMAIL HARVESTER AGENT
+# AGENTE DE COLETA DE E-MAILS
 # ══════════════════════════════════════════════════════════════════════════════
 
 # FIX #10: *EMAIL_RE → _EMAIL_RE
@@ -2190,18 +2190,18 @@ _EMAIL_CATEGORIES = {
 
 class EmailHarvesterAgent(BaseAgent):
     """
-    Collects and categorises email addresses from snippet + page_content.
+    Coleta e categoriza endereços de e-mail a partir de snippet + page_content.
 
-    Categories: admin, security, info, noreply, personal (everything else).
-    Produces 'emails_found' (List[dict]) for the result and a global list
-    accessible via get_all_emails().
+    Categorias: admin, security, info, noreply, personal (todo o resto).
+    Produz 'emails_found' (List[dict]) para o resultado e uma lista global
+    acessível via get_all_emails().
 
-    Does not perform HTTP requests — works on already present data.
+    Não faz requests HTTP — trabalha sobre dados já presentes.
     """
 
     def __init__(self, plugin=None):
         super().__init__(plugin, name="EmailHarvesterAgent")
-        self._global_emails: Dict[str, dict] = {}  # email → entry, global dedup
+        self._global_emails: Dict[str, dict] = {}  # email → entry, dedup global
 
     def run(self, results: List[dict]) -> List[dict]:
         candidates = [
@@ -2209,10 +2209,10 @@ class EmailHarvesterAgent(BaseAgent):
             if r.get("page_content") or r.get("snippet")
         ]
         if not candidates:
-            _log(f"[{self.name}] No content available.", style="dim")
+            _log(f"[{self.name}] Nenhum conteúdo disponível.", style="dim")
             return results
 
-        _log(f"[{self.name}] Email harvesting on {len(candidates)} results...", style="bold cyan")
+        _log(f"[{self.name}] Coleta de e-mails em {len(candidates)} resultados...", style="bold cyan")
 
         for r in candidates:
             text = (r.get("page_content", "") or "") + " " + (r.get("snippet", "") or "")
@@ -2220,12 +2220,12 @@ class EmailHarvesterAgent(BaseAgent):
             if found:
                 r["emails_found"] = found
                 _log(
-                    f"[{self.name}] {len(found)} email → {r.get('url','')[:65]}",
+                    f"[{self.name}] {len(found)} e-mail(s) → {r.get('url','')[:65]}",
                     style="yellow"
                 )
 
         total = len(self._global_emails)
-        _log(f"[{self.name}] Completed: {total} unique emails found.", style="bold green")
+        _log(f"[{self.name}] Concluído: {total} e-mails únicos encontrados.", style="bold green")
         return results
 
     def _harvest(self, text: str, source_url: str) -> List[dict]:
@@ -2252,24 +2252,24 @@ class EmailHarvesterAgent(BaseAgent):
         return "personal"
 
     def get_all_emails(self) -> List[dict]:
-        """Returns all collected emails, sorted by category."""
+        """Retorna todos os e-mails coletados, ordenados por categoria."""
         order = {"admin": 0, "security": 1, "info": 2, "personal": 3, "noreply": 4}
         return sorted(self._global_emails.values(), key=lambda e: order.get(e["category"], 9))
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PII DETECTOR AGENT
+# AGENTE DETECTOR DE PII
 # ══════════════════════════════════════════════════════════════════════════════
 
 class PiiDetectorAgent(BaseAgent):
     """
-    Detects personal data (PII) in snippet + page_content.
+    Detecta dados pessoais (PII) em snippet + page_content.
 
-    Types detected: email, phone (IT/EU/US), IBAN, Italian fiscal code,
-    credit card (Luhn validation), US SSN, date of birth, passport,
-    public IPs.
+    Tipos detectados: e-mail, telefone (IT/EU/US), IBAN, código fiscal italiano,
+    cartão de crédito (validação Luhn), SSN dos EUA, data de nascimento, passaporte,
+    IPs públicos.
 
-    Adds 'pii_found' (List[dict]) to each result with findings.
-    Separate from SecretsAgent — PII ≠ technical credentials.
+    Adiciona 'pii_found' (List[dict]) a cada resultado com achados.
+    Separado do SecretsAgent — PII ≠ credenciais técnicas.
     """
 
     def __init__(self, plugin=None, max_content: int = 8000):
@@ -2282,10 +2282,10 @@ class PiiDetectorAgent(BaseAgent):
             if r.get("page_content") or r.get("snippet")
         ]
         if not candidates:
-            _log(f"[{self.name}] No content available.", style="dim")
+            _log(f"[{self.name}] Nenhum conteúdo disponível.", style="dim")
             return results
 
-        _log(f"[{self.name}] PII scan on {len(candidates)} results...", style="bold cyan")
+        _log(f"[{self.name}] Scan de PII em {len(candidates)} resultados...", style="bold cyan")
 
         total_found = 0
         for r in candidates:
@@ -2302,7 +2302,7 @@ class PiiDetectorAgent(BaseAgent):
                 )
 
         _log(
-            f"[{self.name}] Completed: {total_found} total PII found.",
+            f"[{self.name}] Concluído: {total_found} PII no total.",
             style="bold green" if total_found == 0 else "bold red"
         )
         return results
@@ -2344,19 +2344,19 @@ class PiiDetectorAgent(BaseAgent):
         return findings
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SUBDOMAIN HARVESTER AGENT
+# AGENTE DE COLETA DE SUBDOMÍNIOS
 # ══════════════════════════════════════════════════════════════════════════════
 
 class SubdomainHarvesterAgent(BaseAgent):
     """
-    Extracts subdomains from URL + snippet + page_content of all results.
+    Extrai subdomínios de URL + snippet + page_content de todos os resultados.
 
-    For each detected base domain collects unique subdomains, deduplicates them
-    and generates 'site:sub.domain.*' dorks ready to be injected into the
-    DorkCrawlerAgent in the next round.
+    Para cada domínio base detectado coleta subdomínios únicos, os deduplica
+    e gera dorks 'site:sub.domain.*' prontos para serem injetados no
+    DorkCrawlerAgent na próxima rodada.
 
-    Adds 'subdomains' (List[str]) to each result and produces a global list
-    accessible via get_all_subdomains() and get_followup_dorks().
+    Adiciona 'subdomains' (List[str]) a cada resultado e produz uma lista global
+    acessível via get_all_subdomains() e get_followup_dorks().
     """
 
     def __init__(self, plugin=None):
@@ -2367,7 +2367,7 @@ class SubdomainHarvesterAgent(BaseAgent):
         if not results:
             return results
 
-        _log(f"[{self.name}] Subdomain harvesting on {len(results)} results...", style="bold cyan")
+        _log(f"[{self.name}] Coleta de subdomínios em {len(results)} resultados...", style="bold cyan")
 
         base_domains: set = set()
         for r in results:
@@ -2375,10 +2375,10 @@ class SubdomainHarvesterAgent(BaseAgent):
             if bd:
                 base_domains.add(bd)
         if not base_domains:
-            _log(f"[{self.name}] No base domain found.", style="dim")
+            _log(f"[{self.name}] Nenhum domínio base encontrado.", style="dim")
             return results
 
-        _log(f"[{self.name}] Base domains: {', '.join(list(base_domains)[:5])}", style="dim")
+        _log(f"[{self.name}] Domínios base: {', '.join(list(base_domains)[:5])}", style="dim")
 
         for r in results:
             text = " ".join(filter(None, [
@@ -2399,7 +2399,7 @@ class SubdomainHarvesterAgent(BaseAgent):
                 r["subdomains"] = sorted(set(found_subs))
 
         total = sum(len(v) for v in self._global_subdomains.values())
-        _log(f"[{self.name}] Completed: {total} unique subdomains found.", style="bold green")
+        _log(f"[{self.name}] Concluído: {total} subdomínios únicos encontrados.", style="bold green")
         for bd, subs in self._global_subdomains.items():
             _log(f"[{self.name}]   {bd}: {', '.join(sorted(subs)[:8])}", style="dim")
         return results
@@ -2431,11 +2431,11 @@ class SubdomainHarvesterAgent(BaseAgent):
         return results
 
     def get_all_subdomains(self) -> Dict[str, List[str]]:
-        """Returns all subdomains found per base domain."""
+        """Retorna todos os subdomínios encontrados por domínio base."""
         return {bd: sorted(subs) for bd, subs in self._global_subdomains.items()}
 
     def get_followup_dorks(self) -> List[str]:
-        """Generates site:subdomain dorks to feed DorkCrawlerAgent."""
+        """Gera dorks site:subdomain para alimentar o DorkCrawlerAgent."""
         dorks = []
         for bd, subs in self._global_subdomains.items():
             for sub in sorted(subs):
@@ -2445,7 +2445,7 @@ class SubdomainHarvesterAgent(BaseAgent):
         return dorks
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DORK CRAWLER AGENT — recursive adaptive dorking
+# AGENTE DORK CRAWLER — dorking recursivo adaptativo
 # ══════════════════════════════════════════════════════════════════════════════
 
 # FIX #11: *CMS_DORK_TEMPLATES → _CMS_DORK_TEMPLATES
@@ -2533,12 +2533,12 @@ _TECH_DETECTION: List[Tuple[re.Pattern, str]] = [
     # FIX: "option=com*" → "option=com_\w*"
     (re.compile(r"joomla|com_content|option=com_\w*",            re.I), "joomla"),
     (re.compile(r"drupal|sites/default|node/\d+",                re.I), "drupal"),
-    # FIX minore: "blade.php" → "blade\.php"
+    # FIX menor: "blade.php" → "blade\.php"
     (re.compile(r"laravel|artisan|eloquent|blade\.php",          re.I), "laravel"),
-    # FIX minore: "settings.py|manage.py" → "settings\.py|manage\.py"
+    # FIX menor: "settings.py|manage.py" → "settings\.py|manage\.py"
     (re.compile(r"django|wsgi|settings\.py|manage\.py",         re.I), "django"),
     (re.compile(r"phpmyadmin|pma_|phpMyAdmin",                   re.I), "phpmyadmin"),
-    # FIX minore: "adminer.php" → "adminer\.php"
+    # FIX menor: "adminer.php" → "adminer\.php"
     (re.compile(r"adminer\.php|adminer/",                        re.I), "adminer"),
     (re.compile(r"magento|mage/|varien/",                        re.I), "magento"),
     (re.compile(r"prestashop|/modules/|/themes/community",       re.I), "prestashop"),
@@ -2562,25 +2562,25 @@ _SUSPICIOUS_PARAMS = re.compile(
 
 class DorkCrawlerAgent(BaseAgent):
     """
-    Adaptive recursive crawling agent via DDGS.
+    Agente de crawl recursivo adaptativo via DDGS.
 
-    Runs multiple rounds of dorking, automatically refining the dorks
-    each round based on patterns found in previous results.
-    Zero LLM — entirely based on regex, templates and pattern matching.
+    Roda múltiplas rodadas de dorking, refinando automaticamente os dorks
+    a cada rodada com base em padrões encontrados nos resultados anteriores.
+    Zero LLM — inteiramente baseado em regex, templates e pattern matching.
 
-    Round pipeline:
-      1. Search with current dorks via DDGS
-      2. TriageAgent classifies new results
-      3. _extract_intelligence() extracts patterns: domains, paths, CMS, ext
-      4. _generate_followup_dorks() produces new targeted dorks
-      5. Check stop conditions
-      6. Restart from step 1 with the new dorks
+    Pipeline de rodada:
+      1. Busca com os dorks atuais via DDGS
+      2. TriageAgent classifica os novos resultados
+      3. _extract_intelligence() extrai padrões: domínios, paths, CMS, ext
+      4. _generate_followup_dorks() produz novos dorks direcionados
+      5. Verifica as condições de parada
+      6. Reinicia da etapa 1 com os novos dorks
 
-    Stop conditions (all evaluated before triggering):
-      - Max rounds reached
-      - Max total results reached
-      - No new HIGH/CRITICAL results in the last round
-      - No new dorks can be generated (all already used)
+    Condições de parada (todas avaliadas antes de disparar):
+      - Máximo de rodadas alcançado
+      - Máximo de resultados totais alcançado
+      - Nenhum novo resultado HIGH/CRITICAL na última rodada
+      - Nenhum novo dork pode ser gerado (todos já usados)
     """
 
     def __init__(
@@ -2612,11 +2612,11 @@ class DorkCrawlerAgent(BaseAgent):
         target:     str = "",
     ) -> dict:
         if not seed_dorks:
-            _log(f"[{self.name}] No seed dorks provided.", style="yellow")
+            _log(f"[{self.name}] Nenhum dork seed fornecido.", style="yellow")
             return self._build_output("no_seed_dorks")
 
         _log(
-            f"[{self.name}] Starting recursive crawl — "
+            f"[{self.name}] Iniciando crawl recursivo — "
             f"seed:{len(seed_dorks)} dork | "
             f"max_rounds:{self.max_rounds} | "
             f"max_results:{self.max_results} | "
@@ -2624,7 +2624,7 @@ class DorkCrawlerAgent(BaseAgent):
             style="bold cyan"
         )
         if target:
-            _log(f"[{self.name}] Target: {target}", style="cyan")
+            _log(f"[{self.name}] Alvo: {target}", style="cyan")
 
         current_dorks = list(seed_dorks)
         stop_reason   = "completed"
@@ -2632,7 +2632,7 @@ class DorkCrawlerAgent(BaseAgent):
         try:
             from ddgs import DDGS
         except ImportError:
-            _log(f"[{self.name}] ddgs not installed. Install with: pip install ddgs", style="red")
+            _log(f"[{self.name}] ddgs não instalado. Instale com: pip install ddgs", style="red")
             return self._build_output("ddgs_missing")
 
         triage_agent = TriageAgent(plugin=self.plugin)
@@ -2646,9 +2646,9 @@ class DorkCrawlerAgent(BaseAgent):
                 break
 
             _log(
-                f"\n[{self.name}] ── Round {round_n}/{self.max_rounds} "
+                f"\n[{self.name}] ── Rodada {round_n}/{self.max_rounds} "
                 f"({len(current_dorks)} dork, "
-                f"{len(self._all_results)} results so far) ──",
+                f"{len(self._all_results)} resultados até agora) ──",
                 style="bold cyan"
             )
 
@@ -2662,13 +2662,13 @@ class DorkCrawlerAgent(BaseAgent):
                     new_results.append(r)
 
             _log(
-                f"[{self.name}] Round {round_n}: "
-                f"{len(round_results)} found, {len(new_results)} new unique",
+                f"[{self.name}] Rodada {round_n}: "
+                f"{len(round_results)} encontrados, {len(new_results)} novos únicos",
                 style="cyan"
             )
 
             if not new_results:
-                _log(f"[{self.name}] No new results — stopping.", style="yellow")
+                _log(f"[{self.name}] Nenhum novo resultado — parando.", style="yellow")
                 stop_reason = "no_new_results"
                 break
 
@@ -2680,7 +2680,7 @@ class DorkCrawlerAgent(BaseAgent):
                 if r.get("triage_label") in ("CRITICAL", "HIGH")
             )
             _log(
-                f"[{self.name}] Triage round {round_n}: "
+                f"[{self.name}] Triage rodada {round_n}: "
                 f"CRITICAL+HIGH={n_high} | "
                 f"TOTAL={len(self._all_results)}",
                 style="green" if n_high > 0 else "dim"
@@ -2697,8 +2697,8 @@ class DorkCrawlerAgent(BaseAgent):
 
             if round_n > 1 and n_high < self.min_new_high:
                 _log(
-                    f"[{self.name}] Only {n_high} new HIGH/CRITICAL "
-                    f"(min={self.min_new_high}) — stop.",
+                    f"[{self.name}] Apenas {n_high} novos HIGH/CRITICAL "
+                    f"(min={self.min_new_high}) — parar.",
                     style="yellow"
                 )
                 stop_reason = "no_new_findings"
@@ -2713,23 +2713,23 @@ class DorkCrawlerAgent(BaseAgent):
 
             next_dorks = self._generate_followup_dorks(intelligence)
             if not next_dorks:
-                _log(f"[{self.name}] No new dorks can be generated — stopping.", style="yellow")
+                _log(f"[{self.name}] Nenhum novo dork pode ser gerado — parando.", style="yellow")
                 stop_reason = "no_new_dorks"
                 break
 
             current_dorks = next_dorks
             _log(
-                f"[{self.name}] {len(current_dorks)} follow-up dorks generated for round {round_n+1}",
+                f"[{self.name}] {len(current_dorks)} dorks de follow-up gerados para a rodada {round_n+1}",
                 style="bold cyan"
             )
             for d in current_dorks[:8]:
                 _log(f"  → {d}", style="dim")
             if len(current_dorks) > 8:
-                _log(f"  ... and {len(current_dorks)-8} more", style="dim")
+                _log(f"  ... e mais {len(current_dorks)-8}", style="dim")
 
             if round_n < self.max_rounds:
                 _log(
-                    f"[{self.name}] Sleeping {self.delay_between:.1f}s "
+                    f"[{self.name}] Dormindo {self.delay_between:.1f}s "
                     f"(stealth: {'on' if self.stealth else 'off'})...",
                     style="dim"
                 )
@@ -2749,7 +2749,7 @@ class DorkCrawlerAgent(BaseAgent):
             if dork in self._used_dorks:
                 continue
             self._used_dorks.add(dork)
-            _log(f"[{self.name}] Searching: {dork[:80]}", style="dim")
+            _log(f"[{self.name}] Buscando: {dork[:80]}", style="dim")
             try:
                 for item in DDGS().text(dork, max_results=self.results_per_dork):
                     url = item.get("href") or item.get("url", "")
@@ -2765,7 +2765,7 @@ class DorkCrawlerAgent(BaseAgent):
                         "category":  "webpage",
                     })
             except Exception as e:
-                _log(f"[{self.name}] DDGS error '{dork[:50]}': {e}", style="yellow")
+                _log(f"[{self.name}] Erro DDGS '{dork[:50]}': {e}", style="yellow")
 
             time.sleep(max(1.0, self.delay_between / 3))
 
@@ -2868,7 +2868,7 @@ class DorkCrawlerAgent(BaseAgent):
         if intel.get("params"):       parts.append(f"params:{','.join(intel['params'])}")
         _log(
             f"[{self.name}] Intelligence round {round_n}: "
-            + (" | ".join(parts) if parts else "nothing new"),
+            + (" | ".join(parts) if parts else "nada novo"),
             style="cyan"
         )
 
@@ -2887,14 +2887,14 @@ class DorkCrawlerAgent(BaseAgent):
 
     def _print_summary(self, output: dict) -> None:
         _panel(
-            f"  Rounds completed  : {output['rounds']}/{self.max_rounds}\n"
-            f"  Stop reason       : {output['stop_reason']}\n"
-            f"  Dorks used        : {len(output['dorks_used'])}\n"
-            f"  Total results     : {output['total']}\n"
+            f"  Rodadas concluídas: {output['rounds']}/{self.max_rounds}\n"
+            f"  Motivo de parada  : {output['stop_reason']}\n"
+            f"  Dorks usados      : {len(output['dorks_used'])}\n"
+            f"  Resultados totais : {output['total']}\n"
             f"  CRITICAL          : {output['critical']}\n"
             f"  HIGH              : {output['high']}\n"
             f"  MEDIUM            : {output['medium']}",
-            title="[bold cyan][ DorkCrawlerAgent — Crawl Summary ][/bold cyan]",
+            title="[bold cyan][ DorkCrawlerAgent — Resumo do Crawl ][/bold cyan]",
             border="cyan",
         )
 
@@ -2903,39 +2903,39 @@ class DorkCrawlerAgent(BaseAgent):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def add_crawler_args(parser) -> object:
-    """Adds --crawl-* flags to the DorkEye CLI parser."""
+    """Adiciona as flags --crawl-* ao parser do CLI do DorkEye."""
     g = parser.add_argument_group(
-        "Recursive Crawl — adaptive multi-round dorking (no AI)"
+        "Crawl Recursivo — dorking multi-rodada adaptativo (sem IA)"
     )
     g.add_argument("--crawl", action="store_true",
-                   help="Activate the adaptive recursive crawl after the initial search")
+                   help="Ativa o crawl recursivo adaptativo após a busca inicial")
     g.add_argument("--crawl-rounds", type=int, default=4,
-                   help="Maximum number of refinement rounds (default: 4)")
+                   help="Número máximo de rodadas de refinamento (padrão: 4)")
     g.add_argument("--crawl-max", type=int, default=300,
-                   help="Total aggregated results limit (default: 300)")
+                   help="Limite total de resultados agregados (padrão: 300)")
     g.add_argument("--crawl-per-dork", type=int, default=20,
-                   help="DDGS results per dork per round (default: 20)")
+                   help="Resultados do DDGS por dork por rodada (padrão: 20)")
     g.add_argument("--crawl-stealth", action="store_true",
-                   help="Stealth mode: longer delays between searches")
+                   help="Modo stealth: delays maiores entre buscas")
     g.add_argument("--crawl-report", action="store_true",
-                   help="Generate HTML report at the end of the crawl")
+                   help="Gera relatório HTML ao final do crawl")
     g.add_argument("--crawl-out", type=str, default=None,
-                   help="Path report crawl (default: dorkeye_crawl_<timestamp>.html)")
+                   help="Path do relatório do crawl (padrão: dorkeye_crawl_<timestamp>.html)")
     return parser
 
 
 def add_security_args(parser) -> object:
-    """Adds --security-* flags to the DorkEye CLI parser."""
+    """Adiciona as flags --security-* ao parser do CLI do DorkEye."""
     g = parser.add_argument_group(
-        "Security Agent — threat detection for phishing, malware, exploits"
+        "Security Agent — detecção de ameaças para phishing, malware, exploits"
     )
     g.add_argument("--no-security", action="store_true",
-                   help="Disable the SecurityAgent in the pipeline")
+                   help="Desativa o SecurityAgent no pipeline")
     g.add_argument("--security-mode", type=str, default="passive",
                    choices=["active", "passive"],
-                   help="active: block DANGEROUS/CRITICAL | passive: report only (default: passive)")
+                   help="active: bloqueia DANGEROUS/CRITICAL | passive: apenas relata (padrão: passive)")
     g.add_argument("--security-quarantine", action="store_true",
-                   help="Save quarantined content to dorkeye_quarantine/")
+                   help="Salva conteúdo em quarentena em dorkeye_quarantine/")
     return parser
 
 
@@ -2945,7 +2945,7 @@ def run_crawl(
     target:  str = "",
     plugin       = None,
 ) -> dict:
-    """Entry point for dorkeye.py — starts the DorkCrawlerAgent."""
+    """Entry point para o dorkeye.py — inicia o DorkCrawlerAgent."""
     crawler = DorkCrawlerAgent(
         plugin           = plugin,
         max_rounds       = getattr(args, "crawl_rounds",   4),
@@ -2972,7 +2972,7 @@ def run_crawl(
             fmt         = fmt,
         )
         output["report_path"] = out
-        _log(f"[Crawl] Report saved: {out}", style="bold green")
+        _log(f"[Crawl] Relatório salvo: {out}", style="bold green")
 
     return output
 
@@ -2984,20 +2984,20 @@ def run_analysis_pipeline(
     target:    str = "",
 ) -> dict:
     """
-    Runs the post-search analysis pipeline v3.1.
+    Roda o pipeline de análise pós-busca v3.1.
 
-    Works WITHOUT LLM (llm_plugin=None):
-        1.  TriageAgent             — classifies with regex + runtime bonus
-        2.  PageFetchAgent          — downloads HIGH/CRITICAL pages (if --analyze-fetch)
-        3.  SecurityAgent  [NEW]    — phishing/malware/exploit/obfuscation detection
-        4.  HeaderIntelAgent        — analyses response headers
-        5.  TechFingerprintAgent    — detects CMS/frameworks/versions
-        6.  SecretsAgent            — secrets scan + hash + severity
-        7.  PiiDetectorAgent        — detects PII (CC, IBAN, CF, SSN, etc.)
-        8.  EmailHarvesterAgent     — collects and categorises emails
-        9.  SubdomainHarvesterAgent — extracts subdomains, generates follow-up dorks
-        10. ReportAgent             — generates complete HTML/MD/JSON report (incl. security)
-        11. DBPortScanAgent         — scans exposed DB ports (opt-in: --dbscan)
+    Funciona SEM LLM (llm_plugin=None):
+        1.  TriageAgent             — classifica com regex + bônus de runtime
+        2.  PageFetchAgent          — baixa páginas HIGH/CRITICAL (com --analyze-fetch)
+        3.  SecurityAgent  [NOVO]   — detecção de phishing/malware/exploit/ofuscação
+        4.  HeaderIntelAgent        — analisa headers de resposta
+        5.  TechFingerprintAgent    — detecta CMS/frameworks/versões
+        6.  SecretsAgent            — scan de segredos + hash + severidade
+        7.  PiiDetectorAgent        — detecta PII (CC, IBAN, CF, SSN etc.)
+        8.  EmailHarvesterAgent     — coleta e categoriza e-mails
+        9.  SubdomainHarvesterAgent — extrai subdomínios, gera dorks de follow-up
+        10. ReportAgent             — gera relatório HTML/MD/JSON completo (incl. segurança)
+        11. DBPortScanAgent         — escaneia portas DB expostas (opt-in: --dbscan)
     """
     if args is None:
         args = type("A", (), {
@@ -3033,7 +3033,7 @@ def run_analysis_pipeline(
     }
 
     if not results:
-        _log("[Agents] No results to analyse.", style="yellow")
+        _log("[Agents] Nenhum resultado para analisar.", style="yellow")
         return output
 
     mode_label = "LLM + regex" if llm_plugin else "autonomous regex"
@@ -3057,17 +3057,17 @@ def run_analysis_pipeline(
             f"  [{counts[l]:>3}]  {l}"
             for l in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "SKIP")
         ) + f"\n\n  TOTAL: {len(triaged)}",
-        title="[bold cyan][ Triage Results ][/bold cyan]",
+        title="[bold cyan][ Resultados do Triage ][/bold cyan]",
         border="cyan",
     )
 
-    # ── 2. Page Fetch (optional) ──────────────────────────────────────────────
+    # ── 2. Page Fetch (opcional) ──────────────────────────────────────────────
     if getattr(args, "analyze_fetch", False):
         fetch_max = getattr(args, "analyze_fetch_max", 20)
         fetcher   = PageFetchAgent(max_pages=fetch_max)
         triaged   = fetcher.run(triaged)
 
-    # ── 3. Security Agent [NEW in v3.1] ───────────────────────────────────────
+    # ── 3. Security Agent [NOVO na v3.1] ───────────────────────────────────────
     sec_agent = None
     if not getattr(args, "no_security", False):
         sec_mode       = getattr(args, "security_mode", "passive")
@@ -3107,7 +3107,7 @@ def run_analysis_pipeline(
     cve_dorks  = tech_agent.get_all_cve_dorks(triaged)
     output["cve_dorks"] = cve_dorks
     if cve_dorks:
-        _log(f"[Agents] TechFP: {len(cve_dorks)} CVE dorks generated.", style="cyan")
+        _log(f"[Agents] TechFP: {len(cve_dorks)} dorks de CVE gerados.", style="cyan")
 
     # ── 6. Secrets scan ───────────────────────────────────────────────────────
     use_llm_secrets = llm_plugin is not None
@@ -3129,7 +3129,7 @@ def run_analysis_pipeline(
                 f"({s.get('source','?')[:45]})"
                 for s in all_secrets_sorted[:30]
             ),
-            title=f"[bold red][ {len(all_secrets)} Secret(s) Found ][/bold red]",
+            title=f"[bold red][ {len(all_secrets)} Segredo(s) Encontrado(s) ][/bold red]",
             border="red",
         )
 
@@ -3139,7 +3139,7 @@ def run_analysis_pipeline(
     all_pii   = [p for r in triaged for p in r.get("pii_found", [])]
     output["pii_total"] = len(all_pii)
     if all_pii:
-        _log(f"[Agents] PII: {len(all_pii)} personal data item(s) detected.", style="bold red")
+        _log(f"[Agents] PII: {len(all_pii)} item(ns) de dados pessoais detectado(s).", style="bold red")
 
     # ── 8. Email Harvesting ───────────────────────────────────────────────────
     email_agent   = EmailHarvesterAgent()
@@ -3147,7 +3147,7 @@ def run_analysis_pipeline(
     all_emails    = email_agent.get_all_emails()
     output["emails_total"] = len(all_emails)
     if all_emails:
-        _log(f"[Agents] Email: {len(all_emails)} unique emails collected.", style="cyan")
+        _log(f"[Agents] Email: {len(all_emails)} e-mails únicos coletados.", style="cyan")
 
     # ── 9. Subdomain Harvesting ───────────────────────────────────────────────
     subdomain_agent = SubdomainHarvesterAgent()
@@ -3158,14 +3158,14 @@ def run_analysis_pipeline(
     output["cve_dorks"]  = list(dict.fromkeys(cve_dorks + followup_dorks))
     if all_subdomains:
         total_subs = sum(len(v) for v in all_subdomains.values())
-        _log(f"[Agents] Subdomain: {total_subs} subdomains found.", style="cyan")
+        _log(f"[Agents] Subdomain: {total_subs} subdomínios encontrados.", style="cyan")
 
-    # ── 11. DB Port Scanner (optional — activate with --dbscan) ────────────────
+    # ── 11. DB Port Scanner (opcional — ative com --dbscan) ────────────────
     if getattr(args, "dbscan", False):
         if not _DBSCAN_OK:
-            _log("[Agents] db_portscan.py non trovato in Tools/ — DBScan saltato.", style="yellow")
+            _log("[Agents] db_portscan.py não encontrado em Tools/ — DBScan pulado.", style="yellow")
         else:
-            _log("[Agents] Step 11 — DB Port Scanner", style="bold cyan")
+            _log("[Agents] Etapa 11 — Scanner de Portas DB", style="bold cyan")
             _db_agent = _DBPortScanAgent(
                 timeout   = getattr(args, "dbscan_timeout",   2.5),
                 threads   = getattr(args, "dbscan_threads",   60),
@@ -3190,7 +3190,7 @@ def run_analysis_pipeline(
                     )
     # ─────────────────────────────────────────────────────────────────────────
 
-    # ── LLM analysis (only if llm_plugin available) ────────────────────────────
+    # ── Análise LLM (apenas se llm_plugin disponível) ────────────────────────────
     analysis: dict = {}
     if llm_plugin:
         try:
@@ -3200,19 +3200,19 @@ def run_analysis_pipeline(
             _sc    = {"LOW": "green", "MEDIUM": "yellow", "HIGH": "red", "CRITICAL": "bold red"}
             _style = _sc.get(_sev, "white")
             _panel(
-                f"[bold white]Summary:[/bold white] {analysis.get('summary','N/A')}\n\n"
-                f"[bold yellow]High-value:[/bold yellow] "
-                f"{', '.join(analysis.get('high_value',[])[:5]) or 'none'}\n"
-                f"[bold cyan]Patterns:[/bold cyan] "
-                f"{', '.join(analysis.get('patterns',[])[:5]) or 'none'}\n"
-                f"[bold green]Recommendations:[/bold green] "
-                f"{chr(10).join(analysis.get('recommendations',[])[:3]) or 'none'}\n"
-                f"[bold white]Severity:[/bold white] [{_style}]{_sev}[/{_style}]",
-                title="[bold magenta][ LLM Analysis ][/bold magenta]",
+                f"[bold white]Resumo:[/bold white] {analysis.get('summary','N/A')}\n\n"
+                f"[bold yellow]De alto valor:[/bold yellow] "
+                f"{', '.join(analysis.get('high_value',[])[:5]) or 'nenhum'}\n"
+                f"[bold cyan]Padrões:[/bold cyan] "
+                f"{', '.join(analysis.get('patterns',[])[:5]) or 'nenhum'}\n"
+                f"[bold green]Recomendações:[/bold green] "
+                f"{chr(10).join(analysis.get('recommendations',[])[:3]) or 'nenhum'}\n"
+                f"[bold white]Severidade:[/bold white] [{_style}]{_sev}[/{_style}]",
+                title="[bold magenta][ Análise LLM ][/bold magenta]",
                 border="magenta",
             )
         except Exception as e:
-            _log(f"[Agents] LLM analysis error: {e}", style="yellow")
+            _log(f"[Agents] Erro na análise LLM: {e}", style="yellow")
 
     # ── 10. Report ────────────────────────────────────────────────────────────
     if getattr(args, "analyze_report", False):
@@ -3245,7 +3245,7 @@ def run_analysis_pipeline(
         )
         output["report_path"] = out
 
-    # LLM stats
+    # Estatísticas LLM
     if llm_plugin:
         try:
             s = llm_plugin.stats()
@@ -3260,61 +3260,61 @@ def run_analysis_pipeline(
     return output
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STANDALONE — analyses a DorkEye JSON results file
+# STANDALONE — analisa um arquivo JSON de resultados do DorkEye
 # ══════════════════════════════════════════════════════════════════════════════
 
-# FIX #1 (continued): **name** → __name__
+# FIX #1 (continuação): **name** → __name__
 if __name__ == "__main__":
     import argparse as _ap
     import sys
 
     parser = _ap.ArgumentParser(
-        description="DorkEye Agents v3.1 — Standalone analysis on results file",
+        description="DorkEye Agents v3.1 — Análise standalone sobre arquivo de resultados",
         formatter_class=_ap.RawDescriptionHelpFormatter,
         epilog=(
-            "Examples:\n"
-            "  # Standalone analysis (no LLM required)\n"
+            "Exemplos:\n"
+            "  # Análise standalone (sem exigência de LLM)\n"
             "  python dorkeye_agents.py results.json\n"
             "  python dorkeye_agents.py results.json --analyze-fetch --analyze-fmt=html\n\n"
-            "  # With security agent in active mode + quarantine\n"
+            "  # Com security agent em modo active + quarentena\n"
             "  python dorkeye_agents.py results.json --security-mode=active --security-quarantine\n\n"
-            "  # Disable security agent\n"
+            "  # Desativa o security agent\n"
             "  python dorkeye_agents.py results.json --no-security\n\n"
-            "  # With Ollama LLM (optional — adds summary and contextual analysis)\n"
+            "  # Com LLM Ollama (opcional — adiciona resumo e análise contextual)\n"
             "  python dorkeye_agents.py results.json --llm --analyze-fetch\n"
         ),
     )
     parser.add_argument(
         "results_file",
-        help="DorkEye JSON results file (produced with -o results.json)",
+        help="Arquivo JSON de resultados do DorkEye (produzido com -o results.json)",
     )
-    parser.add_argument("--target", default="", help="Target description (optional)")
+    parser.add_argument("--target", default="", help="Descrição do alvo (opcional)")
     parser.add_argument("--analyze-fetch",     action="store_true",
-                        help="Download HIGH/CRITICAL pages for more accurate analysis")
+                        help="Baixa páginas HIGH/CRITICAL para análise mais precisa")
     parser.add_argument("--analyze-fetch-max", type=int, default=20,
-                        help="Max pages to download (default: 20)")
+                        help="Máximo de páginas para baixar (padrão: 20)")
     parser.add_argument("--analyze-no-llm-triage", action="store_true",
-                        help="Regex-only triage (ignores LLM even if available)")
+                        help="Triage apenas com regex (ignora LLM mesmo se disponível)")
     parser.add_argument("--analyze-report",    action="store_true", default=True,
-                        help="Generate report file (default: True)")
+                        help="Gera arquivo de relatório (padrão: True)")
     parser.add_argument("--analyze-fmt",       choices=["html","md","json","txt"],
-                        default="html", help="Report format (default: html)")
+                        default="html", help="Formato do relatório (padrão: html)")
     parser.add_argument("--analyze-out",       default=None,
-                        help="Report output path")
+                        help="Path de saída do relatório")
 
     add_security_args(parser)
 
     # ── DB Port Scanner ───────────────────────────────────────────────────────
     parser.add_argument("--dbscan",           action="store_true",
-                        help="Scan open DB ports on hosts from results (step 11)")
+                        help="Escaneia portas DB abertas nos hosts dos resultados (etapa 11)")
     parser.add_argument("--dbscan-timeout",   type=float, default=2.5,
-                        help="TCP connect timeout in seconds (default: 2.5)")
+                        help="Timeout de conexão TCP em segundos (padrão: 2.5)")
     parser.add_argument("--dbscan-threads",   type=int,   default=60,
-                        help="Worker threads per host (default: 60)")
+                        help="Threads de trabalho por host (padrão: 60)")
     parser.add_argument("--dbscan-ports",     type=int,   nargs="+", default=None,
-                        help="Override port list (default: all known DB ports)")
+                        help="Sobrescreve a lista de portas (padrão: todas as portas DB conhecidas)")
     parser.add_argument("--dbscan-max-hosts", type=int,   default=200,
-                        help="Max hosts to scan (default: 200)")
+                        help="Máximo de hosts para escanear (padrão: 200)")
     # ─────────────────────────────────────────────────────────────────────────
 
     _llm_available = False
@@ -3324,7 +3324,7 @@ if __name__ == "__main__":
         _llm_available = True
     except ImportError:
         parser.add_argument("--llm", action="store_true",
-                            help="(unavailable: dorkeye_llm_plugin.py not found)")
+                            help="(indisponível: dorkeye_llm_plugin.py não encontrado)")
 
     args     = parser.parse_args()
     args.llm = getattr(args, "llm", False)
@@ -3332,29 +3332,29 @@ if __name__ == "__main__":
     from pathlib import Path as _Path
     p = _Path(args.results_file)
     if not p.exists():
-        print(f"[!] File not found: {p}", file=sys.stderr)
+        print(f"[!] Arquivo não encontrado: {p}", file=sys.stderr)
         sys.exit(1)
 
     try:
         raw_data = json.loads(p.read_text(encoding="utf-8"))
         results  = raw_data if isinstance(raw_data, list) else raw_data.get("results", [])
     except Exception as e:
-        print(f"[!] Read error: {e}", file=sys.stderr)
+        print(f"[!] Erro de leitura: {e}", file=sys.stderr)
         sys.exit(1)
 
     if not results:
-        print(f"[!] No results found in '{p}'.", file=sys.stderr)
+        print(f"[!] Nenhum resultado encontrado em '{p}'.", file=sys.stderr)
         sys.exit(1)
 
     llm = None
     if args.llm and _llm_available:
         llm = init_llm_plugin(args)
         if not llm:
-            print("[!] LLM not initialised — continuing in autonomous mode.", file=sys.stderr)
+            print("[!] LLM não inicializado — continuando em modo autônomo.", file=sys.stderr)
     elif args.llm and not _llm_available:
-        print("[!] dorkeye_llm_plugin.py not found — autonomous mode.", file=sys.stderr)
+        print("[!] dorkeye_llm_plugin.py não encontrado — modo autônomo.", file=sys.stderr)
 
-    print(f"\n[*] Analysing {len(results)} results from '{p.name}'")
+    print(f"\n[*] Analisando {len(results)} resultados de '{p.name}'")
     print(f"[*] Mode: {'LLM + regex' if llm else 'autonomous (regex)'}")
     sec_mode = getattr(args, "security_mode", "passive")
     no_sec   = getattr(args, "no_security", False)
@@ -3369,24 +3369,24 @@ if __name__ == "__main__":
 
     print()
     if out.get("report_path"):
-        print(f"[✓] Report: {out['report_path']}")
-    print(f"[✓] Secrets found:     {out['secrets_total']}")
-    print(f"[✓] PII found:         {out.get('pii_total', 0)}")
-    print(f"[✓] Emails collected:  {out.get('emails_total', 0)}")
+        print(f"[✓] Relatório: {out['report_path']}")
+    print(f"[✓] Segredos encontrados: {out['secrets_total']}")
+    print(f"[✓] PII encontrados:     {out.get('pii_total', 0)}")
+    print(f"[✓] E-mails coletados:   {out.get('emails_total', 0)}")
     n_subs = sum(len(v) for v in out.get('subdomains', {}).values())
-    print(f"[✓] Subdomains:        {n_subs}")
-    print(f"[✓] CVE dorks:         {len(out.get('cve_dorks', []))}")
+    print(f"[✓] Subdomínios:         {n_subs}")
+    print(f"[✓] Dorks de CVE:       {len(out.get('cve_dorks', []))}")
 
     sec_stats = out.get("security_stats", {})
     if sec_stats:
-        print(f"[✓] Security scanned:  {sec_stats.get('total_scanned', 0)}")
-        print(f"[✓] Security threats:  {len(out.get('security_threats', []))}")
-        print(f"[✓] Security blocked:  {sec_stats.get('blocked', 0)}")
+        print(f"[✓] Segurança escaneada: {sec_stats.get('total_scanned', 0)}")
+        print(f"[✓] Ameaças de segurança: {len(out.get('security_threats', []))}")
+        print(f"[✓] Bloqueados (seg.):   {sec_stats.get('blocked', 0)}")
 
     db_stats = out.get("dbscan_stats", {})
     if db_stats:
-        print(f"[✓] DBScan hosts:      {db_stats.get('hosts_scanned', 0)}")
-        print(f"[✓] DBScan open ports: {db_stats.get('open_ports', 0)}")
+        print(f"[✓] Hosts DBScan:        {db_stats.get('hosts_scanned', 0)}")
+        print(f"[✓] Portas abertas DBScan: {db_stats.get('open_ports', 0)}")
         print(f"[✓] DBScan CRITICAL:   {db_stats.get('critical', 0)}  (no-auth)")
         print(f"[✓] DBScan HIGH:       {db_stats.get('high', 0)}")
 

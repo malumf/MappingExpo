@@ -24,28 +24,28 @@ class DorkGenerator:
         self._load()
 
     # ─────────────────────────────────────────────
-    # LOAD TEMPLATES
+    # CARREGAMENTO DE TEMPLATES
     # ─────────────────────────────────────────────
 
     def _load(self):
         if not self.yaml_file.exists():
-            raise FileNotFoundError(f"Template file not found: {self.yaml_file}")
+            raise FileNotFoundError(f"Arquivo de template não encontrado: {self.yaml_file}")
 
         with open(self.yaml_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         if not isinstance(data, dict):
-            raise ValueError(f"Invalid YAML structure in: {self.yaml_file}")
+            raise ValueError(f"Estrutura YAML inválida em: {self.yaml_file}")
 
         self.variables = data.get("variables", {})
         self.templates = data.get("templates", {})
 
     # ─────────────────────────────────────────────
-    # PLACEHOLDER UTILITIES
+    # UTILITÁRIOS DE PLACEHOLDER
     # ─────────────────────────────────────────────
 
     def _extract_placeholders(self, template: str) -> list:
-        """Extracts placeholders preserving order without duplicates."""
+        """Extrai os placeholders preservando a ordem, sem duplicatas."""
         seen = set()
         unique = []
         for ph in re.findall(r"\{(.*?)\}", template):
@@ -55,24 +55,24 @@ class DorkGenerator:
         return unique
 
     def _validate_placeholders(self, template: str, category: str):
-        """Warns if a placeholder is not defined in the variables."""
+        """Emite um aviso se um placeholder não estiver definido nas variáveis."""
         placeholders = re.findall(r"\{(.*?)\}", template)
         unknown = [ph for ph in placeholders if ph not in self.variables]
         if unknown:
             print(
-                f"[WARNING] Category '{category}': "
-                f"unknown placeholder(s) {unknown} in: {template}"
+                f"[AVISO] Categoria '{category}': "
+                f"placeholder(s) desconhecido(s) {unknown} em: {template}"
             )
 
     # ─────────────────────────────────────────────
-    # GENERATION
+    # GERAÇÃO
     # ─────────────────────────────────────────────
 
     def _generate_from_template(self, template: str) -> list:
         """
-        Generates all combinations for a single template.
-        Sampling occurs BEFORE expanding to avoid
-        memory explosions on templates with many variables.
+        Gera todas as combinações para um único template.
+        A amostragem ocorre ANTES da expansão para evitar
+        explosões de memória em templates com muitas variáveis.
         """
         placeholders = self._extract_placeholders(template)
 
@@ -86,12 +86,12 @@ class DorkGenerator:
                 values = [f"{{{ph}}}"]
             value_lists.append(values)
 
-        # Estimate the total number of combinations without generating them all
+        # Estima o total de combinações sem gerá-las todas
         total = 1
         for vl in value_lists:
             total *= len(vl)
 
-        # Sample before expanding if it exceeds the limit
+        # Faz amostragem antes de expandir se ultrapassar o limite
         if total > self.max_combinations:
             sampled = set()
             attempts = 0
@@ -117,9 +117,9 @@ class DorkGenerator:
 
     def _get_dork_list(self, data: dict, allowed_modes: list) -> list:
         """
-        Extracts dorks from a category by supporting two YAML structures:
+        Extrai os dorks de uma categoria suportando duas estruturas YAML:
 
-        Structure A — nested (recommended):
+        Estrutura A — aninhada (recomendada):
             dorks:
               soft:
                 - 'dork1'
@@ -128,7 +128,7 @@ class DorkGenerator:
               aggressive:
                 - 'dork3'
 
-        Structure B — flat with single mode (legacy):
+        Estrutura B — plana com modo único (legado):
             mode: soft
             dorks:
               - 'dork1'
@@ -136,17 +136,17 @@ class DorkGenerator:
         """
         raw_dorks = data.get("dorks", [])
 
-        # ── Structure A: dorks is a dict with keys soft/medium/aggressive ──
+        # ── Estrutura A: dorks é um dict com as chaves soft/medium/aggressive ──
         if isinstance(raw_dorks, dict):
             collected = []
             for level, dork_list in raw_dorks.items():
-                # Include only the levels allowed by the hierarchy
+                # Inclui apenas os níveis permitidos pela hierarquia
                 if allowed_modes is None or level in allowed_modes:
                     if isinstance(dork_list, list):
                         collected.extend(dork_list)
             return collected
 
-        # ── Structure B: dorks is a flat list, mode is at category level ──
+        # ── Estrutura B: dorks é uma lista plana, o mode fica no nível da categoria ──
         if isinstance(raw_dorks, list):
             template_mode = data.get("mode", "soft")
             if allowed_modes is None or template_mode in allowed_modes:
@@ -157,13 +157,13 @@ class DorkGenerator:
 
     def generate(self, categories: list = None, mode: str = None) -> list:
         """
-        Generates dorks filtered by category and mode.
+        Gera dorks filtrados por categoria e modo.
 
-        Mode hierarchy:
-          soft       → only "soft" templates
+        Hierarquia de modos:
+          soft       → apenas templates "soft"
           medium     → "soft" + "medium"
           aggressive → "soft" + "medium" + "aggressive"
-          None       → no filter, all templates
+          None       → sem filtro, todos os templates
         """
         all_dorks = []
 
@@ -174,40 +174,40 @@ class DorkGenerator:
                 k: v for k, v in self.templates.items() if k in categories
             }
 
-        # Calculate the allowed modes based on the hierarchy
+        # Calcula os modos permitidos com base na hierarquia
         allowed_modes = MODE_HIERARCHY.get(mode) if mode else None
 
         for category, data in selected_templates.items():
             dork_templates = self._get_dork_list(data, allowed_modes)
 
             for template in dork_templates:
-                # Validate placeholders before generating
+                # Valida os placeholders antes de gerar
                 self._validate_placeholders(template, category)
                 generated = self._generate_from_template(template)
                 all_dorks.extend(generated)
 
-        # Global dedup + shuffle
+        # Deduplicação global + embaralhamento
         all_dorks = list(set(all_dorks))
         random.shuffle(all_dorks)
 
-        # Global safety limit
+        # Limite global de segurança
         if len(all_dorks) > self.max_combinations:
             all_dorks = all_dorks[:self.max_combinations]
 
         return all_dorks
 
     # ─────────────────────────────────────────────
-    # INTROSPECTION
+    # INTROSPECÇÃO
     # ─────────────────────────────────────────────
 
     def get_available_categories(self) -> list:
-        """Returns the categories available in the loaded template."""
+        """Retorna as categorias disponíveis no template carregado."""
         return sorted(self.templates.keys())
 
     def get_available_modes(self) -> list:
         """
-        Returns the available modes by automatically detecting both
-        nested and flat structures.
+        Retorna os modos disponíveis detectando automaticamente tanto
+        estruturas aninhadas quanto planas.
         """
         modes = set()
         for data in self.templates.values():
@@ -219,7 +219,7 @@ class DorkGenerator:
         return sorted(modes)
 
     def get_stats(self) -> dict:
-        """Useful statistics for debugging and reporting."""
+        """Estatísticas úteis para depuração e relatórios."""
         total = 0
         for data in self.templates.values():
             raw_dorks = data.get("dorks", [])

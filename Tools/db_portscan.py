@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """
 DB Port Scanner for DorkEye Project
-Scans exposed database ports on hosts extracted from dork results.
+Escaneia portas de banco de dados expostas em hosts extraídos de resultados de dorks.
 
-Lives in: DorkEye/Tools/db_portscan.py
+Localização: DorkEye/Tools/db_portscan.py
 
-Detects:
-  - Open database ports: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch,
+Detecta:
+  - Portas de banco de dados abertas: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch,
     CouchDB, MSSQL, Oracle, Cassandra, Memcached, InfluxDB, Neo4j, RethinkDB
-  - Unauthenticated access via no-auth probes (Redis PING, ES HTTP, CouchDB
-    HTTP, MongoDB handshake, Memcached stats, InfluxDB /ping)
-  - Service banner grabbing for port confirmation
+  - Acesso sem autenticação via probes no-auth (PING do Redis, HTTP do ES, HTTP do
+    CouchDB, handshake do MongoDB, stats do Memcached, /ping do InfluxDB)
+  - Banner grabbing de serviço para confirmação da porta
 
-Severity:
-  CRITICAL  — port open + no-auth confirmed  (data directly accessible)
-  HIGH      — port open + service confirmed  (auth likely required)
-  MEDIUM    — port open, service unconfirmed
-  INFO      — port closed / filtered / timeout
+Severidade:
+  CRITICAL  — porta aberta + no-auth confirmado  (dados diretamente acessíveis)
+  HIGH      — porta aberta + serviço confirmado  (autenticação provavelmente exigida)
+  MEDIUM    — porta aberta, serviço não confirmado
+  INFO      — porta fechada / filtrada / timeout
 
 Author: xPloits3c | DorkEye Project
 """
@@ -35,7 +35,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Set, Tuple
 from urllib.parse import urlparse
 
-# ── Optional rich console ─────────────────────────────────────────────────────
+# ── Console rich opcional ─────────────────────────────────────────────────────
 try:
     from rich.console import Console
     from rich.markup import escape as _re
@@ -50,7 +50,7 @@ except ImportError:
     def _log(msg: str, style: str = "") -> None:
         print(msg)
 
-# ── Optional requests (for HTTP probes) ──────────────────────────────────────
+# ── requests opcional (para probes HTTP) ──────────────────────────────────────
 try:
     import requests as _requests
     import urllib3
@@ -60,30 +60,30 @@ except ImportError:
     _REQUESTS_OK = False
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  DB PORT DEFINITIONS
+#  DEFINIÇÕES DE PORTAS DB
 # ══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
 class DBPortDef:
     port:         int
-    name:         str                  # service name
+    name:         str                  # nome do serviço
     probe:        str                  # none | banner | http | redis | mongodb | memcached
-    http_path:    str  = ""            # path for HTTP probe (e.g. "/" for ES)
-    http_ok_keys: List[str] = field(default_factory=list)  # keys in response body confirming no-auth
-    default_db:   bool = True          # include in default scan set
+    http_path:    str  = ""            # path para o probe HTTP (ex.: "/" para ES)
+    http_ok_keys: List[str] = field(default_factory=list)  # chaves no corpo da resposta que confirmam no-auth
+    default_db:   bool = True          # incluir no conjunto default do scan
 
 
-# Full DB port catalogue
+# Catálogo completo de portas DB
 DB_PORT_CATALOGUE: List[DBPortDef] = [
-    # ── No-auth HTTP probes ──────────────────────────────────────────────────
+    # ── Probes HTTP no-auth ──────────────────────────────────────────────────
     DBPortDef(9200,  "Elasticsearch",  "http",       "/",         ["cluster_name","version","tagline"]),
     DBPortDef(9300,  "Elasticsearch",  "banner",     "",          []),
     DBPortDef(5984,  "CouchDB",        "http",       "/",         ["couchdb","Welcome"]),
-    DBPortDef(8086,  "InfluxDB",       "http",       "/ping",     []),          # 204 = alive
+    DBPortDef(8086,  "InfluxDB",       "http",       "/ping",     []),          # 204 = ativo
     DBPortDef(7474,  "Neo4j HTTP",     "http",       "/",         ["neo4j","bolt"]),
     DBPortDef(8098,  "Riak HTTP",      "http",       "/",         ["riak"]),
     DBPortDef(28015, "RethinkDB",      "banner",     "",          []),
-    # ── Raw TCP banner/probe ─────────────────────────────────────────────────
+    # ── Banner/probe TCP puro ─────────────────────────────────────────────────
     DBPortDef(3306,  "MySQL",          "banner",     "",          []),
     DBPortDef(5432,  "PostgreSQL",     "banner",     "",          []),
     DBPortDef(27017, "MongoDB",        "mongodb",    "",          []),
@@ -98,22 +98,22 @@ DB_PORT_CATALOGUE: List[DBPortDef] = [
     DBPortDef(27019, "MongoDB Config", "mongodb",    "",          [],           False),
 ]
 
-# Quick lookup by port number
+# Busca rápida por número de porta
 DB_PORT_MAP: Dict[int, DBPortDef] = {d.port: d for d in DB_PORT_CATALOGUE}
 
-# Default scan set (only default_db=True)
+# Conjunto default do scan (apenas default_db=True)
 DEFAULT_PORTS: List[int] = [d.port for d in DB_PORT_CATALOGUE if d.default_db]
 
-# Severity weights per probe outcome
+# Pesos de severidade por resultado do probe
 _SEVERITY_MAP = {
     "no_auth":   "CRITICAL",
     "confirmed": "HIGH",
     "open":      "MEDIUM",
 }
 
-# ── Dork-pattern → port hints ─────────────────────────────────────────────────
-# If a URL/title/dork snippet matches these patterns, those ports are
-# promoted to the front of the scan queue for that host.
+# ── Padrões de dork → hints de portas ─────────────────────────────────────────────────
+# Se uma URL/título/snippet de dork casar com estes padrões, essas portas
+# são promovidas para o início da fila de scan daquele host.
 DORK_PORT_HINTS: List[Tuple[re.Pattern, List[int]]] = [
     (re.compile(r"phpmyadmin|mysqladmin",        re.I), [3306]),
     (re.compile(r"pgadmin|postgresql|postgres",  re.I), [5432]),
@@ -130,7 +130,7 @@ DORK_PORT_HINTS: List[Tuple[re.Pattern, List[int]]] = [
 ]
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  RESULT DATACLASSES
+#  DATACLASSES DE RESULTADO
 # ══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
@@ -155,7 +155,7 @@ class PortFinding:
         if self.no_auth:
             return f"CRITICAL — {self.service} no-auth"
         if self.status == "open":
-            return f"{self.severity} — {self.service} open"
+            return f"{self.severity} — {self.service} aberta"
         return f"INFO — {self.service} {self.status}"
 
 
@@ -191,11 +191,11 @@ class HostScanResult:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  LOW-LEVEL PROBES
+#  PROBES DE BAIXO NÍVEL
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _tcp_connect(host: str, port: int, timeout: float) -> Optional[socket.socket]:
-    """Return connected socket or None."""
+    """Retorna socket conectado ou None."""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(timeout)
@@ -207,8 +207,8 @@ def _tcp_connect(host: str, port: int, timeout: float) -> Optional[socket.socket
 
 def _probe_banner(host: str, port: int, timeout: float) -> Tuple[str, str]:
     """
-    Connect, wait for a banner, close.
-    Returns (status, banner_snippet).
+    Conecta, aguarda um banner, fecha.
+    Retorna (status, snippet_do_banner).
     status: 'open' | 'closed' | 'timeout'
     """
     s = _tcp_connect(host, port, timeout)
@@ -231,8 +231,8 @@ def _probe_banner(host: str, port: int, timeout: float) -> Tuple[str, str]:
 
 def _probe_redis(host: str, port: int, timeout: float) -> Tuple[str, bool, str]:
     """
-    Send PING. If +PONG received → no-auth.
-    Returns (status, no_auth, detail).
+    Envia PING. Se receber +PONG → no-auth.
+    Retorna (status, no_auth, detail).
     """
     s = _tcp_connect(host, port, timeout)
     if s is None:
@@ -242,11 +242,11 @@ def _probe_redis(host: str, port: int, timeout: float) -> Tuple[str, bool, str]:
         s.sendall(b"PING\r\n")
         data = s.recv(128).decode("utf-8", errors="replace").strip()
         if "+PONG" in data:
-            return "open", True, "Unauthenticated PING/PONG — data directly accessible"
+            return "open", True, "PING/PONG sem autenticação — dados diretamente acessíveis"
         if "-NOAUTH" in data or "NOAUTH" in data:
-            return "open", False, "Auth required (NOAUTH error received)"
+            return "open", False, "Autenticação exigida (erro NOAUTH recebido)"
         if "-ERR" in data:
-            return "open", False, f"Open, auth response: {data[:80]}"
+            return "open", False, f"Aberta, resposta de auth: {data[:80]}"
         return "open", False, data[:80]
     except Exception as e:
         return "open", False, str(e)[:80]
@@ -259,20 +259,20 @@ def _probe_redis(host: str, port: int, timeout: float) -> Tuple[str, bool, str]:
 
 def _probe_mongodb(host: str, port: int, timeout: float) -> Tuple[str, bool, str]:
     """
-    Send a minimal MongoDB OP_MSG isMaster probe.
-    A successful reply means the port is open; lack of auth error → no-auth.
+    Envia um probe OP_MSG isMaster mínimo do MongoDB.
+    Resposta bem-sucedida = porta aberta; ausência de erro de auth → no-auth.
     """
-    # Minimal OP_MSG: isMaster command
+    # OP_MSG mínimo: comando isMaster
     # MsgHeader(16) + flagBits(4) + section(kind=0 + BSON doc)
     # BSON: {isMaster: 1}
     _bson_doc = (
-        b"\x13\x00\x00\x00"     # doc length = 19
-        b"\x10"                 # int32 type
-        b"isMaster\x00"         # key
-        b"\x01\x00\x00\x00"     # value = 1
-        b"\x00"                 # doc terminator
+        b"\x13\x00\x00\x00"     # comprimento do doc = 19
+        b"\x10"                 # tipo int32
+        b"isMaster\x00"         # chave
+        b"\x01\x00\x00\x00"     # valor = 1
+        b"\x00"                 # terminador do doc
     )
-    _section = b"\x00" + _bson_doc                  # kind byte + body
+    _section = b"\x00" + _bson_doc                  # byte de kind + corpo
     _flag    = b"\x00\x00\x00\x00"                  # flagBits
     _payload = _flag + _section
     _msg_len = (16 + len(_payload)).to_bytes(4, "little")
@@ -289,12 +289,12 @@ def _probe_mongodb(host: str, port: int, timeout: float) -> Tuple[str, bool, str
         if len(data) > 16:
             body = data[20:].decode("utf-8", errors="replace")
             if "ismaster" in body.lower() or "isWritablePrimary" in body.lower():
-                return "open", True, "MongoDB responded to isMaster — no auth required"
-            return "open", False, "MongoDB port open, auth state unclear"
-        return "open", False, "MongoDB port open (short response)"
+                return "open", True, "MongoDB respondeu ao isMaster — sem autenticação exigida"
+            return "open", False, "Porta MongoDB aberta, estado de autenticação incerto"
+        return "open", False, "Porta MongoDB aberta (resposta curta)"
     except Exception as e:
-        # Connection accepted but errored → port is open
-        return "open", False, f"Open (probe error: {str(e)[:60]})"
+        # Conexão aceita mas com erro → porta está aberta
+        return "open", False, f"Aberta (erro no probe: {str(e)[:60]})"
     finally:
         try:
             s.close()
@@ -304,7 +304,7 @@ def _probe_mongodb(host: str, port: int, timeout: float) -> Tuple[str, bool, str
 
 def _probe_memcached(host: str, port: int, timeout: float) -> Tuple[str, bool, str]:
     """
-    Send 'stats\r\n'. A STAT response → no-auth (memcached has no auth by default).
+    Envia 'stats\r\n'. Uma resposta STAT → no-auth (memcached não tem auth por padrão).
     """
     s = _tcp_connect(host, port, timeout)
     if s is None:
@@ -316,7 +316,7 @@ def _probe_memcached(host: str, port: int, timeout: float) -> Tuple[str, bool, s
         if data.startswith("STAT"):
             version_match = re.search(r"STAT version (\S+)", data)
             ver = version_match.group(1) if version_match else "?"
-            return "open", True, f"Memcached v{ver} — unauthenticated stats accessible"
+            return "open", True, f"Memcached v{ver} — stats acessíveis sem autenticação"
         return "open", False, data[:80]
     except Exception:
         return "open", False, ""
@@ -335,12 +335,12 @@ def _probe_http(
     timeout: float,
 ) -> Tuple[str, bool, str]:
     """
-    HTTP GET probe. Returns (status, no_auth, detail).
-    no_auth is True if response contains all ok_keys (service open without credentials).
-    Falls back to raw TCP if requests is unavailable.
+    Probe HTTP GET. Retorna (status, no_auth, detail).
+    no_auth é True se a resposta contém todas as ok_keys (serviço aberto sem credenciais).
+    Faz fallback para TCP puro se requests não estiver disponível.
     """
     if not _REQUESTS_OK:
-        # Fallback: raw TCP banner
+        # Fallback: banner TCP puro
         status, banner = _probe_banner(host, port, timeout)
         return status, False, banner
 
@@ -355,16 +355,16 @@ def _probe_http(
                 headers={"User-Agent": "Mozilla/5.0 DorkEye DBScan/1.0"},
             )
             body = r.text[:1000]
-            # Check for no-auth indicators
+            # Verifica indicadores de no-auth
             if ok_keys and all(k.lower() in body.lower() for k in ok_keys):
-                detail = f"HTTP {r.status_code} — unauthenticated access confirmed"
+                detail = f"HTTP {r.status_code} — acesso sem autenticação confirmado"
                 return "open", True, detail
             if r.status_code in (200, 201, 204):
-                return "open", False, f"HTTP {r.status_code} — service responding"
+                return "open", False, f"HTTP {r.status_code} — serviço respondendo"
             if r.status_code == 401:
-                return "open", False, f"HTTP 401 — auth required"
+                return "open", False, f"HTTP 401 — autenticação exigida"
             if r.status_code == 403:
-                return "open", False, f"HTTP 403 — access restricted"
+                return "open", False, f"HTTP 403 — acesso restrito"
             return "open", False, f"HTTP {r.status_code}"
         except _requests.exceptions.SSLError:
             continue
@@ -376,7 +376,7 @@ def _probe_http(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  PER-PORT SCAN DISPATCHER
+#  DISPATCHER DE SCAN POR PORTA
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _scan_port(
@@ -386,12 +386,12 @@ def _scan_port(
     source_url:  str = "",
 ) -> Optional[PortFinding]:
     """
-    Scan a single port on a host.
-    Returns a PortFinding only if the port is open.
+    Escaneia uma única porta em um host.
+    Retorna um PortFinding apenas se a porta estiver aberta.
     """
     probe = port_def.probe
 
-    # ── Dispatch probe type ───────────────────────────────────────────────────
+    # ── Dispara o tipo de probe ───────────────────────────────────────────────────
     if probe == "redis":
         status, no_auth, detail = _probe_redis(host, port_def.port, timeout)
 
@@ -411,15 +411,15 @@ def _scan_port(
         no_auth = False
         detail  = banner
 
-    # Only return a finding if the port is open
+    # Retorna um finding apenas se a porta estiver aberta
     if status != "open":
         return None
 
-    # Compute severity
+    # Calcula a severidade
     if no_auth:
         severity = "CRITICAL"
     else:
-        # Attempt banner-based confirmation
+        # Tenta confirmação via banner
         banner_lower = detail.lower()
         confirmed = any(kw in banner_lower for kw in [
             port_def.name.lower(), "mysql", "postgre", "mongo",
@@ -443,7 +443,7 @@ def _scan_port(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  GLOBAL INTERRUPT FLAG (mirrors sqli.py pattern)
+#  FLAG GLOBAL DE INTERRUPÇÃO (espelha o padrão do sqli.py)
 # ══════════════════════════════════════════════════════════════════════════════
 
 _exit_requested: bool  = False
@@ -451,22 +451,22 @@ _skip_current:   bool  = False
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  DB PORT SCAN AGENT
+#  AGENTE DE SCAN DE PORTAS DB
 # ══════════════════════════════════════════════════════════════════════════════
 
 class DBPortScanAgent:
     """
-    Extracts hosts from DorkEye result dicts and scans them for exposed
-    database ports.
+    Extrai hosts de dicts de resultados do DorkEye e os escaneia em busca de
+    portas de banco de dados expostas.
 
-    Usage:
+    Uso:
         agent = DBPortScanAgent(timeout=2.0, threads=50)
         scan_results = agent.run(dorkeye_results)
 
-    Each entry in dorkeye_results must have at least a 'url' key.
-    Optionally 'title', 'snippet', 'dork' are used for port-hint detection.
+    Cada entrada em dorkeye_results precisa ter ao menos a chave 'url'.
+    Opcionalmente 'title', 'snippet', 'dork' são usados para detecção de hints de porta.
 
-    Returns a DBScanReport with per-host findings.
+    Retorna um DBScanReport com findings por host.
     """
 
     def __init__(
@@ -483,11 +483,11 @@ class DBPortScanAgent:
         self.stealth   = stealth
         self.max_hosts = max_hosts
 
-        # Results accumulator
+        # Acumulador de resultados
         self._host_results: Dict[str, HostScanResult] = {}
         self._lock = threading.Lock()
 
-        # Stats
+        # Estatísticas
         self.stats = {
             "hosts_scanned":    0,
             "ports_scanned":    0,
@@ -497,12 +497,12 @@ class DBPortScanAgent:
             "medium":           0,
         }
 
-    # ── Host extraction ───────────────────────────────────────────────────────
+    # ── Extração de hosts ───────────────────────────────────────────────────────
 
     def _extract_hosts(self, results: List[dict]) -> List[Tuple[str, str, List[int]]]:
         """
-        Extract unique (hostname, source_url, priority_ports) tuples from results.
-        priority_ports: ports hinted by dork/title/snippet pattern matching.
+        Extrai tuplas únicas (hostname, source_url, priority_ports) dos resultados.
+        priority_ports: portas sugeridas por matching de padrões dork/title/snippet.
         """
         seen:  Set[str] = set()
         hosts: List[Tuple[str, str, List[int]]] = []
@@ -518,12 +518,12 @@ class DBPortScanAgent:
                 continue
             if not host or host in seen:
                 continue
-            # Skip private / loopback addresses
+            # Pula endereços privados / loopback
             if self._is_private_or_local(host):
                 continue
             seen.add(host)
 
-            # Port hints from dork/title/snippet content
+            # Hints de portas a partir do conteúdo dork/título/snippet
             context   = " ".join(filter(None, [
                 r.get("dork", ""),
                 r.get("title", ""),
@@ -544,7 +544,7 @@ class DBPortScanAgent:
 
     @staticmethod
     def _is_private_or_local(host: str) -> bool:
-        """Skip private IPs and localhost."""
+        """Pula IPs privados e localhost."""
         private = (
             "localhost", "127.0.0.1", "0.0.0.0",
             "::1", "192.168.", "10.", "172.16.",
@@ -555,18 +555,18 @@ class DBPortScanAgent:
         )
         return any(host.startswith(p) for p in private)
 
-    # ── Port ordering ──────────────────────────────────────────────────────────
+    # ── Ordenação de portas ──────────────────────────────────────────────────────────
 
     def _ordered_ports(self, hint_ports: List[int]) -> List[int]:
-        """Return scan port list with hint_ports first, rest shuffled."""
+        """Retorna a lista de portas do scan com hint_ports primeiro, o resto embaralhado."""
         base = [p for p in self.ports if p not in hint_ports]
         random.shuffle(base)
         return hint_ports + base
 
-    # ── Single host scan ───────────────────────────────────────────────────────
+    # ── Scan de um único host ───────────────────────────────────────────────────────
 
     def _scan_host(self, host: str, source_url: str, hint_ports: List[int]) -> HostScanResult:
-        """Scan all configured ports on one host (threaded internally)."""
+        """Escaneia todas as portas configuradas em um host (com threads internas)."""
         global _exit_requested, _skip_current
 
         ordered  = self._ordered_ports(hint_ports)
@@ -615,22 +615,22 @@ class DBPortScanAgent:
         result.duration  = time.monotonic() - t_start
         return result
 
-    # ── Main run ───────────────────────────────────────────────────────────────
+    # ── Execução principal ───────────────────────────────────────────────────────────────
 
     def run(self, results: List[dict]) -> "DBScanReport":
         """
-        Run DB port scan on all unique hosts from the given result list.
-        Returns a DBScanReport.
+        Executa o scan de portas DB em todos os hosts únicos da lista de resultados dada.
+        Retorna um DBScanReport.
         """
         global _exit_requested, _skip_current
 
         hosts = self._extract_hosts(results)
         if not hosts:
-            _log("[DBScan] No scannable hosts extracted from results.", style="yellow")
+            _log("[DBScan] Nenhum host escaneável extraído dos resultados.", style="yellow")
             return DBScanReport(host_results=[], stats=dict(self.stats))
 
         _log(
-            f"[DBScan] Scanning {len(hosts)} host(s) × {len(self.ports)} port(s) "
+            f"[DBScan] Escaneando {len(hosts)} host(s) × {len(self.ports)} porta(s) "
             f"— timeout: {self.timeout}s  threads/host: {self.threads}",
             style="bold cyan"
         )
@@ -639,10 +639,10 @@ class DBPortScanAgent:
 
         for idx, (host, source_url, hint_ports) in enumerate(hosts, 1):
             if _exit_requested:
-                _log("[DBScan] Exit requested — stopping scan.", style="bold red")
+                _log("[DBScan] Saída solicitada — interrompendo o scan.", style="bold red")
                 break
             if _skip_current:
-                _log("[DBScan] Skip requested — stopping scan.", style="yellow")
+                _log("[DBScan] Skip solicitado — interrompendo o scan.", style="yellow")
                 _skip_current = False
                 break
 
@@ -655,7 +655,7 @@ class DBPortScanAgent:
             hsr = self._scan_host(host, source_url, hint_ports)
             host_scan_results.append(hsr)
 
-            # Print per-host findings immediately
+            # Imprime os findings por host imediatamente
             _open_badge   = "[bold green][ Open   ][/bold green]"
             _closed_badge = "[bold red][ Closed ][/bold red]"
 
@@ -679,15 +679,15 @@ class DBPortScanAgent:
                         style=""
                     )
 
-            # Closed-port summary — one compact line instead of per-port spam
+            # Resumo de portas fechadas — uma linha compacta em vez de spam por porta
             _closed_cnt = hsr.scanned - len(hsr.open_ports)
             if _closed_cnt > 0:
                 _log(
-                    f"  {_closed_badge} [dim]{_closed_cnt} port(s) closed / filtered[/dim]",
+                    f"  {_closed_badge} [dim]{_closed_cnt} porta(s) fechada(s) / filtrada(s)[/dim]",
                     style=""
                 )
 
-            # Update global stats
+            # Atualiza as estatísticas globais
             self.stats["hosts_scanned"]  += 1
             self.stats["ports_scanned"]  += hsr.scanned
             self.stats["open_ports"]     += len(hsr.open_ports)
@@ -697,7 +697,7 @@ class DBPortScanAgent:
                 1 for f in hsr.findings if f.severity == "MEDIUM"
             )
 
-            # Stealth inter-host delay
+            # Delay entre hosts no modo stealth
             if self.stealth and idx < len(hosts):
                 time.sleep(random.uniform(1.5, 3.5))
 
@@ -708,7 +708,7 @@ class DBPortScanAgent:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  REPORT
+#  RELATÓRIO
 # ══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
@@ -716,7 +716,7 @@ class DBScanReport:
     host_results: List[HostScanResult]
     stats:        dict = field(default_factory=dict)
 
-    # ── Aggregated views ──────────────────────────────────────────────────────
+    # ── Visões agregadas ──────────────────────────────────────────────────────
 
     @property
     def critical_findings(self) -> List[PortFinding]:
@@ -740,7 +740,7 @@ class DBScanReport:
     def has_findings(self) -> bool:
         return bool(self.all_findings)
 
-    # ── Serialization ─────────────────────────────────────────────────────────
+    # ── Serialização ─────────────────────────────────────────────────────────
 
     def to_dict(self) -> dict:
         return {
@@ -752,49 +752,49 @@ class DBScanReport:
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
-    # ── Text summary (terminal) ───────────────────────────────────────────────
+    # ── Resumo em texto (terminal) ───────────────────────────────────────────────
 
     def print_summary(self) -> None:
         stats = self.stats
-        _log("\n[bold cyan]┌─[ DB Port Scan — Summary ][/bold cyan]", style="")
-        _log(f"[bold cyan]│[/bold cyan]  Hosts scanned  : {stats.get('hosts_scanned', 0)}", style="")
-        _log(f"[bold cyan]│[/bold cyan]  Ports scanned  : {stats.get('ports_scanned', 0)}", style="")
-        _log(f"[bold cyan]│[/bold cyan]  Open ports     : {stats.get('open_ports', 0)}", style="")
+        _log("\n[bold cyan]┌─[ Varredura de portas DB — Resumo ][/bold cyan]", style="")
+        _log(f"[bold cyan]│[/bold cyan]  Hosts escaneados: {stats.get('hosts_scanned', 0)}", style="")
+        _log(f"[bold cyan]│[/bold cyan]  Portas escaneadas: {stats.get('ports_scanned', 0)}", style="")
+        _log(f"[bold cyan]│[/bold cyan]  Portas abertas: {stats.get('open_ports', 0)}", style="")
         _log(f"[bold magenta]│[/bold magenta]  CRITICAL (no-auth): {stats.get('critical', 0)}", style="")
         _log(f"[bold red]│[/bold red]  HIGH           : {stats.get('high', 0)}", style="")
         _log(f"[bold yellow]│[/bold yellow]  MEDIUM         : {stats.get('medium', 0)}", style="")
         _log("[bold cyan]└─>[/bold cyan]", style="")
 
         if self.critical_findings:
-            _log("\n[bold magenta]⚠ CRITICAL — Unauthenticated DB exposure:[/bold magenta]", style="")
+            _log("\n[bold magenta]⚠ CRITICAL — Exposição de banco de dados sem autenticação:[/bold magenta]", style="")
             for f in self.critical_findings:
                 _log(f"  {f.host}:{f.port}  [{f.service}]  {f.detail[:120]}", style="bold magenta")
 
-    # ── Sqlmap-friendly TXT ───────────────────────────────────────────────────
+    # ── TXT amigável ao Sqlmap ───────────────────────────────────────────────────
 
     def to_txt_report(self) -> str:
         """
-        Human-readable TXT report of open DB ports, usable as a
-        reference list for follow-up tooling.
+        Relatório TXT legível por humanos das portas DB abertas, utilizável como
+        lista de referência para ferramentas de follow-up.
         """
         lines = [
-            "# DorkEye DB Port Scan Report",
-            f"# Generated : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "# DorkEye — Relatório de Varredura de Portas DB",
+            f"# Gerado em : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"# Hosts     : {self.stats.get('hosts_scanned', 0)}",
-            f"# Open ports: {self.stats.get('open_ports', 0)}",
-            f"# CRITICAL  : {self.stats.get('critical', 0)}  (no-auth confirmed)",
+            f"# Portas abertas: {self.stats.get('open_ports', 0)}",
+            f"# CRITICAL  : {self.stats.get('critical', 0)}  (no-auth confirmado)",
             f"# HIGH      : {self.stats.get('high', 0)}",
             "#",
-            "# Severity legend:",
-            "#   CRITICAL = unauthenticated access confirmed",
-            "#   HIGH     = service confirmed, auth likely required",
-            "#   MEDIUM   = port open, service unclear",
+            "# Legenda de severidade:",
+            "#   CRITICAL = acesso sem autenticação confirmado",
+            "#   HIGH     = serviço confirmado, autenticação provavelmente exigida",
+            "#   MEDIUM   = porta aberta, serviço incerto",
             "",
         ]
         for hsr in self.host_results:
             if not hsr.findings:
                 continue
-            lines.append(f"## Host: {hsr.host}  ({len(hsr.open_ports)} open port(s))")
+            lines.append(f"## Host: {hsr.host}  ({len(hsr.open_ports)} porta(s) aberta(s))")
             for f in hsr.findings:
                 lines.append(
                     f"  [{f.severity:8}] {f.host}:{f.port:<6} {f.service:<18} "
@@ -805,14 +805,14 @@ class DBScanReport:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SAVE HELPERS
+#  AUXILIARES DE SALVAMENTO
 # ══════════════════════════════════════════════════════════════════════════════
 
 def save_dbscan_report(report: DBScanReport, base_path: str) -> str:
     """
-    Save DBScanReport alongside the main results file.
-    Writes: <base>_dbscan_<ts>.json  and  <base>_dbscan_<ts>.txt
-    Returns the JSON path.
+    Salva o DBScanReport junto ao arquivo principal de resultados.
+    Escreve: <base>_dbscan_<ts>.json e <base>_dbscan_<ts>.txt
+    Retorna o path do JSON.
     """
     from pathlib import Path as _Path
 
@@ -820,7 +820,7 @@ def save_dbscan_report(report: DBScanReport, base_path: str) -> str:
     stem = _Path(base_path).stem.replace("_dbscan", "")
     dump = _Path(base_path).parent
 
-    # Ensure the output directory exists (e.g. Dump/ may not yet be created)
+    # Garante que o diretório de saída existe (ex.: Dump/ pode ainda não ter sido criado)
     dump.mkdir(parents=True, exist_ok=True)
 
     json_path = dump / f"{stem}_dbscan_{ts}.json"
@@ -829,13 +829,13 @@ def save_dbscan_report(report: DBScanReport, base_path: str) -> str:
     json_path.write_text(report.to_json(), encoding="utf-8")
     txt_path.write_text(report.to_txt_report(), encoding="utf-8")
 
-    _log(f"[DBScan] Report saved: {json_path}", style="bold green")
-    _log(f"[DBScan] TXT report  : {txt_path}",  style="bold green")
+    _log(f"[DBScan] Relatório salvo: {json_path}", style="bold green")
+    _log(f"[DBScan] Relatório TXT: {txt_path}",  style="bold green")
     return str(json_path)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  STANDALONE CLI
+#  CLI STANDALONE
 # ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
@@ -843,10 +843,10 @@ if __name__ == "__main__":
     import sys
 
     p = argparse.ArgumentParser(
-        description="DorkEye DB Port Scanner v1.0 — standalone mode",
+        description="DorkEye DB Port Scanner v1.0 — modo standalone",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
-            "Examples:\n"
+            "Exemplos:\n"
             "  python db_portscan.py results.json\n"
             "  python db_portscan.py results.json --timeout 3 --threads 80\n"
             "  python db_portscan.py results.json --ports 3306 5432 27017 6379\n"
@@ -854,19 +854,19 @@ if __name__ == "__main__":
         ),
     )
     p.add_argument("results_file",
-                   help="DorkEye JSON results file")
+                   help="Arquivo JSON de resultados do DorkEye")
     p.add_argument("--timeout",   type=float, default=2.5,
-                   help="TCP connect timeout in seconds (default: 2.5)")
+                   help="Timeout de conexão TCP em segundos (padrão: 2.5)")
     p.add_argument("--threads",   type=int,   default=60,
-                   help="Worker threads per host (default: 60)")
+                   help="Threads de trabalho por host (padrão: 60)")
     p.add_argument("--ports",     type=int,   nargs="+", default=None,
-                   help="Port list to scan (default: all DB ports)")
+                   help="Lista de portas para escanear (padrão: todas as portas DB)")
     p.add_argument("--max-hosts", type=int,   default=200,
-                   help="Max hosts to scan (default: 200)")
+                   help="Máximo de hosts para escanear (padrão: 200)")
     p.add_argument("--stealth",   action="store_true",
-                   help="Add inter-host delay (1.5–3.5s)")
+                   help="Adiciona delay entre hosts (1.5–3.5s)")
     p.add_argument("--out",       type=str,   default=None,
-                   help="Output base path (default: same dir as results file)")
+                   help="Path base de saída (padrão: mesmo diretório do arquivo de resultados)")
     args = p.parse_args()
 
     src = args.results_file
@@ -874,11 +874,11 @@ if __name__ == "__main__":
         raw = json.loads(open(src, encoding="utf-8").read())
         results_data = raw if isinstance(raw, list) else raw.get("results", [])
     except Exception as e:
-        print(f"[!] Cannot read '{src}': {e}", file=sys.stderr)
+        print(f"[!] Não foi possível ler '{src}': {e}", file=sys.stderr)
         sys.exit(1)
 
     if not results_data:
-        print(f"[!] No results in '{src}'.", file=sys.stderr)
+        print(f"[!] Nenhum resultado em '{src}'.", file=sys.stderr)
         sys.exit(1)
 
     agent  = DBPortScanAgent(

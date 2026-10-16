@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DorkEye v5.0 | OSINT Dorking Tool
+DorkEye v5.0 | Ferramenta de Dorking OSINT
 Author: xPloits3c I.C.W.T| https://github.com/xPloits3c/DorkEye
 """
 
@@ -29,7 +29,7 @@ import urllib3
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# ── Tools sub-package path injection ─────────────────────────────────────────
+# ── Injeção do path do sub-pacote Tools ─────────────────────────────────────────
 _TOOLS_DIR = Path(__file__).parent / "Tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
@@ -37,7 +37,7 @@ if str(_TOOLS_DIR) not in sys.path:
 
 from dork_generator import DorkGenerator
 
-# ── SQLi engine ───────────────────────────────────────────────────────────────
+# ── Engine SQLi ───────────────────────────────────────────────────────────────
 from sqli import (
     SQLiDetector,
     SQLiConfidence,
@@ -65,13 +65,13 @@ try:
 except ImportError:
     _ANALYZE_AVAILABLE = False
     def _run_agents_pipeline(*a, **kw):
-        """Fallback stub."""
+        """Stub de fallback."""
         return {"triaged": None, "all_secrets": [], "report_path": None}
     def add_crawler_args(parser):
-        """Fallback stub."""
+        """Stub de fallback."""
         return parser
     def run_crawl(*a, **kw):
-        """Fallback stub."""
+        """Stub de fallback."""
         return {"results": [], "rounds": 0, "stop_reason": "unavailable"}
 
 from rich.console import Console
@@ -85,17 +85,17 @@ import getpass
 
 console = Console()
 
-# ── DB Port Scanner ───────────────────────────────────────────────────────────
-# Importato DOPO console per poter stampare avvisi dall'interno dello stub.
-# except Exception (non solo ImportError) cattura anche SyntaxError /
-# AttributeError che si verificherebbero se db_portscan.py fosse corrotto.
+# ── Scanner de Portas DB ───────────────────────────────────────────────────────────
+# Importado DEPOIS do console para poder imprimir avisos de dentro do stub.
+# except Exception (não apenas ImportError) captura também SyntaxError /
+# AttributeError que ocorreriam se db_portscan.py estivesse corrompido.
 try:
     from db_portscan import DBPortScanAgent, save_dbscan_report
     _DBSCAN_AVAILABLE = True
 except Exception:
     _DBSCAN_AVAILABLE = False
     class DBPortScanAgent:              # type: ignore[no-redef]
-        """Stub: db_portscan.py assente o non importabile."""
+        """Stub: db_portscan.py ausente ou não importável."""
         def __init__(self, **kw): pass
         def run(self, *a, **kw): return None
     def save_dbscan_report(*a, **kw):   # type: ignore[no-redef]
@@ -105,11 +105,11 @@ except Exception:
 VALID_MODES = ["soft", "medium", "aggressive"]
 
 # ══════════════════════════════════════════════════════════════
-#  [7] Termux / Android auto-detection
+#  [7] Auto-detecção Termux / Android
 # ══════════════════════════════════════════════════════════════
 
 def _detect_termux_android() -> bool:
-    """Return True when running inside Termux on Android."""
+    """Retorna True quando executando dentro do Termux no Android."""
     return (
         "TERMUX_VERSION" in os.environ
         or os.environ.get("PREFIX", "").startswith("/data/data/com.termux")
@@ -119,7 +119,7 @@ def _detect_termux_android() -> bool:
 TERMUX_IS_ANDROID: bool = _detect_termux_android()
 
 # ══════════════════════════════════════════════════════════════
-#  Ctrl+C interrupt state
+#  Estado de interrupção Ctrl+C
 # ══════════════════════════════════════════════════════════════
 
 _last_interrupt_time: float = 0.0
@@ -128,16 +128,16 @@ _exit_requested: bool       = False
 
 
 def _sigint_handler(signum, frame):
-    """Handle SIGINT (Ctrl+C). Single press skips; double press within 1.5 s exits."""
+    """Trata SIGINT (Ctrl+C). Pressão única pula; pressão dupla em até 1,5 s encerra."""
     global _last_interrupt_time, _skip_current, _exit_requested
     now = time.monotonic()
     if now - _last_interrupt_time < 1.5:
         _exit_requested = True
-        sys.stderr.write("\n[!!] Double Ctrl+C detected — exiting...\n")
+        sys.stderr.write("\n[!!] Ctrl+C duplo detectado — encerrando...\n")
         sys.stderr.flush()
     else:
         _skip_current = True
-        sys.stderr.write("\n[~] Ctrl+C — skipping current task...\n")
+        sys.stderr.write("\n[~] Ctrl+C — pulando tarefa atual...\n")
         sys.stderr.flush()
     _last_interrupt_time = now
 
@@ -156,7 +156,7 @@ signal.signal(signal.SIGINT, _sigint_handler)
 
 
 def _interruptible_sleep(seconds: float, step: float = 0.25) -> None:
-    """Sleep in small steps; return immediately if skip/exit is flagged."""
+    """Dorme em passos pequenos; retorna imediatamente se skip/exit estiver sinalizado."""
     elapsed = 0.0
     while elapsed < seconds:
         if _exit_requested or _skip_current:
@@ -166,7 +166,7 @@ def _interruptible_sleep(seconds: float, step: float = 0.25) -> None:
 
 
 def print_banner():
-    """Print the ASCII art banner."""
+    """Imprime o banner ASCII."""
     TITLE_ROWS = [
         ("bold bright_blue", "╔╦╗╔═╗╦═╗╦╔═  ╔═╗╦ ╦╔═╗"),
         ("bold blue",        " ║║║ ║╠╦╝╠╩╗  ║╣ ╚╦╝║╣"),
@@ -188,16 +188,16 @@ def print_banner():
     )
 
     android_badge = (
-        "\n[bold yellow]▸ Platform[/bold yellow] [dim]│[/dim]  "
-        "[bold green]Android / Termux | battery-saver active[/bold green]"
+        "\n[bold yellow]▸ Plataforma[/bold yellow] [dim]│[/dim]  "
+        "[bold green]Android / Termux | economia de bateria ativa[/bold green]"
         if TERMUX_IS_ANDROID else ""
     )
 
     INFO = (
-        "[bold red]OSINT[/bold red][bold white] DORKING TOOL[/bold white]\n"
-        "[bold green]v5.0[/bold green]  [dim]stable[/dim]\n"
+        "[bold white]FERRAMENTA DE DORKING ([/bold white][bold red]OSINT[/bold red][bold white])[/bold white]\n"
+        "[bold green]v5.0[/bold green]  [dim]estável[/dim]\n"
         "\n"
-        "[dim]▸ Author  │[/dim]  [yellow]xPloits3c I.C.W.T[/yellow]\n"
+        "[dim]▸ Autor   │[/dim]  [yellow]xPloits3c I.C.W.T[/yellow]\n"
         "[dim]▸ GitHub  │[/dim]  [cyan]github.com/xPloits3c/DorkEye[/cyan]\n"
         "[dim]▸ Telegram│[/dim]  [cyan]t.me/DorkEye[/cyan]\n"
         "\n"
@@ -205,9 +205,9 @@ def print_banner():
         "[dim]▸ SQLi    │[/dim]  [green]105[/green][red] payloads[/red]\n"
         "[dim]▸ Engine  │[/dim]  [green]DuckDuckGo[/green]\n"
         "[dim]▸ Crawler │[/dim]  [red]Intel[/red]\n"
-        "[dim]▸ Stealth │[/dim]  [green]Slower, stay safe[/green]\n"
-        "[dim]▸ DorkGen │[/dim]  [green]Max:[/green][red] 10.000[/red]\n"
-        "[dim]▸ Analyzer│[/dim]  [green]Extract metadata[/green]"
+        "[dim]▸ Stealth │[/dim]  [green]Mais lento, mais seguro[/green]\n"
+        "[dim]▸ DorkGen │[/dim]  [green]Máx:[/green][red] 10.000[/red]\n"
+        "[dim]▸ Analyzer│[/dim]  [green]Extrai metadados[/green]"
         + android_badge
     )
 
@@ -219,9 +219,9 @@ def print_banner():
     console.print()
 
     console.print(Panel(
-        "[bold red]⚠  Legal disclaimer[/bold red]\n"
-        "[dim]Attacking targets without prior mutual consent is illegal.[/dim]\n"
-        "[dim]It is the end user's responsibility to obey all applicable local, state and federal laws.[/dim]",
+        "[bold red]⚠  Aviso legal[/bold red]\n"
+        "[dim]Atacar alvos sem consentimento mútuo prévio é ilegal.[/dim]\n"
+        "[dim]É responsabilidade do usuário final obedecer a todas as leis locais, estaduais e federais aplicáveis.[/dim]",
         border_style="red",
         padding=(0, 2),
     ))
@@ -229,31 +229,31 @@ def print_banner():
 
 
 WELCOME_MESSAGES = [
-    "Stay safe, {name}.",
-    "Session initialized, {name}.",
-    "Connected. Welcome back, {name}.",
-    "Terminal ready, {name}.",
-    "OSINT mode active, {name}.",
-    "Shall we play a game, {name}?",
-    "You wanna play a game?",
-    "Greetings, {name}. Shall we begin?",
-    "Curiosity leaves footprints.",
-    "VPN is not invisibility.",
-    "They log more than you think.",
-    "Silence. Just data, {name}.",
-    "Back online, {name}.",
-    "Workspace loaded, {name}.",
-    "Use isolated environments.",
-    "Targets waiting, {name}.",
-    "Query the noise, {name}.",
-    "Burn what you touch.",
-    "You are visible.",
-    "No small talk. Just results, {name}.",
-    "We don't break things. We observe, {name}.",
-    "Information wants to be found, {name}.",
-    "Trust nothing. Verify everything, {name}.",
-    "Stay invisible, {name}.",
-    "Let's see what they forgot to hide, {name}.",
+    "Fique seguro, {name}.",
+    "Sessão inicializada, {name}.",
+    "Conectado. Bem-vindo de volta, {name}.",
+    "Terminal pronto, {name}.",
+    "Modo OSINT ativo, {name}.",
+    "Pronto para começar, {name}?",
+    "Vamos ao trabalho.",
+    "Saudações, {name}. Podemos começar?",
+    "A curiosidade deixa rastros.",
+    "VPN não é anonimato.",
+    "Eles registram mais do que você imagina.",
+    "Silêncio. Só dados, {name}.",
+    "De volta online, {name}.",
+    "Ambiente carregado, {name}.",
+    "Use ambientes isolados.",
+    "Alvos na fila, {name}.",
+    "Filtre o ruído, {name}.",
+    "Registre suas ações para auditoria.",
+    "Sua atividade é visível.",
+    "Sem conversa fiada. Só resultados, {name}.",
+    "Não quebramos nada. Observamos, {name}.",
+    "A informação quer ser encontrada, {name}.",
+    "Confie em nada. Verifique tudo, {name}.",
+    "Opere de forma discreta e responsável, {name}.",
+    "Vamos ver o que foi exposto por descuido, {name}.",
 ]
 
 WELCOME_COLORS = [
@@ -264,18 +264,18 @@ WELCOME_COLORS = [
 
 
 def get_user_name() -> str:
-    """Return the current OS username; fall back to hostname, then 'friend'."""
+    """Retorna o nome de usuário do SO atual; fallback para hostname, depois 'amigo'."""
     try:
         return getpass.getuser()
     except Exception:
         try:
             return socket.gethostname()
         except Exception:
-            return "friend"
+            return "amigo"
 
 
 def greet_user():
-    """Print a random welcome message with a random colour."""
+    """Imprime uma mensagem de boas-vindas aleatória com uma cor aleatória."""
     name    = _rich_escape(get_user_name())
     message = random.choice(WELCOME_MESSAGES).format(name=name)
     color   = random.choice(WELCOME_COLORS)
@@ -309,7 +309,7 @@ DEFAULT_CONFIG = {
 
 
 class UserAgentRotator:
-    """Rotates User-Agent strings across Chrome, Firefox, Safari, and Edge profiles."""
+    """Rotaciona strings de User-Agent entre perfis Chrome, Firefox, Safari e Edge."""
     def __init__(self):
         self.agents        = [a for lst in USER_AGENTS.values() for a in lst]
         self.current_index = 0
@@ -324,27 +324,27 @@ class UserAgentRotator:
 
 
 # ══════════════════════════════════════════════════════════════
-#  SessionCheckpoint  ← NUOVO (punto 3)
+#  SessionCheckpoint  ← NOVO (ponto 3)
 # ══════════════════════════════════════════════════════════════
 
 class SessionCheckpoint:
     """
-    Saves and restores the state of a disk search session.
+    Salva e restaura o estado de uma sessão de busca em disco.
 
-    The checkpoint file is written to the Dump/.checkpoints/ folder
-    and automatically removed when the session is complete.
-    If an I/O error occurs during saving, a warning is printed
-    but the session continues without interruption.
+    O arquivo de checkpoint é gravado na pasta Dump/.checkpoints/
+    e removido automaticamente quando a sessão é concluída.
+    Se ocorrer um erro de E/S durante o salvamento, um aviso é impresso
+    mas a sessão continua sem interrupção.
     """
 
     CHECKPOINT_DIR = Path(__file__).parent / "Dump" / ".checkpoints"
 
     def __init__(self, session_id: str):
-        """Create the checkpoint directory and set the file path."""
+        """Cria o diretório de checkpoint e define o path do arquivo."""
         try:
             self.CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            console.print(f"[yellow][~] Checkpoint dir non creabile: {e}[/yellow]")
+            console.print(f"[yellow][~] Não foi possível criar o diretório de checkpoint: {e}[/yellow]")
         self.path       = self.CHECKPOINT_DIR / f"{session_id}.pkl"
         self.session_id = session_id
 
@@ -354,7 +354,7 @@ class SessionCheckpoint:
         results:         List[Dict],
         stats:           dict,
     ) -> None:
-        """Pickle the current session state to disk."""
+        """Serializa (pickle) o estado atual da sessão em disco."""
         try:
             with open(self.path, "wb") as f:
                 pickle.dump(
@@ -368,14 +368,14 @@ class SessionCheckpoint:
                     protocol=pickle.HIGHEST_PROTOCOL,
                 )
         except Exception as e:
-            # Non-fatal: the session continues even without a checkpoint
-            console.print(f"[yellow][~] Checkpoint save fallito: {e}[/yellow]")
+            # Não fatal: a sessão continua mesmo sem checkpoint
+            console.print(f"[yellow][~] Falha ao salvar checkpoint: {e}[/yellow]")
 
     def load(self) -> Optional[dict]:
         """
-        Loads the checkpoint from disk.
+        Carrega o checkpoint do disco.
 
-        Returns None if the file does not exist or is corrupt.
+        Retorna None se o arquivo não existir ou estiver corrompido.
         """
         if not self.path.exists():
             return None
@@ -383,15 +383,15 @@ class SessionCheckpoint:
             with open(self.path, "rb") as f:
                 return pickle.load(f)
         except Exception as e:
-            console.print(f"[yellow][~] Checkpoint corrotto, ignorato: {e}[/yellow]")
+            console.print(f"[yellow][~] Checkpoint corrompido, ignorado: {e}[/yellow]")
             return None
 
     def delete(self) -> None:
-        """Removes the checkpoint file upon session completion."""
+        """Remove o arquivo de checkpoint ao concluir a sessão."""
         try:
             self.path.unlink(missing_ok=True)
         except Exception:
-            pass  # Non critico
+            pass  # Não crítico
 
 
 # ══════════════════════════════════════════════════════════════
@@ -400,7 +400,7 @@ class SessionCheckpoint:
 
 class FileAnalyzer:
     """
-    Performs HEAD-request file analysis and optional SQLi/XSS checking on discovered URLs.
+    Faz análise de arquivos via requests HEAD e verificação opcional de SQLi/XSS em URLs descobertas.
     """
     def __init__(self, config: Dict, ua_rotator: UserAgentRotator, fp_rotator: HTTPFingerprintRotator):
         self.config        = config
@@ -525,7 +525,7 @@ class FileAnalyzer:
 # ══════════════════════════════════════════════════════════════
 
 class DorkEyeEnhanced:
-    """Main orchestrator: dork searches, file analysis, SQLi/XSS testing, result persistence."""
+    """Orquestrador principal: buscas de dorks, análise de arquivos, testes SQLi/XSS, persistência de resultados."""
 
     def __init__(self, config: Dict, output_file: str = None):
         self.config      = config
@@ -538,9 +538,9 @@ class DorkEyeEnhanced:
         self.url_hashes: Set[str]  = set()
         self.start_time  = time.time()
         self._total_results_at_last_extended_delay: int = 0
-        # ── Dedup terminale SQLi / XSS ──────────────────────────────────────
-        # Evitano di ristampare la stessa vulnerabilità se lo stesso URL
-        # riemerge in un dork successivo o in modalità -f / resume.
+        # ── Dedup terminal SQLi / XSS ──────────────────────────────────────
+        # Evita reimprimir a mesma vulnerabilidade se a mesma URL
+        # reaparecer em um dork posterior ou em modo -f / resume.
         self._reported_sqli_urls: Set[str] = set()
         self._reported_xss_urls:  Set[str] = set()
 
@@ -581,16 +581,16 @@ class DorkEyeEnhanced:
 
     def search_dork(self, dork: str, count: int,
                     dork_index: int = 1, total_dorks: int = 1) -> List[Dict]:
-        """Search DuckDuckGo for one dork via a daemon producer thread."""
+        """Busca no DuckDuckGo por um dork via thread produtora daemon."""
         global _skip_current, _exit_requested
 
         _ts = datetime.now().strftime("%H:%M:%S")
         console.print(
             f"\n[bold cyan][ Dork {dork_index}/{total_dorks} ][/bold cyan]"
             f"  [dim]{_ts}[/dim]"
-            f"  [dim]Ctrl+C → skip  │  ×2 → quit[/dim]"
+            f"  [dim]Ctrl+C → pular  │  ×2 → sair[/dim]"
         )
-        console.print(f"[bold green][*] Searching dork:[/bold green] {_rich_escape(dork)}")
+        console.print(f"[bold green][*] Buscando dork:[/bold green] {_rich_escape(dork)}")
 
         _skip_current = False
 
@@ -607,7 +607,7 @@ class DorkEyeEnhanced:
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             console=console
         ) as progress:
-            task = progress.add_task("[cyan]Searching DuckDuckGo...", total=count)
+            task = progress.add_task("[cyan]Buscando no DuckDuckGo...", total=count)
 
             for attempt in range(max_attempts):
                 if _exit_requested or _skip_current:
@@ -685,41 +685,41 @@ class DorkEyeEnhanced:
                             break
                         backoff = (2 ** attempt) + random.uniform(0, 3)
                         console.print(
-                            f"[yellow][~] Retry {attempt + 1}/{max_attempts - 1} — "
-                            f"backing off {backoff:.1f}s[/yellow]"
+                            f"[yellow][~] Tentativa {attempt + 1}/{max_attempts - 1} — "
+                            f"backoff de {backoff:.1f}s[/yellow]"
                         )
                         _interruptible_sleep(backoff)
 
                 except Exception as e:
-                    console.print(f"[yellow][!] Attempt {attempt + 1} failed: {str(e)}[/yellow]")
+                    console.print(f"[yellow][!] Tentativa {attempt + 1} falhou: {str(e)}[/yellow]")
                     if attempt < max_attempts - 1 and not _exit_requested and not _skip_current:
                         backoff = (2 ** attempt) + random.uniform(0, 3)
                         console.print(
-                            f"[yellow][~] Waiting {backoff:.1f}s before next attempt...[/yellow]"
+                            f"[yellow][~] Aguardando {backoff:.1f}s antes da próxima tentativa...[/yellow]"
                         )
                         _interruptible_sleep(backoff)
                     continue
 
         if _skip_current:
-            console.print(f"[yellow][~] Dork {dork_index}/{total_dorks} skipped.[/yellow]")
+            console.print(f"[yellow][~] Dork {dork_index}/{total_dorks} pulado.[/yellow]")
             _skip_current = False
 
-        console.print(f"[bold blue][+] Found {len(results)} unique results for this dork[/bold blue]")
+        console.print(f"[bold blue][+] Encontrados {len(results)} resultados únicos para este dork[/bold blue]")
         return results
 
     def analyze_results(self, results: List[Dict]) -> List[Dict]:
-        """Run file analysis and/or SQLi/XSS testing on a batch of result dicts."""
+        """Roda análise de arquivos e/ou testes SQLi/XSS sobre um lote de dicts de resultado."""
         global _skip_current, _exit_requested
 
         if not self.config.get("analyze_files", True) and not self.config.get("sqli_detection", False):
             return results
-        console.print("\n[bold yellow][*] Analyzing results...[/bold yellow]")
+        console.print("\n[bold yellow][*] Analisando resultados...[/bold yellow]")
         files_to_analyze  = [r for r in results if r["category"] != "webpage"]
         urls_to_test_sqli = [r for r in results if self.config.get("sqli_detection", False)]
 
         with Progress(console=console) as progress:
             if self.config.get("analyze_files", True) and files_to_analyze:
-                task1 = progress.add_task("[cyan]Analyzing [yellow]files[cyan]...", total=len(files_to_analyze))
+                task1 = progress.add_task("[cyan]Analisando [yellow]arquivos[cyan]...", total=len(files_to_analyze))
                 for result in files_to_analyze:
                     if _exit_requested or _skip_current:
                         break
@@ -734,16 +734,16 @@ class DorkEyeEnhanced:
                     _interruptible_sleep(random.uniform(1, 2) if self.config.get("stealth_mode", False) else 0.5)
 
                 if _skip_current and not _exit_requested:
-                    console.print("[yellow][~] Ctrl+C — file analysis skipped.[/yellow]")
+                    console.print("[yellow][~] Ctrl+C — análise de arquivos pulada.[/yellow]")
                     _skip_current = False
 
             if self.config.get("sqli_detection", False) and urls_to_test_sqli:
-                task2 = progress.add_task("[cyan]Testing for [red]SQLi[cyan]...", total=len(urls_to_test_sqli))
+                task2 = progress.add_task("[cyan]Testando [red]SQLi[cyan]...", total=len(urls_to_test_sqli))
                 for result in urls_to_test_sqli:
                     if _exit_requested:
                         break
                     if _skip_current:
-                        console.print("[yellow][~] Ctrl+C — skipping remaining SQLi tests for this dork.[/yellow]")
+                        console.print("[yellow][~] Ctrl+C — pulando os testes SQLi restantes deste dork.[/yellow]")
                         _skip_current = False
                         break
 
@@ -752,7 +752,7 @@ class DorkEyeEnhanced:
 
                     if sqli_result.get("waf_detected"):
                         console.print(
-                            f"[yellow][~] WAF detected "
+                            f"[yellow][~] WAF detectado "
                             f"({sqli_result['waf_detected']}): {_rich_escape(result['url'])}[/yellow]"
                         )
                         self.stats["waf_detected"] += 1
@@ -769,10 +769,10 @@ class DorkEyeEnhanced:
                                 else "[bold red]"
                             )
                             console.print(
-                                f"{style}[!] Potential SQLi found "
+                                f"{style}[!] SQLi potencial encontrado "
                                 f"({confidence}): {_rich_escape(_sqli_url)}[/{style[1:]}"
                             )
-                            # ── Dedup sub-test: un solo ↳ per (method, param) ─
+                            # ── Dedup de sub-test: um único ↳ por (method, param) ─
                             _seen_sqli: set = set()
                             for _t in sqli_result.get("tests", []):
                                 if _t.get("vulnerable"):
@@ -784,26 +784,26 @@ class DorkEyeEnhanced:
                                     _seen_sqli.add(_subkey)
                                     _ev_list  = _t.get("evidence", [])
                                     _ev_str   = " | ".join(_ev_list[:2]) if _ev_list else ""
-                                    _param_str = f" [param: {_param}]" if _param else ""
+                                    _param_str = f" [parâmetro: {_param}]" if _param else ""
                                     console.print(
-                                        f"[dim]    ↳ method: [yellow]{_method}[/yellow]"
+                                        f"[dim]    ↳ método: [yellow]{_method}[/yellow]"
                                         f"{_param_str}"
-                                        + (f"  evidence: [italic]{_rich_escape(_ev_str[:120])}[/italic]" if _ev_str else "")
+                                        + (f"  evidência: [italic]{_rich_escape(_ev_str[:120])}[/italic]" if _ev_str else "")
                                         + "[/dim]"
                                     )
                     progress.advance(task2)
                     if self.config.get("stealth_mode", False):
                         _interruptible_sleep(random.uniform(3, 6))
 
-            # ── XSS Testing ──────────────────────────────────────────────────
+            # ── Testes XSS ──────────────────────────────────────────────────
             urls_to_test_xss = [r for r in results if self.config.get("xss_detection", False)]
             if self.config.get("xss_detection", False) and urls_to_test_xss:
-                task3 = progress.add_task("[cyan]Testing for [bold yellow]XSS[cyan]...", total=len(urls_to_test_xss))
+                task3 = progress.add_task("[cyan]Testando [bold yellow]XSS[cyan]...", total=len(urls_to_test_xss))
                 for result in urls_to_test_xss:
                     if _exit_requested:
                         break
                     if _skip_current:
-                        console.print("[yellow][~] Ctrl+C — skipping remaining XSS tests for this dork.[/yellow]")
+                        console.print("[yellow][~] Ctrl+C — pulando os testes XSS restantes deste dork.[/yellow]")
                         _skip_current = False
                         break
 
@@ -812,7 +812,7 @@ class DorkEyeEnhanced:
 
                     if xss_result.get("waf_detected") and not result.get("sqli_test", {}).get("waf_detected"):
                         console.print(
-                            f"[yellow][~] WAF detected "
+                            f"[yellow][~] WAF detectado "
                             f"({xss_result['waf_detected']}): {_rich_escape(result['url'])}[/yellow]"
                         )
                         self.stats["waf_detected"] += 1
@@ -826,10 +826,10 @@ class DorkEyeEnhanced:
                             confidence = xss_result.get("overall_confidence", "?")
                             types_str  = ", ".join(xss_result.get("xss_types_found", []))
                             console.print(
-                                f"[bold yellow][!] Potential XSS found "
+                                f"[bold yellow][!] XSS potencial encontrado "
                                 f"({confidence}) [{types_str}]: {_rich_escape(_xss_url)}[/bold yellow]"
                             )
-                            # ── Dedup sub-test: un solo ↳ per XSS type ───────
+                            # ── Dedup de sub-test: um único ↳ por tipo XSS ───────
                             _seen_xss: set = set()
                             for _xt in xss_result.get("tests", []):
                                 if _xt.get("vulnerable"):
@@ -841,8 +841,8 @@ class DorkEyeEnhanced:
                                     _xpayld = _xt.get("payload", "")
                                     _xpstr  = f" [payload: {_xpayld[:60]}]" if _xpayld else ""
                                     console.print(
-                                        f"[dim]    ↳ type: [yellow]{_xtype}[/yellow]{_xpstr}"
-                                        + (f"  evidence: [italic]{_rich_escape(_xev[:120])}[/italic]" if _xev else "")
+                                        f"[dim]    ↳ tipo: [yellow]{_xtype}[/yellow]{_xpstr}"
+                                        + (f"  evidência: [italic]{_rich_escape(_xev[:120])}[/italic]" if _xev else "")
                                         + "[/dim]"
                                     )
                     progress.advance(task3)
@@ -852,13 +852,13 @@ class DorkEyeEnhanced:
 
     def run_search(self, dorks: List[str], count: int):
         """
-        Iterate over dorks, search each one, analyse results, apply inter-dork delays.
+        Itera sobre os dorks, busca cada um, analisa os resultados e aplica delays entre dorks.
 
-        Integrates the Checkpoint/Resume system (point 3):
-        -   Generates a deterministic session_id from past dorks.
-        - If a valid checkpoint exists, prompts the user whether to resume.
-        - Saves the checkpoint to disk after each completed dork.
-        - Deletes the checkpoint at the end of the session (completed or terminated via exit).
+        Integra o sistema de Checkpoint/Resume (ponto 3):
+        -   Gera um session_id determinístico a partir dos dorks anteriores.
+        - Se existir um checkpoint válido, pergunta ao usuário se deseja retomar.
+        - Salva o checkpoint em disco após cada dork concluído.
+        - Exclui o checkpoint ao final da sessão (concluída ou encerrada via exit).
         """
         global _skip_current, _exit_requested
 
@@ -875,15 +875,15 @@ class DorkEyeEnhanced:
             n_done   = len(saved_state.get("completed_dorks", []))
             saved_at = saved_state.get("saved_at", "?")
             console.print(
-                f"\n[bold yellow]┌─[ CHECKPOINT FOUND ][/bold yellow]"
+                f"\n[bold yellow]┌─[ CHECKPOINT ENCONTRADO ][/bold yellow]"
             )
             console.print(
                 f"[bold yellow]│[/bold yellow]"
-                f"  Saved: [dim]{saved_at}[/dim]"
-                f"  │  Dorks completed: [green]{n_done}[/green] / {len(dorks)}"
+                f"  Salvo: [dim]{saved_at}[/dim]"
+                f"  │  Dorks concluídos: [green]{n_done}[/green] / {len(dorks)}"
             )
             console.print(
-                "[bold yellow]│  Resume session? [Y/n]:[/bold yellow] ",
+                "[bold yellow]│  Retomar sessão? [Y/n]:[/bold yellow] ",
                 end="",
             )
             try:
@@ -895,50 +895,50 @@ class DorkEyeEnhanced:
                 completed_dorks = set(saved_state.get("completed_dorks", []))
                 self.results    = saved_state.get("results", [])
                 self.stats.update(saved_state.get("stats", {}))
-                # Rebuild url_hashes from the loaded results
-                # To ensure is_duplicate() works correctly
+                # Reconstrói url_hashes a partir dos resultados carregados
+                # Para garantir que is_duplicate() funcione corretamente
                 for r in self.results:
                     _h = self._hash_url(r.get("url", ""))
                     self.url_hashes.add(_h)
                 console.print(
-                    f"[bold yellow]└─>[/bold yellow] [green]Session resumed — "
-                    f"{len(self.results)} results already collected.[/green]\n"
+                    f"[bold yellow]└─>[/bold yellow] [green]Sessão retomada — "
+                    f"{len(self.results)} resultados já coletados.[/green]\n"
                 )
             else:
-                # User chose not to resume: delete old checkpoint
+                # Usuário optou por não retomar: exclui o checkpoint antigo
                 checkpoint.delete()
                 console.print(
-                    "[bold yellow]└─>[/bold yellow] [dim]New session started.[/dim]\n"
+                    "[bold yellow]└─>[/bold yellow] [dim]Nova sessão iniciada.[/dim]\n"
                 )
-        # ── Fine checkpoint setup ─────────────────────────────────────────────
+        # ── Fim do setup de checkpoint ─────────────────────────────────────────────
 
         total_dorks = len(dorks)
-        console.print(f"[bold cyan][*] Search with {total_dorks} dork(s)[/bold cyan]\n")
+        console.print(f"[bold cyan][*] Busca com {total_dorks} dork(s)[/bold cyan]\n")
         console.print(
-            f"[dim]💡 Ctrl+C during a dork → skip.  "
-            f"Double Ctrl+C → quit.[/dim]\n"
+            f"[dim]💡 Ctrl+C durante um dork → pular.  "
+            f"Ctrl+C duplo → sair.[/dim]\n"
         )
         if self.config.get("stealth_mode", False):
-            console.print("[bold magenta][*] Stealth mode:[/bold magenta][bold green] OK[/bold green]")
+            console.print("[bold magenta][*] Modo stealth:[/bold magenta][bold green] OK[/bold green]")
         if self.config.get("http_fingerprinting", True):
             console.print("[bold magenta][*] HTTP Fingerprinting:[/bold magenta][bold green] OK[/bold green]")
         if self.config.get("sqli_detection", False):
-            console.print("[bold red][*] SQL Injection Detection:[/bold red][bold green] OK[/bold green]")
+            console.print("[bold red][*] Detecção de SQL Injection:[/bold red][bold green] OK[/bold green]")
         if self.config.get("xss_detection", False):
             xss_t = self.config.get("xss_type", "all").upper()
-            console.print(f"[bold yellow][*] XSS Detection:[/bold yellow][bold green] OK[/bold green] [dim](type: {xss_t})[/dim]")
+            console.print(f"[bold yellow][*] Detecção de XSS:[/bold yellow][bold green] OK[/bold green] [dim](tipo: {xss_t})[/dim]")
         if TERMUX_IS_ANDROID:
-            console.print("[bold green][*] Android/Termux mode: battery-saver constants active[/bold green]")
+            console.print("[bold green][*] Modo Android/Termux: constantes de economia de bateria ativas[/bold green]")
 
         for index, dork in enumerate(dorks, start=1):
             if _exit_requested:
-                console.print("[bold red][!!] Exit requested — stopping search.[/bold red]")
+                console.print("[bold red][!!] Saída solicitada — interrompendo a busca.[/bold red]")
                 break
 
-            # ── Skip dorks already completed in the previous session ─────────
+            # ── Pula dorks já concluídos na sessão anterior ─────────
             if dork in completed_dorks:
                 console.print(
-                    f"[dim][~] Dork {index}/{total_dorks} already completed — skip.[/dim]"
+                    f"[dim][~] Dork {index}/{total_dorks} já concluído — pular.[/dim]"
                 )
                 continue
 
@@ -949,9 +949,9 @@ class DorkEyeEnhanced:
                 self.results.extend(results)
                 if self.output_file:
                     self.save_results()
-                # Save checkpoint even if forced exit
+                # Salva checkpoint mesmo em saída forçada
                 checkpoint.save(list(completed_dorks), self.results, dict(self.stats))
-                console.print("[bold red][!!] Exit requested — stopping search.[/bold red]")
+                console.print("[bold red][!!] Saída solicitada — interrompendo a busca.[/bold red]")
                 break
 
             if (
@@ -965,12 +965,12 @@ class DorkEyeEnhanced:
             if self.output_file:
                 self.save_results()
 
-            # ── Salva checkpoint dopo ogni dork completato ────────────────────
+            # ── Salva checkpoint após cada dork concluído ────────────────────
             completed_dorks.add(dork)
             checkpoint.save(list(completed_dorks), self.results, dict(self.stats))
 
             if _exit_requested:
-                console.print("[bold red][!!] Exit requested — stopping search.[/bold red]")
+                console.print("[bold red][!!] Saída solicitada — interrompendo a busca.[/bold red]")
                 break
 
             if index >= total_dorks:
@@ -978,15 +978,15 @@ class DorkEyeEnhanced:
 
             stealth = self.config.get("stealth_mode", False)
             delay   = self._compute_base_delay(len(results), stealth)
-            console.print(f"[yellow][~] Waiting {delay}s before next dork...[/yellow]")
+            console.print(f"[yellow][~] Aguardando {delay}s antes do próximo dork...[/yellow]")
 
             _interruptible_sleep(delay)
 
             if _exit_requested:
-                console.print("[bold red][!!] Exit requested — stopping search.[/bold red]")
+                console.print("[bold red][!!] Saída solicitada — interrompendo a busca.[/bold red]")
                 break
             if _skip_current:
-                console.print("[yellow][~] Delay skipped.[/yellow]")
+                console.print("[yellow][~] Delay pulado.[/yellow]")
                 _skip_current = False
 
             if self._should_trigger_extended_delay():
@@ -995,30 +995,30 @@ class DorkEyeEnhanced:
                     else random.uniform(85, 110), 2
                 )
                 console.print(
-                    f"[bold magenta][~] Extended delay: {long_delay}s "
-                    f"({len(self.results)} total results collected — rate limit protection)"
+                    f"[bold magenta][~] Delay estendido: {long_delay}s "
+                    f"({len(self.results)} resultados totais coletados — proteção de rate limit)"
                     f"[/bold magenta]"
                 )
                 _interruptible_sleep(long_delay)
 
                 if _exit_requested:
-                    console.print("[bold red][!!] Exit requested — stopping search.[/bold red]")
+                    console.print("[bold red][!!] Saída solicitada — interrompendo a busca.[/bold red]")
                     break
                 if _skip_current:
-                    console.print("[yellow][~] Extended delay skipped.[/yellow]")
+                    console.print("[yellow][~] Delay estendido pulado.[/yellow]")
                     _skip_current = False
 
                 self._total_results_at_last_extended_delay = len(self.results)
 
-        #   ──  Session completed: remove checkpoint ────────────────────────
-        # We only delete it if _exit_requested is False (session terminated
-        # normally or due to dork exhaustion). If it is True, the checkpoint has already
-        # been saved in the break above, so the session can be resumed.
+        #   ──  Sessão concluída: remove checkpoint ────────────────────────
+        # Só excluímos se _exit_requested for False (sessão encerrada
+        # normalmente ou por esgotamento de dorks). Se for True, o checkpoint já foi
+        # salvo no break acima, então a sessão pode ser retomada.
         if not _exit_requested:
             checkpoint.delete()
 
     def save_results(self):
-        """Persist self.results to disk in the format determined by the output file extension."""
+        """Persiste self.results em disco no formato determinado pela extensão do arquivo de saída."""
         if not self.output_file:
             return
         downloads_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dump")
@@ -1034,10 +1034,10 @@ class DorkEyeEnhanced:
             elif ext == ".html": self._save_html(filename)
             elif ext == ".txt":  self._save_txt(filename)
             else:
-                console.print(f"[red][!] Unsupported output format: {ext}[/red]")
+                console.print(f"[red][!] Formato de saída não suportado: {ext}[/red]")
         except Exception as _save_err:
             import traceback as _tb
-            console.print(f"[red][!] Error saving results to {filename}[/red]")
+            console.print(f"[red][!] Erro ao salvar resultados em {filename}[/red]")
             console.print(f"[red]    {_save_err}[/red]")
             console.print(f"[dim]{_tb.format_exc()}[/dim]")
 
@@ -1093,9 +1093,9 @@ class DorkEyeEnhanced:
             for idx, result in enumerate(self.results, 1):
                 f.write(f"{idx}. {result.get('url')}\n")
                 if result.get("title"):
-                    f.write(f"   Title: {result.get('title')}\n")
+                    f.write(f"   Título: {result.get('title')}\n")
                 if result.get("category"):
-                    f.write(f"   Category: {result.get('category')}\n")
+                    f.write(f"   Categoria: {result.get('category')}\n")
                 if "sqli_test" in result:
                     sqli = result["sqli_test"]
                     if sqli.get("tested", False):
@@ -1112,7 +1112,7 @@ class DorkEyeEnhanced:
                 f.write("\n")
 
     def _save_html(self, filename: str):
-        """Build and write the full interactive dark-theme HTML report."""
+        """Constrói e grava o relatório HTML interativo completo com tema escuro."""
         sqli_count = self.stats.get("sqli_vulnerable", 0)
         sqli_safe  = sum(
             1 for r in self.results
@@ -1190,7 +1190,7 @@ class DorkEyeEnhanced:
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>DorkEye | Report</title>
+    <title>DorkEye | Relatório</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Courier New', monospace; background: #000; color: #00ff41; min-height: 100vh; overflow-x: hidden; }
@@ -1399,57 +1399,57 @@ class DorkEyeEnhanced:
 <canvas id="matrix-canvas"></canvas>
 <div id="content">
     <div class="header">
-        <h1>&#9632; DorkEye | Report <span class="blink">_</span></h1>
+        <h1>&#9632; DorkEye | Relatório <span class="blink">_</span></h1>
 """)
-        parts.append(f'        <div class="subtitle">&#10132; Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} &nbsp;|&nbsp; xploits3c.github.io/DorkEye</div>\n')
+        parts.append(f'        <div class="subtitle">&#10132; Gerado: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} &nbsp;|&nbsp; xploits3c.github.io/DorkEye</div>\n')
         parts.append("    </div>\n")
 
         if sqli_count > 0:
             parts.append(f"""    <div class="sqli-alert">
-        <h2>&#9888; SECURITY ALERT &#9888;</h2>
-        <p><strong>{sqli_count}</strong> potential SQL injection vulnerabilities detected!</p>
-        <p>Review the results marked VULNERABLE below.</p>
+        <h2>&#9888; ALERTA DE SEGURANÇA &#9888;</h2>
+        <p><strong>{sqli_count}</strong> vulnerabilidades potenciais de injeção SQL detectadas!</p>
+        <p>Revise abaixo os resultados marcados como VULNERABLE.</p>
     </div>
 """)
         if xss_count > 0:
             parts.append(f"""    <div class="xss-alert" style="background:rgba(40,20,0,0.88);border:1px solid #ffaa00;border-left:4px solid #ffaa00;padding:14px 20px;margin-bottom:20px;color:#ffcc44;">
-        <h2 style="font-size:15px;letter-spacing:2px;margin-bottom:6px;">&#9888; XSS ALERT &#9888;</h2>
-        <p style="font-size:13px;color:#ffdd88;"><strong>{xss_count}</strong> potential Cross-Site Scripting vulnerabilities detected!</p>
+        <h2 style="font-size:15px;letter-spacing:2px;margin-bottom:6px;">&#9888; ALERTA XSS &#9888;</h2>
+        <p style="font-size:13px;color:#ffdd88;"><strong>{xss_count}</strong> vulnerabilidades potenciais de Cross-Site Scripting detectadas!</p>
     </div>
 """)
         if waf_count > 0:
             parts.append(f"""    <div class="waf-alert">
-        &#9888; <strong>{waf_count}</strong> WAF-protected target(s) detected.
+        &#9888; <strong>{waf_count}</strong> alvo(s) protegido(s) por WAF detectado(s).
     </div>
 """)
         parts.append(f"""    <div class="stats">
-        <div class="stat-card"><h3>&#9632; TOTAL RESULTS</h3><p>{len(self.results)}</p></div>
-        <div class="stat-card"><h3>&#9632; DUPLICATES FILTERED</h3><p>{self.stats.get("duplicates", 0)}</p></div>
-        <div class="stat-card"><h3>&#9632; SQLI VULNERABILITIES</h3><p style="color:#ff3333;">{sqli_count}</p></div>
-        <div class="stat-card"><h3>&#9632; XSS VULNERABILITIES</h3><p style="color:#ffaa00;">{xss_count}</p></div>
-        <div class="stat-card"><h3>&#9632; WAF DETECTED</h3><p style="color:#ffaa00;">{waf_count}</p></div>
-        <div class="stat-card"><h3>&#9632; EXECUTION TIME</h3><p>{round(time.time() - self.start_time, 2)}s</p></div>
+        <div class="stat-card"><h3>&#9632; TOTAL DE RESULTADOS</h3><p>{len(self.results)}</p></div>
+        <div class="stat-card"><h3>&#9632; DUPLICADOS FILTRADOS</h3><p>{self.stats.get("duplicates", 0)}</p></div>
+        <div class="stat-card"><h3>&#9632; VULNERABILIDADES SQLI</h3><p style="color:#ff3333;">{sqli_count}</p></div>
+        <div class="stat-card"><h3>&#9632; VULNERABILIDADES XSS</h3><p style="color:#ffaa00;">{xss_count}</p></div>
+        <div class="stat-card"><h3>&#9632; WAF DETECTADO</h3><p style="color:#ffaa00;">{waf_count}</p></div>
+        <div class="stat-card"><h3>&#9632; TEMPO DE EXECUÇÃO</h3><p>{round(time.time() - self.start_time, 2)}s</p></div>
     </div>
 
     <div class="toolbar">
       <div class="filter-bar">
-        <span class="filter-label">[ FILTER ]</span>
-        <button class="filter-btn active" data-group="all" onclick="applyFilter(this)">ALL <span class="badge" id="badge-all">{cnt["all"]}</span></button>
+        <span class="filter-label">[ FILTRO ]</span>
+        <button class="filter-btn active" data-group="all" onclick="applyFilter(this)">TODOS <span class="badge" id="badge-all">{cnt["all"]}</span></button>
         <div class="filter-group" id="fg-doc">
-            <button class="filter-btn has-sub" data-group="doc" onclick="applyFilter(this)">DOC <span class="badge" id="badge-doc">{cnt["doc"]}</span><span class="arrow">&#9660;</span></button>
+            <button class="filter-btn has-sub" data-group="doc" onclick="applyFilter(this)">DOCS <span class="badge" id="badge-doc">{cnt["doc"]}</span><span class="arrow">&#9660;</span></button>
             <div class="sub-menu" id="sub-doc">
-                <button class="sub-btn active" data-sub="doc-all"  onclick="applySubFilter(this,'doc')">ALL      <span class="sub-badge" id="sbadge-doc-all">{cnt["doc"]}</span></button>
+                <button class="sub-btn active" data-sub="doc-all"  onclick="applySubFilter(this,'doc')">TODOS    <span class="sub-badge" id="sbadge-doc-all">{cnt["doc"]}</span></button>
                 <button class="sub-btn"        data-sub="doc-pdf"  onclick="applySubFilter(this,'doc')">PDF      <span class="sub-badge" id="sbadge-doc-pdf">-</span></button>
                 <button class="sub-btn"        data-sub="doc-docx" onclick="applySubFilter(this,'doc')">DOCX     <span class="sub-badge" id="sbadge-doc-docx">-</span></button>
                 <button class="sub-btn"        data-sub="doc-xlsx" onclick="applySubFilter(this,'doc')">XLSX     <span class="sub-badge" id="sbadge-doc-xlsx">-</span></button>
                 <button class="sub-btn"        data-sub="doc-ppt"  onclick="applySubFilter(this,'doc')">PPT      <span class="sub-badge" id="sbadge-doc-ppt">-</span></button>
-                <button class="sub-btn"        data-sub="doc-arc"  onclick="applySubFilter(this,'doc')">ARCHIVES <span class="sub-badge" id="sbadge-doc-arc">-</span></button>
+                <button class="sub-btn"        data-sub="doc-arc"  onclick="applySubFilter(this,'doc')">ARQUIVOS <span class="sub-badge" id="sbadge-doc-arc">-</span></button>
             </div>
         </div>
         <div class="filter-group" id="fg-sqli">
             <button class="filter-btn has-sub" data-group="sqli" onclick="applyFilter(this)">SQLi <span class="badge" id="badge-sqli">{cnt["sqli"]}</span><span class="arrow">&#9660;</span></button>
             <div class="sub-menu" id="sub-sqli">
-                <button class="sub-btn active" data-sub="sqli-all"      onclick="applySubFilter(this,'sqli')">SQLi ALL      <span class="sub-badge" id="sbadge-sqli-all">{sqli_total}</span></button>
+                <button class="sub-btn active" data-sub="sqli-all"      onclick="applySubFilter(this,'sqli')">SQLi TODOS    <span class="sub-badge" id="sbadge-sqli-all">{sqli_total}</span></button>
                 <button class="sub-btn"        data-sub="sqli-critical" onclick="applySubFilter(this,'sqli')">SQLi CRITICAL <span class="sub-badge sqli-critical" id="sbadge-sqli-critical">-</span></button>
                 <button class="sub-btn"        data-sub="sqli-vuln"     onclick="applySubFilter(this,'sqli')">SQLi VULN     <span class="sub-badge sqli-vuln" id="sbadge-sqli-vuln">{sqli_count}</span></button>
                 <button class="sub-btn"        data-sub="sqli-safe"     onclick="applySubFilter(this,'sqli')">SQLi SAFE     <span class="sub-badge" id="sbadge-sqli-safe">{sqli_safe}</span></button>
@@ -1458,7 +1458,7 @@ class DorkEyeEnhanced:
         <div class="filter-group" id="fg-xss">
             <button class="filter-btn has-sub" data-group="xss" onclick="applyFilter(this)">XSS <span class="badge" id="badge-xss">{cnt["xss"]}</span><span class="arrow">&#9660;</span></button>
             <div class="sub-menu" id="sub-xss">
-                <button class="sub-btn active" data-sub="xss-all"  onclick="applySubFilter(this,'xss')">ALL  <span class="sub-badge" id="sbadge-xss-all">{xss_total}</span></button>
+                <button class="sub-btn active" data-sub="xss-all"  onclick="applySubFilter(this,'xss')">TODOS <span class="sub-badge" id="sbadge-xss-all">{xss_total}</span></button>
                 <button class="sub-btn"        data-sub="xss-vuln" onclick="applySubFilter(this,'xss')">VULN <span class="sub-badge xss-vuln" id="sbadge-xss-vuln">{xss_count}</span></button>
                 <button class="sub-btn"        data-sub="xss-safe" onclick="applySubFilter(this,'xss')">SAFE <span class="sub-badge" id="sbadge-xss-safe">{xss_safe}</span></button>
             </div>
@@ -1466,7 +1466,7 @@ class DorkEyeEnhanced:
         <div class="filter-group" id="fg-scripts">
             <button class="filter-btn has-sub" data-group="scripts" onclick="applyFilter(this)">SCRIPTS <span class="badge" id="badge-scripts">{cnt["scripts"]}</span><span class="arrow">&#9660;</span></button>
             <div class="sub-menu" id="sub-scripts">
-                <button class="sub-btn active" data-sub="scripts-all"    onclick="applySubFilter(this,'scripts')">ALL     <span class="sub-badge" id="sbadge-scripts-all">{cnt["scripts"]}</span></button>
+                <button class="sub-btn active" data-sub="scripts-all"    onclick="applySubFilter(this,'scripts')">TODOS   <span class="sub-badge" id="sbadge-scripts-all">{cnt["scripts"]}</span></button>
                 <button class="sub-btn"        data-sub="scripts-php"    onclick="applySubFilter(this,'scripts')">PHP     <span class="sub-badge" id="sbadge-scripts-php">-</span></button>
                 <button class="sub-btn"        data-sub="scripts-asp"    onclick="applySubFilter(this,'scripts')">ASP     <span class="sub-badge" id="sbadge-scripts-asp">-</span></button>
                 <button class="sub-btn"        data-sub="scripts-sh"     onclick="applySubFilter(this,'scripts')">SH/BAT  <span class="sub-badge" id="sbadge-scripts-sh">-</span></button>
@@ -1474,25 +1474,25 @@ class DorkEyeEnhanced:
                 <button class="sub-btn"        data-sub="scripts-creds"  onclick="applySubFilter(this,'scripts')">CREDS   <span class="sub-badge" id="sbadge-scripts-creds">-</span></button>
             </div>
         </div>
-        <button class="filter-btn" data-group="page" onclick="applyFilter(this)">PAGE <span class="badge" id="badge-page">{cnt["page"]}</span></button>
+        <button class="filter-btn" data-group="page" onclick="applyFilter(this)">PÁGINAS <span class="badge" id="badge-page">{cnt["page"]}</span></button>
       </div>
       <div class="right-btns">
         <div class="srch-wrap" id="srchWrap">
-          <button class="rbt" id="srchToggle" onclick="toggleSearch()">&#128269; SEARCH</button>
+          <button class="rbt" id="srchToggle" onclick="toggleSearch()">&#128269; BUSCAR</button>
           <div class="rpanel srch-panel" id="srchPanel">
-            <button class="panel-close" onclick="document.getElementById('srchPanel').classList.remove('open');document.getElementById('srchToggle').classList.remove('open')" title="Close">&#10005;</button>
+            <button class="panel-close" onclick="document.getElementById('srchPanel').classList.remove('open');document.getElementById('srchToggle').classList.remove('open')" title="Fechar">&#10005;</button>
             <div class="srch-inner">
-              <div class="srch-title">&#9632; Search</div>
+              <div class="srch-title">&#9632; Busca</div>
               <div class="srch-input-wrap">
-                <input class="srch-input" id="srchInput" type="text" placeholder="Type to filter results..." oninput="doSearch()" autocomplete="off" spellcheck="false">
-                <button class="srch-clear" onclick="clearSearch()">CLEAR</button>
+                <input class="srch-input" id="srchInput" type="text" placeholder="Digite para filtrar resultados..." oninput="doSearch()" autocomplete="off" spellcheck="false">
+                <button class="srch-clear" onclick="clearSearch()">LIMPAR</button>
               </div>
-              <div class="srch-meta">Matching: <span id="srchCount">-</span> of {len(self.results)} results</div>
+              <div class="srch-meta">Correspondências: <span id="srchCount">-</span> de {len(self.results)} resultados</div>
               <div class="srch-scope">
                 <span class="srch-scope-lbl">SCOPE:</span>
                 <button class="scope-btn active" data-scope="url"      onclick="toggleScope(this)">URL</button>
-                <button class="scope-btn active" data-scope="title"    onclick="toggleScope(this)">TITLE</button>
-                <button class="scope-btn active" data-scope="category" onclick="toggleScope(this)">CATEGORY</button>
+                <button class="scope-btn active" data-scope="title"    onclick="toggleScope(this)">TÍTULO</button>
+                <button class="scope-btn active" data-scope="category" onclick="toggleScope(this)">CATEGORIA</button>
                 <button class="scope-btn active" data-scope="dork"     onclick="toggleScope(this)">DORK</button>
               </div>
             </div>
@@ -1501,20 +1501,20 @@ class DorkEyeEnhanced:
         <div class="export-wrap" id="exportWrap">
           <button class="rbt" id="exportToggle" onclick="toggleExportPanel()">&#11015; LINKS</button>
           <div class="rpanel" id="exportPanel">
-            <button class="panel-close" onclick="document.getElementById('exportPanel').classList.remove('open');document.getElementById('exportToggle').classList.remove('open')" title="Close">&#10005;</button>
+            <button class="panel-close" onclick="document.getElementById('exportPanel').classList.remove('open');document.getElementById('exportToggle').classList.remove('open')" title="Fechar">&#10005;</button>
             <div class="ep-section">
-              <div class="ep-title">&#9632; Export Links - All</div>
+              <div class="ep-title">&#9632; Exportar Links - Todos</div>
               <div class="ep-row">
-                <span class="ep-label">All ({len(self.results)})</span>
+                <span class="ep-label">Todos ({len(self.results)})</span>
                 <button class="exp-btn txt" onclick="doExport('txt','all')">TXT</button>
                 <button class="exp-btn json" onclick="doExport('json','all')">JSON</button>
                 <button class="exp-btn csv" onclick="doExport('csv','all')">CSV</button>
               </div>
             </div>
             <div class="ep-section">
-              <div class="ep-title">&#9632; Export Links - SQLi</div>
+              <div class="ep-title">&#9632; Exportar Links - SQLi</div>
               <div class="ep-row">
-                <span class="ep-label warn">All tested <span id="epCntSqliAll"></span></span>
+                <span class="ep-label warn">Todos os testados <span id="epCntSqliAll"></span></span>
                 <button class="exp-btn txt"  onclick="doExport('txt','sqli-all')">TXT</button>
                 <button class="exp-btn json" onclick="doExport('json','sqli-all')">JSON</button>
                 <button class="exp-btn csv"  onclick="doExport('csv','sqli-all')">CSV</button>
@@ -1533,9 +1533,9 @@ class DorkEyeEnhanced:
               </div>
             </div>
             <div class="ep-section">
-              <div class="ep-title">&#9632; Export Links - XSS</div>
+              <div class="ep-title">&#9632; Exportar Links - XSS</div>
               <div class="ep-row">
-                <span class="ep-label warn">All tested <span id="epCntXssAll"></span></span>
+                <span class="ep-label warn">Todos os testados <span id="epCntXssAll"></span></span>
                 <button class="exp-btn txt"  onclick="doExport('txt','xss-all')">TXT</button>
                 <button class="exp-btn json" onclick="doExport('json','xss-all')">JSON</button>
                 <button class="exp-btn csv"  onclick="doExport('csv','xss-all')">CSV</button>
@@ -1554,9 +1554,9 @@ class DorkEyeEnhanced:
               </div>
             </div>
             <div class="ep-section">
-              <div class="ep-title">&#9632; Current View</div>
+              <div class="ep-title">&#9632; Visão Atual</div>
               <div class="ep-row">
-                <span class="ep-label view-lbl">Visible <span id="epCntView"></span></span>
+                <span class="ep-label view-lbl">Visíveis <span id="epCntView"></span></span>
                 <button class="exp-btn txt"  onclick="doExport('txt','view')">TXT</button>
                 <button class="exp-btn json" onclick="doExport('json','view')">JSON</button>
                 <button class="exp-btn csv"  onclick="doExport('csv','view')">CSV</button>
@@ -1565,18 +1565,18 @@ class DorkEyeEnhanced:
           </div>
         </div>
         <div class="files-wrap" id="filesWrap">
-          <button class="rbt" id="filesToggle" onclick="toggleFilesPanel()">&#128196; FILES</button>
+          <button class="rbt" id="filesToggle" onclick="toggleFilesPanel()">&#128196; ARQUIVOS</button>
           <div class="rpanel files-panel" id="filesPanel">
             <div class="files-hdr" style="position:relative">
-              <div class="ep-title" style="margin-bottom:0">&#9632; Download Files</div>
-              <button class="panel-close" onclick="document.getElementById('filesPanel').classList.remove('open');document.getElementById('filesToggle').classList.remove('open')" title="Close">&#10005;</button>
+              <div class="ep-title" style="margin-bottom:0">&#9632; Baixar Arquivos</div>
+              <button class="panel-close" onclick="document.getElementById('filesPanel').classList.remove('open');document.getElementById('filesToggle').classList.remove('open')" title="Fechar">&#10005;</button>
             </div>
             <div class="files-bulk">
-              <span class="bulk-lbl">Selected: <span id="selCount">0</span></span>
-              <button class="exp-btn txt"  onclick="selectAllFiles(true)"  style="font-size:9px;padding:2px 7px">ALL</button>
-              <button class="exp-btn txt"  onclick="selectAllFiles(false)" style="font-size:9px;padding:2px 7px;color:#555;border-color:#333">NONE</button>
-              <button class="exp-btn csv"  onclick="exportSelectedFiles('list')" style="font-size:9px;padding:2px 7px">LIST (TXT)</button>
-              <button class="exp-btn json" onclick="exportSelectedFiles('json')" style="font-size:9px;padding:2px 7px">LIST (JSON)</button>
+              <span class="bulk-lbl">Selecionados: <span id="selCount">0</span></span>
+              <button class="exp-btn txt"  onclick="selectAllFiles(true)"  style="font-size:9px;padding:2px 7px">TODOS</button>
+              <button class="exp-btn txt"  onclick="selectAllFiles(false)" style="font-size:9px;padding:2px 7px;color:#555;border-color:#333">NENHUM</button>
+              <button class="exp-btn csv"  onclick="exportSelectedFiles('list')" style="font-size:9px;padding:2px 7px">LISTA (TXT)</button>
+              <button class="exp-btn json" onclick="exportSelectedFiles('json')" style="font-size:9px;padding:2px 7px">LISTA (JSON)</button>
             </div>
             <div class="files-list" id="filesList">
 """)
@@ -1606,7 +1606,7 @@ class DorkEyeEnhanced:
               </div>
 """)
         else:
-            parts.append('              <div class="files-empty">No file results in this report.</div>\n')
+            parts.append('              <div class="files-empty">Nenhum resultado de arquivo neste relatório.</div>\n')
 
         parts.append(f"""            </div>
           </div>
@@ -1622,8 +1622,8 @@ class DorkEyeEnhanced:
           <col class="c-cat"><col class="c-sqli"><col class="c-xss"><col class="c-waf"><col class="c-size">
         </colgroup>
         <thead><tr>
-          <th>#</th><th>URL</th><th>Title</th>
-          <th>Category</th><th>SQLi</th><th>XSS</th><th>WAF</th><th>Size</th>
+          <th>#</th><th>URL</th><th>Título</th>
+          <th>Categoria</th><th>SQLi</th><th>XSS</th><th>WAF</th><th>Tamanho</th>
         </tr></thead>
         <tbody id="results-tbody">
 """)
@@ -1735,7 +1735,7 @@ class DorkEyeEnhanced:
             parts.append(f"""            <tr data-category="{category}" data-ext="{ext}" data-sqli="{sqli_data}" data-conf="{sqli_conf}" data-xss="{xss_data}"
                 data-idx="{idx-1}" data-url="{url_esc_td}" data-title="{title_esc}" data-dork="{dork_val}">
                 <td style="color:#444">{idx}</td>
-                <td><div class="url-cell"><a href="{url_esc_td}" target="_blank" title="{url_esc_td}">{url_display}</a><a class="dl-btn" href="{url_esc_td}" download>&#8681;</a><button class="info-btn" onclick="showInfo(this)" data-info='{_info_obj}' title="Details">&#9432;</button></div></td>
+                <td><div class="url-cell"><a href="{url_esc_td}" target="_blank" title="{url_esc_td}">{url_display}</a><a class="dl-btn" href="{url_esc_td}" download>&#8681;</a><button class="info-btn" onclick="showInfo(this)" data-info='{_info_obj}' title="Detalhes">&#9432;</button></div></td>
                 <td title="{title_esc}">{_html_mod.escape(title_disp)}</td>
                 <td><span class="category category-{category}">{category}</span></td>
                 <td class="{sqli_class}">{sqli_status}</td>
@@ -1748,14 +1748,14 @@ class DorkEyeEnhanced:
         parts.append(f"""        </tbody>
     </table>
     </div>
-    <div class="footer">DorkEye v5.0 &nbsp;|&nbsp; xploits3c &nbsp;|&nbsp; For authorized security research only</div>
+    <div class="footer">DorkEye v5.0 &nbsp;|&nbsp; xploits3c &nbsp;|&nbsp; Apenas para pesquisa de segurança autorizada</div>
 </div>
 
 <div id="toast"></div>
 <div class="info-overlay" id="infoOverlay" onclick="closeInfo()"></div>
 <div class="info-popup" id="infoPopup">
   <div class="info-popup-title">
-    <span>&#9432; RESULT DETAILS</span>
+    <span>&#9432; DETALHES DO RESULTADO</span>
     <button class="info-close" onclick="closeInfo()">&#10005;</button>
   </div>
   <div id="infoBody"></div>
@@ -1868,9 +1868,9 @@ function buildSubBadges(){{
 function updateInfoBar(){{
   const bar=document.getElementById('sub-info');if(!bar)return;
   const visible=document.querySelectorAll('#results-tbody tr:not(.hidden):not(.srch-hidden)').length;
-  if(activeGroup==='all'&&!activeSub){{bar.innerHTML='&#10142; Showing <span>'+visible+'</span> result(s)';return;}}
+  if(activeGroup==='all'&&!activeSub){{bar.innerHTML='&#10142; Exibindo <span>'+visible+'</span> resultado(s)';return;}}
   const subLabel=(activeSub||'').split('-').slice(1).join(' ').toUpperCase();
-  bar.innerHTML='&#10142; Filter: <span>'+activeGroup.toUpperCase()+'</span> &rsaquo; <span>'+subLabel+'</span> &mdash; <span>'+visible+'</span> result(s)';
+  bar.innerHTML='&#10142; Filtro: <span>'+activeGroup.toUpperCase()+'</span> &rsaquo; <span>'+subLabel+'</span> &mdash; <span>'+visible+'</span> resultado(s)';
 }}
 let activeScopes=new Set(['url','title','category','dork']);
 function toggleSearch(){{
@@ -1944,21 +1944,21 @@ function _download(content,filename,mime){{const blob=new Blob([content],{{type:
 function _showToast(msg){{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}}
 function doExport(fmt,scope){{
   const rows=_getRows(scope);
-  if(!rows.length){{_showToast('No results to export.');return;}}
+  if(!rows.length){{_showToast('Nenhum resultado para exportar.');return;}}
   const ts=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
   const base=REPORT_BASE+'_links_'+_scopeLabel(scope)+'_'+ts;
   if(fmt==='txt'){{
-    const lines=rows.map((r,i)=>{{let s=(i+1)+'. '+r.url+'\\n';if(r.title)s+='   Title: '+r.title+'\\n';if(r.sqli&&r.sqli!=='untested')s+='   SQLi: '+r.sqli.toUpperCase()+'\\n';if(r.xss&&r.xss!=='untested')s+='   XSS: '+r.xss.toUpperCase()+'\\n';s+='   Time: '+r.timestamp+'\\n';return s;}});
-    _download('DorkEye Export\\nScope: '+scope+'\\nGenerated: '+ts+'\\nTotal: '+rows.length+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
-    _showToast('Exported '+rows.length+' links');
+    const lines=rows.map((r,i)=>{{let s=(i+1)+'. '+r.url+'\\n';if(r.title)s+='   Título: '+r.title+'\\n';if(r.sqli&&r.sqli!=='untested')s+='   SQLi: '+r.sqli.toUpperCase()+'\\n';if(r.xss&&r.xss!=='untested')s+='   XSS: '+r.xss.toUpperCase()+'\\n';s+='   Data/Hora: '+r.timestamp+'\\n';return s;}});
+    _download('Exportação DorkEye\\nEscopo: '+scope+'\\nGerado: '+ts+'\\nTotal: '+rows.length+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
+    _showToast('Exportados '+rows.length+' links');
   }}else if(fmt==='json'){{
     _download(JSON.stringify({{meta:{{generated:ts,scope:scope,total:rows.length}},results:rows}},null,2),base+'.json','application/json');
-    _showToast('Exported '+rows.length+' links');
+    _showToast('Exportados '+rows.length+' links');
   }}else if(fmt==='csv'){{
     const headers=['url','title','dork','category','ext','sqli','conf','waf','xss','xss_conf','xss_types','timestamp'];
     const esc=v=>{{const s=String(v??'');return s.includes(',')||s.includes('"')||s.includes('\\n')?'"'+s.replace(/"/g,'""')+'"':s;}};
     _download([headers.join(','),...rows.map(r=>headers.map(h=>esc(r[h]||'')).join(','))].join('\\r\\n'),base+'.csv','text/csv');
-    _showToast('Exported '+rows.length+' links');
+    _showToast('Exportados '+rows.length+' links');
   }}
 }}
 function toggleFilesPanel(){{
@@ -1970,17 +1970,17 @@ function updateSelCount(){{const n=document.querySelectorAll('.file-chk:checked'
 function selectAllFiles(val){{document.querySelectorAll('.file-chk').forEach(c=>c.checked=val);updateSelCount();}}
 function exportSelectedFiles(fmt){{
   const checked=Array.from(document.querySelectorAll('.file-chk:checked'));
-  if(!checked.length){{_showToast('No files selected.');return;}}
+  if(!checked.length){{_showToast('Nenhum arquivo selecionado.');return;}}
   const rows=checked.map(c=>FILE_DATA[parseInt(c.dataset.fidx)]).filter(Boolean);
   const ts=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
   const base=REPORT_BASE+'_files_selected_'+ts;
   if(fmt==='list'){{
-    const lines=rows.map((r,i)=>(i+1)+'. '+r.url+'\\n   Category: '+r.category+'\\n   Size: '+r.size_str+'\\n');
-    _download('DorkEye File List\\nGenerated: '+ts+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
-    _showToast('File list ('+rows.length+') exported');
+    const lines=rows.map((r,i)=>(i+1)+'. '+r.url+'\\n   Categoria: '+r.category+'\\n   Tamanho: '+r.size_str+'\\n');
+    _download('Lista de Arquivos DorkEye\\nGerado: '+ts+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
+    _showToast('Lista de arquivos ('+rows.length+') exportada');
   }}else if(fmt==='json'){{
     _download(JSON.stringify({{meta:{{generated:ts,total:rows.length}},files:rows}},null,2),base+'.json','application/json');
-    _showToast('File list ('+rows.length+') exported');
+    _showToast('Lista de arquivos ('+rows.length+') exportada');
   }}
 }}
 function closeAllPanels(){{
@@ -2000,13 +2000,13 @@ function showInfo(btn){{
   let rows='';
   const row=(lbl,val,color)=>val?`<div class="info-row"><span class="info-lbl">${{lbl}}</span><span class="info-val" style="color:${{color||'#00aaff'}}">${{val}}</span></div>`:'';
   rows+=row('URL',d.url.length>80?d.url.slice(0,80)+'...':d.url);
-  rows+=row('Title',d.title);rows+=row('Category',d.category,'#00cc88');rows+=row('Extension',d.ext,'#ffaa00');
-  rows+=row('Size',d.size,'#009922');rows+=row('Timestamp',d.ts,'#666');rows+=row('Dork',d.dork&&d.dork.length>80?d.dork.slice(0,80)+'...':d.dork,'#cc88ff');
-  rows+=row('Snippet',d.snippet&&d.snippet.length>120?d.snippet.slice(0,120)+'...':d.snippet,'#777');
-  if(d.sqli)rows+=row('SQLi',d.sqli,sqliColor);if(d.payload)rows+=row('SQLi Method',d.payload.length>100?d.payload.slice(0,100)+'...':d.payload,'#ff6666');
-  if(d.xss)rows+=row('XSS',d.xss,xssColor);if(d.xss_det)rows+=row('XSS Detail',d.xss_det.length>100?d.xss_det.slice(0,100)+'...':d.xss_det,'#ffcc66');
+  rows+=row('Título',d.title);rows+=row('Categoria',d.category,'#00cc88');rows+=row('Extensão',d.ext,'#ffaa00');
+  rows+=row('Tamanho',d.size,'#009922');rows+=row('Data/Hora',d.ts,'#666');rows+=row('Dork',d.dork&&d.dork.length>80?d.dork.slice(0,80)+'...':d.dork,'#cc88ff');
+  rows+=row('Trecho',d.snippet&&d.snippet.length>120?d.snippet.slice(0,120)+'...':d.snippet,'#777');
+  if(d.sqli)rows+=row('SQLi',d.sqli,sqliColor);if(d.payload)rows+=row('Método SQLi',d.payload.length>100?d.payload.slice(0,100)+'...':d.payload,'#ff6666');
+  if(d.xss)rows+=row('XSS',d.xss,xssColor);if(d.xss_det)rows+=row('Detalhe XSS',d.xss_det.length>100?d.xss_det.slice(0,100)+'...':d.xss_det,'#ffcc66');
   if(d.waf)rows+=row('WAF','! '+d.waf,'#ffaa00');
-  document.getElementById('infoBody').innerHTML=rows||'<span style="color:#444">No details.</span>';
+  document.getElementById('infoBody').innerHTML=rows||'<span style="color:#444">Sem detalhes.</span>';
   document.getElementById('infoPopup').classList.add('open');
   document.getElementById('infoOverlay').classList.add('open');
   _infoOpen=true;document.body.style.overflow='hidden';
@@ -2022,7 +2022,7 @@ document.addEventListener('keydown',(e)=>{{if(_infoOpen&&e.key==='Escape')closeI
             f.write(html)
 
     def _format_size(self, size):
-        """Format byte count to human-readable string."""
+        """Formata uma contagem de bytes em string legível."""
         if size is None:
             return "N/A"
         try:
@@ -2038,29 +2038,29 @@ document.addEventListener('keydown',(e)=>{{if(_infoOpen&&e.key==='Escape')closeI
         return f"{size:.1f} TB"
 
     def print_statistics(self):
-        """Print a Rich-formatted statistics table."""
+        """Imprime uma tabela de estatísticas formatada com Rich."""
         table = Table(title="", show_header=False, box=None, padding=(0, 2))
-        table.add_column("Metric", style="cyan")
-        table.add_column("Value",  style="green", justify="right")
-        console.print("\n[bold yellow]┌─[ Search Statistics ][/bold yellow]")
+        table.add_column("Métrica", style="cyan")
+        table.add_column("Valor",  style="green", justify="right")
+        console.print("\n[bold yellow]┌─[ Estatísticas de Busca ][/bold yellow]")
         console.print("[bold yellow]│[/bold yellow]")
-        table.add_row("├─> Total Results Found", str(self.stats.get("total_found", 0)))
-        table.add_row("├─> Unique Results",      str(len(self.results)))
-        table.add_row("├─> Duplicates Removed",  str(self.stats.get("duplicates", 0)))
-        table.add_row("├─> Blacklisted",         str(self.stats.get("blacklisted", 0)))
+        table.add_row("├─> Total de resultados encontrados", str(self.stats.get("total_found", 0)))
+        table.add_row("├─> Resultados únicos",      str(len(self.results)))
+        table.add_row("├─> Duplicados removidos",  str(self.stats.get("duplicates", 0)))
+        table.add_row("├─> Na lista negra",         str(self.stats.get("blacklisted", 0)))
         if self.config.get("sqli_detection", False):
-            table.add_row("├─> SQLi Vulnerabilities", f"[bold red]{self.stats.get('sqli_vulnerable', 0)}[/bold red]")
-            table.add_row("├─> WAF Detected",          f"[bold yellow]{self.stats.get('waf_detected', 0)}[/bold yellow]")
+            table.add_row("├─> Vulnerabilidades SQLi", f"[bold red]{self.stats.get('sqli_vulnerable', 0)}[/bold red]")
+            table.add_row("├─> WAF detectado",          f"[bold yellow]{self.stats.get('waf_detected', 0)}[/bold yellow]")
         if self.config.get("xss_detection", False):
-            table.add_row("├─> XSS Vulnerabilities",  f"[bold yellow]{self.stats.get('xss_vulnerable', 0)}[/bold yellow]")
-        table.add_row("└─> Execution Time", f"{round(time.time() - self.start_time, 2)}s")
+            table.add_row("├─> Vulnerabilidades XSS",  f"[bold yellow]{self.stats.get('xss_vulnerable', 0)}[/bold yellow]")
+        table.add_row("└─> Tempo de execução", f"{round(time.time() - self.start_time, 2)}s")
         console.print(table)
         categories = {k.replace("category_", ""): v for k, v in self.stats.items() if k.startswith("category_")}
         if categories:
             cat_table = Table(title="", show_header=False, box=None, padding=(0, 2))
-            cat_table.add_column("Category", style="cyan")
-            cat_table.add_column("Count",    style="green", justify="right")
-            console.print("\n[bold yellow]┌─[ Results by Category ][/bold yellow]")
+            cat_table.add_column("Categoria", style="cyan")
+            cat_table.add_column("Contagem", style="green", justify="right")
+            console.print("\n[bold yellow]┌─[ Resultados por Categoria ][/bold yellow]")
             console.print("[bold yellow]│[/bold yellow]")
             sorted_cats = sorted(categories.items(), key=lambda x: x[1], reverse=True)
             for i, (category, count) in enumerate(sorted_cats):
@@ -2070,18 +2070,18 @@ document.addEventListener('keydown',(e)=>{{if(_infoOpen&&e.key==='Escape')closeI
 
 
 # ══════════════════════════════════════════════════════════════
-#  Helpers
+#  Funções auxiliares
 # ══════════════════════════════════════════════════════════════
 
 def _load_results_from_file(path: str) -> List[Dict]:
-    """Load DorkEye results from a .json or .txt file."""
+    """Carrega resultados do DorkEye de um arquivo .json ou .txt."""
     p = Path(path)
     if not p.exists():
         alt = Path(__file__).parent / "Dump" / path
         if alt.exists():
             p = alt
     if not p.exists():
-        console.print(f"[red][!] File not found: {path}[/red]")
+        console.print(f"[red][!] Arquivo não encontrado: {path}[/red]")
         return []
 
     ext = p.suffix.lower()
@@ -2093,7 +2093,7 @@ def _load_results_from_file(path: str) -> List[Dict]:
                 return data
             if isinstance(data, dict) and "results" in data:
                 return data["results"]
-            console.print(f"[red][!] Unrecognized JSON structure in {path}[/red]")
+            console.print(f"[red][!] Estrutura JSON não reconhecida em {path}[/red]")
             return []
         elif ext == ".txt":
             results = []
@@ -2106,15 +2106,15 @@ def _load_results_from_file(path: str) -> List[Dict]:
                                         "category": "webpage"})
             return results
         else:
-            console.print(f"[red][!] Unsupported file format: {ext} (use .json or .txt)[/red]")
+            console.print(f"[red][!] Formato de arquivo não suportado: {ext} (use .json ou .txt)[/red]")
             return []
     except Exception as e:
-        console.print(f"[red][!] Error loading file '{path}': {e}[/red]")
+        console.print(f"[red][!] Erro ao carregar arquivo '{path}': {e}[/red]")
         return []
 
 
 def load_config(config_file: str = None) -> Dict:
-    """Load and merge a YAML or JSON config file with DEFAULT_CONFIG."""
+    """Carrega e mescla um arquivo de config YAML ou JSON com o DEFAULT_CONFIG."""
     if not config_file:
         return DEFAULT_CONFIG.copy()
     try:
@@ -2124,14 +2124,14 @@ def load_config(config_file: str = None) -> Dict:
         config.update(user_config)
         return config
     except Exception as e:
-        console.print(f"[red][!] Error loading config: {e}[/red]")
-        console.print("[yellow][!] Using default configuration[/yellow]")
+        console.print(f"[red][!] Erro ao carregar config: {e}[/red]")
+        console.print("[yellow][!] Usando configuração padrão[/yellow]")
         return DEFAULT_CONFIG.copy()
 
 
 def create_sample_config():
-    """Write a sample dorkeye_config.yaml to disk."""
-    config_yaml = """# DorkEye Configuration
+    """Grava um dorkeye_config.yaml de exemplo em disco."""
+    config_yaml = """# Configuração do DorkEye
 
 extensions:
   documents: [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"]
@@ -2155,29 +2155,29 @@ extended_delay_every_n_results: 100
 """
     with open("dorkeye_config.yaml", "w") as f:
         f.write(config_yaml)
-    console.print("[green][✓] Sample config created: dorkeye_config.yaml[/green]")
+    console.print("[green][✓] Config de exemplo criada: dorkeye_config.yaml[/green]")
 
 
 def resolve_templates_argument(template_arg):
-    """Resolve the --templates argument to a list of Path objects."""
+    """Resolve o argumento --templates para uma lista de objetos Path."""
     templates_dir = Path(__file__).parent / "Templates"
     if template_arg is None:
         return [templates_dir / "dorks_templates.yaml"]
     if template_arg.lower() == "all":
         yaml_files = list(templates_dir.glob("*.yaml"))
         if not yaml_files:
-            console.print("[red][!] No template files found in Templates directory[/red]")
+            console.print("[red][!] Nenhum arquivo de template encontrado no diretório Templates[/red]")
             sys.exit(1)
         return yaml_files
     specific_path = templates_dir / template_arg
     if not specific_path.exists():
-        console.print(f"[red][!] Template not found: {template_arg}[/red]")
+        console.print(f"[red][!] Template não encontrado: {template_arg}[/red]")
         sys.exit(1)
     return [specific_path]
 
 
 def get_categories_from_templates(template_files) -> List[str]:
-    """Return a sorted list of category names found across all given template YAML files."""
+    """Retorna uma lista ordenada de nomes de categorias encontradas em todos os arquivos YAML de template fornecidos."""
     categories = set()
     for template_file in template_files:
         try:
@@ -2186,7 +2186,7 @@ def get_categories_from_templates(template_files) -> List[str]:
                 if data and "templates" in data:
                     categories.update(data["templates"].keys())
         except Exception as e:
-            console.print(f"[yellow][!] Could not read categories from {template_file}: {e}[/yellow]")
+            console.print(f"[yellow][!] Não foi possível ler categorias de {template_file}: {e}[/yellow]")
     return sorted(categories)
 
 
@@ -2195,11 +2195,11 @@ def get_categories_from_templates(template_files) -> List[str]:
 # ══════════════════════════════════════════════════════════════
 
 def run_wizard():
-    """Run the interactive guided wizard session."""
+    """Executa a sessão interativa guiada do wizard."""
     print_banner()
     console.print(Panel(
-        "[bold green]Interactive Wizard[/bold green] — Navigate with numbers, ENTER to confirm\n"
-        "[dim]Press Ctrl+C at any time to abort[/dim]",
+        "[bold green]Wizard interativo[/bold green] — Navegue com números, ENTER para confirmar\n"
+        "[dim]Pressione Ctrl+C a qualquer momento para abortar[/dim]",
         border_style="green",
         title="[bold yellow][ DorkEye Wizard ][/bold yellow]"
     ))
@@ -2217,7 +2217,7 @@ def run_wizard():
         for i, opt in enumerate(options, 1):
             marker = "[bold green]>[/bold green]" if i - 1 == default else " "
             console.print(f"  {marker} [yellow]{i})[/yellow] {opt}")
-        console.print(f"[cyan]{prompt} (default {default+1}):[/cyan] ", end="")
+        console.print(f"[cyan]{prompt} (padrão {default+1}):[/cyan] ", end="")
         try:
             raw = input("").strip()
             idx = int(raw) - 1
@@ -2226,7 +2226,7 @@ def run_wizard():
             return default
 
     def ask_string(prompt: str, placeholder: str = "") -> str:
-        display = f" [dim](e.g. {placeholder})[/dim]" if placeholder else ""
+        display = f" [dim](ex.: {placeholder})[/dim]" if placeholder else ""
         console.print(f"[cyan]{prompt}{display}:[/cyan] ", end="")
         try:
             return input("").strip()
@@ -2240,40 +2240,40 @@ def run_wizard():
         return [ext if ext.startswith(".") else f".{ext}" for ext in raw.split()]
 
     def pick_output() -> str:
-        output = ask_string("Output filename", "results.json")
+        output = ask_string("Nome do arquivo de saída", "results.json")
         if not output:
             return None
         if "." in os.path.basename(output):
             return output
-        console.print("\n[bold cyan]Output format:[/bold cyan]")
-        fmt_idx = ask_choice("Choose format", ["JSON", "CSV", "HTML", "TXT"])
+        console.print("\n[bold cyan]Formato de saída:[/bold cyan]")
+        fmt_idx = ask_choice("Escolha o formato", ["JSON", "CSV", "HTML", "TXT"])
         fmts    = [".json", ".csv", ".html", ".txt"]
         return output + fmts[fmt_idx]
 
     def collect_run_options(config: dict, ask_count: bool = True) -> tuple:
-        console.print("\n[bold cyan]┌─[ RUN OPTIONS ][/bold cyan]")
+        console.print("\n[bold cyan]┌─[ OPÇÕES DE EXECUÇÃO ][/bold cyan]")
         console.print("[bold cyan]│[/bold cyan]")
         count = 50
         if ask_count:
-            count_str = ask_string("│  Results per dork", "default 50")
+            count_str = ask_string("│  Resultados por dork", "padrão 50")
             count     = int(count_str) if count_str.isdigit() else 50
             console.print("[bold cyan]│[/bold cyan]")
-        config["sqli_detection"]      = ask_yes_no("│  Enable SQLi detection?")
-        config["xss_detection"]       = ask_yes_no("│  Enable XSS detection?")
+        config["sqli_detection"]      = ask_yes_no("│  Ativar detecção SQLi?")
+        config["xss_detection"]       = ask_yes_no("│  Ativar detecção XSS?")
         if config["xss_detection"]:
-            console.print("[bold cyan]│[/bold cyan]  XSS type: 1)all 2)reflected 3)stored 4)dom")
-            _xtype_idx = ask_choice("│  XSS type", ["all", "reflected", "stored", "dom"])
+            console.print("[bold cyan]│[/bold cyan]  Tipo de XSS: 1)all 2)reflected 3)stored 4)dom")
+            _xtype_idx = ask_choice("│  Tipo de XSS", ["all", "reflected", "stored", "dom"])
             config["xss_type"] = ["all", "reflected", "stored", "dom"][_xtype_idx]
-        config["stealth_mode"]        = ask_yes_no("│  Enable stealth mode?")
-        config["http_fingerprinting"] = not ask_yes_no("│  Disable HTTP fingerprinting?")
-        config["analyze_files"]       = not ask_yes_no("│  Disable file analysis?")
-        if ask_yes_no("│  Set extension blacklist?"):
-            config["blacklist"] = ask_extensions("│    Blacklist extensions")
-        if ask_yes_no("│  Set extension whitelist?"):
-            config["whitelist"] = ask_extensions("│    Whitelist extensions")
-        do_dbscan = ask_yes_no("│  Enable DB port scan (DBScan)?") if _DBSCAN_AVAILABLE else False
+        config["stealth_mode"]        = ask_yes_no("│  Ativar modo stealth?")
+        config["http_fingerprinting"] = not ask_yes_no("│  Desativar fingerprinting HTTP?")
+        config["analyze_files"]       = not ask_yes_no("│  Desativar análise de arquivos?")
+        if ask_yes_no("│  Definir blacklist de extensões?"):
+            config["blacklist"] = ask_extensions("│    Extensões da blacklist")
+        if ask_yes_no("│  Definir whitelist de extensões?"):
+            config["whitelist"] = ask_extensions("│    Extensões da whitelist")
+        do_dbscan = ask_yes_no("│  Ativar varredura de portas DB (DBScan)?") if _DBSCAN_AVAILABLE else False
         if not _DBSCAN_AVAILABLE:
-            console.print("[bold cyan]│[/bold cyan]  [dim]DBScan non disponibile — db_portscan.py mancante[/dim]")
+            console.print("[bold cyan]│[/bold cyan]  [dim]DBScan indisponível — db_portscan.py ausente[/dim]")
         console.print("[bold cyan]└─>[/bold cyan]")
         return count, do_dbscan
 
@@ -2284,17 +2284,17 @@ def run_wizard():
             return False
         if not _ANALYZE_AVAILABLE:
             return False
-        console.print("\n[bold cyan]┌─[ RESULTS ANALYSIS ][/bold cyan]")
-        console.print("[bold cyan]│[/bold cyan]  triage priority · secrets · credentials · HTML report")
+        console.print("\n[bold cyan]┌─[ ANÁLISE DE RESULTADOS ][/bold cyan]")
+        console.print("[bold cyan]│[/bold cyan]  prioridade de triage · segredos · credenciais · relatório HTML")
         try:
-            console.print("[bold cyan]│  Run analysis on results? y/N:[/bold cyan] ", end="")
+            console.print("[bold cyan]│  Executar análise nos resultados? y/N:[/bold cyan] ", end="")
             ans = input("").strip().lower() in ("y", "yes")
         except KeyboardInterrupt:
             ans = False
         if ans:
-            console.print("[bold cyan]└─>[/bold cyan] [green]Analysis enabled.[/green]\n")
+            console.print("[bold cyan]└─>[/bold cyan] [green]Análise ativada.[/green]\n")
         else:
-            console.print("[bold cyan]└─>[/bold cyan] [dim]Analysis skipped.[/dim]\n")
+            console.print("[bold cyan]└─>[/bold cyan] [dim]Análise pulada.[/dim]\n")
         return ans
 
     def _run_analyze(results: list, output: str) -> None:
@@ -2302,7 +2302,7 @@ def run_wizard():
             return
         ts         = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_out = str(output).replace(".json", f"_analysis_{ts}.html")
-        console.print(f"\n[bold cyan][Agents] Starting analysis on {len(results)} result(s)...[/bold cyan]")
+        console.print(f"\n[bold cyan][Agents] Iniciando análise em {len(results)} resultado(s)...[/bold cyan]")
         _wiz_args = type("A", (), {
             "analyze_fetch":          False,
             "analyze_fetch_max":      20,
@@ -2314,40 +2314,40 @@ def run_wizard():
         try:
             out = _run_agents_pipeline(results=results, llm_plugin=None, args=_wiz_args)
             if out.get("report_path"):
-                console.print(f"[bold green][✓] Analysis report → {out['report_path']}[/bold green]")
+                console.print(f"[bold green][✓] Relatório de análise → {out['report_path']}[/bold green]")
             n_sec = out.get("secrets_total", 0)
             if n_sec:
-                console.print(f"[bold red][!] {n_sec} secret(s) detected.[/bold red]")
+                console.print(f"[bold red][!] {n_sec} segredo(s) detectado(s).[/bold red]")
         except Exception as _ae:
-            console.print(f"[yellow][Agents] Error: {_ae}[/yellow]")
+            console.print(f"[yellow][Agents] Erro: {_ae}[/yellow]")
 
     def _ask_crawl() -> dict | None:
         if not _ANALYZE_AVAILABLE:
             return None
-        console.print("\n[bold cyan]┌─[ RECURSIVE CRAWL ][/bold cyan]")
-        console.print("[bold cyan]│[/bold cyan]  [dim](refining dorks based on: domains · paths · technologies)[/dim]")
+        console.print("\n[bold cyan]┌─[ CRAWL RECURSIVO ][/bold cyan]")
+        console.print("[bold cyan]│[/bold cyan]  [dim](refinando dorks com base em: domínios · caminhos · tecnologias)[/dim]")
         try:
-            console.print("[bold cyan]│  Enable recursive crawl? y/N:[/bold cyan] ", end="")
+            console.print("[bold cyan]│  Ativar crawl recursivo? y/N:[/bold cyan] ", end="")
             ans = input("").strip().lower() in ("y", "yes")
         except KeyboardInterrupt:
             ans = False
         if not ans:
-            console.print("[bold cyan]└─>[/bold cyan] [dim]Crawl skipped.[/dim]\n")
+            console.print("[bold cyan]└─>[/bold cyan] [dim]Crawl pulado.[/dim]\n")
             return None
         console.print("[bold cyan]│[/bold cyan]")
-        rounds_idx = ask_choice("Rounds", [
-            "2  [dim]— fast[/dim]",
-            "4  [dim]— balanced (default)[/dim]",
-            "6  [dim]— thorough[/dim]",
-            "10 [dim]— maximum[/dim]",
+        rounds_idx = ask_choice("Rodadas", [
+            "2  [dim]— rápido[/dim]",
+            "4  [dim]— equilibrado (padrão)[/dim]",
+            "6  [dim]— minucioso[/dim]",
+            "10 [dim]— máximo[/dim]",
         ], default=1)
         rounds_map = [2, 4, 6, 10]
         rounds     = rounds_map[rounds_idx]
         console.print("[bold cyan]│[/bold cyan]")
-        stealth   = ask_yes_no("│  Stealth mode for crawl? ")
+        stealth   = ask_yes_no("│  Modo stealth para o crawl? ")
         console.print("[bold cyan]│[/bold cyan]")
-        do_report = ask_yes_no("│  Generate HTML report at end of crawl?", default_yes=True)
-        console.print(f"[bold cyan]└─>[/bold cyan] [green]Crawl enabled — {rounds} round(s)[/green]\n")
+        do_report = ask_yes_no("│  Gerar relatório HTML ao final do crawl?", default_yes=True)
+        console.print(f"[bold cyan]└─>[/bold cyan] [green]Crawl ativado — {rounds} rodada(s)[/green]\n")
         return {"rounds": rounds, "stealth": stealth, "do_report": do_report, "max": 300, "per_dork": 20}
 
     def _run_crawl_wizard(seed_dorks: list, crawl_opts: dict, output: str) -> None:
@@ -2366,28 +2366,28 @@ def run_wizard():
             "crawl_report":   crawl_opts["do_report"],
             "crawl_out":      report_path,
         })()
-        console.print(f"\n[bold cyan][Crawl] Starting recursive crawl — {crawl_opts['rounds']} round max[/bold cyan]")
+        console.print(f"\n[bold cyan][Crawl] Iniciando crawl recursivo — máximo de {crawl_opts['rounds']} rodada(s)[/bold cyan]")
         try:
             crawl_out = run_crawl(seed_dorks=seed_dorks, args=_crawl_args, target="")
             console.print(
-                f"[bold green][Crawl] Completed — "
-                f"{crawl_out.get('rounds', 0)} round(s) · "
-                f"{len(crawl_out.get('results', []))} result(s)[/bold green]"
+                f"[bold green][Crawl] Concluído — "
+                f"{crawl_out.get('rounds', 0)} rodada(s) · "
+                f"{len(crawl_out.get('results', []))} resultado(s)[/bold green]"
             )
             if crawl_out.get("report_path"):
-                console.print(f"[bold green][✓] Report crawl → {crawl_out['report_path']}[/bold green]")
+                console.print(f"[bold green][✓] Relatório do crawl → {crawl_out['report_path']}[/bold green]")
         except Exception as _ce:
-            console.print(f"[yellow][Crawl] Error: {_ce}[/yellow]")
+            console.print(f"[yellow][Crawl] Erro: {_ce}[/yellow]")
 
     MAIN_MENU = [
-        ("Google Dork Search",   "Search DuckDuckGo with dork(s)"),
-        ("Dork Generator",       "Auto-generate dorks from templates"),
-        ("Create sample config", "Write dorkeye_config.yaml to disk"),
-        ("Exit",                 ""),
+        ("Busca de Google Dorks",   "Buscar no DuckDuckGo com dork(s)"),
+        ("Gerador de Dorks",       "Gerar dorks automaticamente a partir de templates"),
+        ("Criar config de exemplo", "Gravar dorkeye_config.yaml em disco"),
+        ("Sair",                 ""),
     ]
 
     while True:
-        console.print("\n[bold cyan]┌─[ MAIN MENU ][/bold cyan]")
+        console.print("\n[bold cyan]┌─[ MENU PRINCIPAL ][/bold cyan]")
         for i, (label, desc) in enumerate(MAIN_MENU, 1):
             hint = f"  [dim]{desc}[/dim]" if desc else ""
             console.print(f"[bold cyan]│[/bold cyan]  [yellow]{i})[/yellow] {label}{hint}")
@@ -2396,7 +2396,7 @@ def run_wizard():
         try:
             choice = input("").strip()
         except KeyboardInterrupt:
-            console.print("\n[red]Aborted.[/red]")
+            console.print("\n[red]Abortado.[/red]")
             return
 
         if choice == "3":
@@ -2405,10 +2405,10 @@ def run_wizard():
 
         if choice == "4":
             EXIT_MESSAGES = [
-                ("Logs don't lie. Neither do we.", "dim"),
-                ("Stay ghost.", "bold cyan"),
-                ("Cover your tracks.", "bold cyan"),
-                ("Good hunt.", "bold green"),
+                ("Logs não mentem. Nós também não.", "dim"),
+                ("Permaneça fantasma.", "bold cyan"),
+                ("Cubra seus rastros.", "bold cyan"),
+                ("Boa caçada.", "bold green"),
             ]
             msg, color = random.choice(EXIT_MESSAGES)
             console.print(f"[{color}]{msg}[/{color}]")
@@ -2417,30 +2417,30 @@ def run_wizard():
         config = load_config(None)
 
         if choice == "1":
-            console.print("\n[bold cyan]┌─[ GOOGLE DORK SEARCH ][/bold cyan]")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] [dim]← Back[/dim]")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]1)[/yellow] Single dork")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]2)[/yellow] Load from file")
+            console.print("\n[bold cyan]┌─[ BUSCA DE GOOGLE DORKS ][/bold cyan]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] [dim]← Voltar[/dim]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]1)[/yellow] Dork único")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]2)[/yellow] Carregar de arquivo")
             console.print("[bold cyan]└─>[/bold cyan] ", end="")
             try:
                 sub = input("").strip()
             except KeyboardInterrupt:
-                console.print("\n[red]Aborted.[/red]")
+                console.print("\n[red]Abortado.[/red]")
                 return
             if sub == "0":
                 continue
             if sub == "1":
-                dork_input = ask_string("Enter dork string")
+                dork_input = ask_string("Informe o dork")
                 if not dork_input:
-                    console.print("[red][!] Empty dork.[/red]")
+                    console.print("[red][!] Dork vazio.[/red]")
                     continue
             elif sub == "2":
-                dork_input = ask_string("ex: dorks.txt")
+                dork_input = ask_string("ex.: dorks.txt")
                 if not os.path.isfile(dork_input):
-                    console.print(f"[red][!] File not found: {dork_input}[/red]")
+                    console.print(f"[red][!] Arquivo não encontrado: {dork_input}[/red]")
                     continue
             else:
-                console.print("[red][!] Invalid choice.[/red]")
+                console.print("[red][!] Opção inválida.[/red]")
                 continue
 
             count, do_dbscan = collect_run_options(config, ask_count=True)
@@ -2450,23 +2450,23 @@ def run_wizard():
 
             dorkeye = DorkEyeEnhanced(config, output)
             dorks   = dorkeye.process_dorks(dork_input)
-            console.print(f"\n[bold cyan]┌─[ LOADED {len(dorks)} DORK(s) ][/bold cyan]")
-            console.print("[bold cyan]└─>[/bold cyan] Starting...\n")
+            console.print(f"\n[bold cyan]┌─[ CARREGADOS {len(dorks)} DORK(S) ][/bold cyan]")
+            console.print("[bold cyan]└─>[/bold cyan] Iniciando...\n")
             try:
                 dorkeye.run_search(dorks, count)
             except KeyboardInterrupt:
-                console.print("\n[red][!] Search interrupted.[/red]")
+                console.print("\n[red][!] Busca interrompida.[/red]")
             dorkeye.print_statistics()
             if output:
-                console.print(f"\n[bold green][✓] Results saved: {output}[/bold green]")
+                console.print(f"\n[bold green][✓] Resultados salvos em: {output}[/bold green]")
             if do_analyze and dorkeye.results:
                 _run_analyze(dorkeye.results, output)
             if crawl_opts and dorks:
                 _run_crawl_wizard(dorks, crawl_opts, output or "")
             if do_dbscan and dorkeye.results:
                 console.print(
-                    f"\n[bold cyan]┌─[ DB Port Scanner ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Starting on {len(dorkeye.results)} results...\n"
+                    f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
                 )
                 try:
                     _db_wiz = DBPortScanAgent(timeout=2.5, threads=60, ports=None, max_hosts=200)
@@ -2476,24 +2476,24 @@ def run_wizard():
                         _dump_dir_wiz  = Path(__file__).parent / "Dump"
                         _db_wiz_base   = str(_dump_dir_wiz / str(output)) if output else str(_dump_dir_wiz / "dorkeye_dbscan.json")
                         _db_wiz_saved  = save_dbscan_report(_db_wiz_report, _db_wiz_base)
-                        console.print(f"[bold green][✓] DBScan report → {_db_wiz_saved}[/bold green]")
+                        console.print(f"[bold green][✓] Relatório DBScan → {_db_wiz_saved}[/bold green]")
                 except KeyboardInterrupt:
-                    console.print("\n[yellow][DBScan] Interrotto dall'utente.[/yellow]")
+                    console.print("\n[yellow][DBScan] Interrompido pelo usuário.[/yellow]")
                 except Exception as _dbe_wiz:
-                    console.print(f"[yellow][DBScan] Errore: {_rich_escape(str(_dbe_wiz))}[/yellow]")
+                    console.print(f"[yellow][DBScan] Erro: {_rich_escape(str(_dbe_wiz))}[/yellow]")
             continue
 
         if choice == "2":
-            console.print("\n[bold cyan]┌─[ DORK GENERATOR ][/bold cyan]")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] [dim]← Back[/dim]")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]1)[/yellow] Default template")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]2)[/yellow] All templates")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]3)[/yellow] Specific template file")
+            console.print("\n[bold cyan]┌─[ GERADOR DE DORKS ][/bold cyan]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] [dim]← Voltar[/dim]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]1)[/yellow] Template padrão")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]2)[/yellow] Todos os templates")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]3)[/yellow] Arquivo de template específico")
             console.print("[bold cyan]└─>[/bold cyan] ", end="")
             try:
                 tmpl_choice = input("").strip()
             except KeyboardInterrupt:
-                console.print("\n[red]Aborted.[/red]")
+                console.print("\n[red]Abortado.[/red]")
                 return
             if tmpl_choice == "0":
                 continue
@@ -2502,29 +2502,29 @@ def run_wizard():
             elif tmpl_choice == "2":
                 template_files = resolve_templates_argument("all")
             elif tmpl_choice == "3":
-                tmpl_name = ask_string("Template filename", "dorks_templates.yaml")
+                tmpl_name = ask_string("Nome do arquivo de template", "dorks_templates.yaml")
                 if not tmpl_name:
-                    console.print("[red][!] No filename given.[/red]")
+                    console.print("[red][!] Nenhum nome de arquivo informado.[/red]")
                     continue
                 template_files = resolve_templates_argument(tmpl_name)
             else:
-                console.print("[red][!] Invalid choice.[/red]")
+                console.print("[red][!] Opção inválida.[/red]")
                 continue
 
             VALID_CATEGORIES = get_categories_from_templates(template_files)
             if not VALID_CATEGORIES:
-                console.print("[red][!] No categories found.[/red]")
+                console.print("[red][!] Nenhuma categoria encontrada.[/red]")
                 continue
 
-            console.print("\n[bold cyan]┌─[ CATEGORY ][/bold cyan]")
-            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] ALL categories")
+            console.print("\n[bold cyan]┌─[ CATEGORIA ][/bold cyan]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow]0)[/yellow] TODAS as categorias")
             for i, cat in enumerate(VALID_CATEGORIES, 1):
                 console.print(f"[bold cyan]│[/bold cyan]  [yellow]{i})[/yellow] {cat}")
             console.print("[bold cyan]└─>[/bold cyan] ", end="")
             try:
                 cat_choice = input("").strip()
             except KeyboardInterrupt:
-                console.print("\n[red]Aborted.[/red]")
+                console.print("\n[red]Abortado.[/red]")
                 return
             if cat_choice == "0":
                 selected_categories = VALID_CATEGORIES
@@ -2533,10 +2533,10 @@ def run_wizard():
                     idx                 = int(cat_choice) - 1
                     selected_categories = [VALID_CATEGORIES[idx]]
                 except (ValueError, IndexError):
-                    console.print("[red][!] Invalid selection.[/red]")
+                    console.print("[red][!] Seleção inválida.[/red]")
                     continue
 
-            mode_idx = ask_choice("Mode", ["soft", "medium", "aggressive"])
+            mode_idx = ask_choice("Modo", ["soft", "medium", "aggressive"])
             mode     = VALID_MODES[mode_idx]
             _, do_dbscan = collect_run_options(config, ask_count=False)
             output      = pick_output()
@@ -2548,23 +2548,23 @@ def run_wizard():
                 generator = DorkGenerator(str(template_file))
                 all_dorks.extend(generator.generate(categories=selected_categories, mode=mode))
 
-            console.print(f"\n[cyan][*] Generated {len(all_dorks)} dorks (mode: {mode})[/cyan]")
+            console.print(f"\n[cyan][*] {len(all_dorks)} dorks gerados (modo: {mode})[/cyan]")
             dorkeye = DorkEyeEnhanced(config, output)
             try:
                 dorkeye.run_search(all_dorks, 50)
             except KeyboardInterrupt:
-                console.print("\n[red][!] Search interrupted.[/red]")
+                console.print("\n[red][!] Busca interrompida.[/red]")
             dorkeye.print_statistics()
             if output:
-                console.print(f"\n[bold green][✓] Results saved: {output}[/bold green]")
+                console.print(f"\n[bold green][✓] Resultados salvos em: {output}[/bold green]")
             if do_analyze and dorkeye.results:
                 _run_analyze(dorkeye.results, output)
             if crawl_opts and all_dorks:
                 _run_crawl_wizard(all_dorks, crawl_opts, output or "")
             if do_dbscan and dorkeye.results:
                 console.print(
-                    f"\n[bold cyan]┌─[ DB Port Scanner ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Starting on {len(dorkeye.results)} results...\n"
+                    f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
                 )
                 try:
                     _db_wiz2 = DBPortScanAgent(timeout=2.5, threads=60, ports=None, max_hosts=200)
@@ -2574,42 +2574,42 @@ def run_wizard():
                         _dump_dir_wiz2  = Path(__file__).parent / "Dump"
                         _db_wiz2_base   = str(_dump_dir_wiz2 / str(output)) if output else str(_dump_dir_wiz2 / "dorkeye_dbscan.json")
                         _db_wiz2_saved  = save_dbscan_report(_db_wiz2_report, _db_wiz2_base)
-                        console.print(f"[bold green][✓] DBScan report → {_db_wiz2_saved}[/bold green]")
+                        console.print(f"[bold green][✓] Relatório DBScan → {_db_wiz2_saved}[/bold green]")
                 except KeyboardInterrupt:
-                    console.print("\n[yellow][DBScan] Interrupted by user.[/yellow]")
+                    console.print("\n[yellow][DBScan] Interrompido pelo usuário.[/yellow]")
                 except Exception as _dbe_wiz2:
-                    console.print(f"[red][DBScan] Error: {_rich_escape(str(_dbe_wiz2))}[/red]")
+                    console.print(f"[red][DBScan] Erro: {_rich_escape(str(_dbe_wiz2))}[/red]")
             continue
 
-        console.print("[red][!] Invalid option.[/red]")
+        console.print("[red][!] Opção inválida.[/red]")
 
 
 # ══════════════════════════════════════════════════════════════
-#  MAIN
+#  PRINCIPAL
 # ══════════════════════════════════════════════════════════════
 
 def main():
-    """Entry point."""
+    """Ponto de entrada."""
     if "--wizard" in sys.argv:
         greet_user()
         run_wizard()
         return
 
-    # ── Web UI ────────────────────────────────────────────────────────────────
-    # Checked before argparse to not consume --port / --no-browser
+    # ── Interface Web ────────────────────────────────────────────────────────────────
+    # Verificado antes do argparse para não consumir --port / --no-browser
     if "--ui" in sys.argv:
-        # dorkeye_web.py It is located in Tools/ which is already in sys.path
+        # dorkeye_web.py está localizado em Tools/, que já está no sys.path
         try:
             from dorkeye_web import launch_web
         except ImportError:
             console.print(
-                "[red][!] dorkeye_web.py not found in Tools/.[/red]\n"
-                "[dim]    Make sure the file exists in DorkEye/Tools/dorkeye_web.py[/dim]\n"
-                "[dim]    and that Flask is installed:  pip install flask[/dim]"
+                "[red][!] dorkeye_web.py não encontrado em Tools/.[/red]\n"
+                "[dim]    Certifique-se de que o arquivo existe em DorkEye/Tools/dorkeye_web.py[/dim]\n"
+                "[dim]    e de que o Flask está instalado:  pip install flask[/dim]"
             )
             sys.exit(1)
 
-        # Read --port and --no-browser if present, ignore the rest
+        # Lê --port e --no-browser se presentes, ignora o resto
         import argparse as _ap_ui
         _ui_p = _ap_ui.ArgumentParser(add_help=False)
         _ui_p.add_argument("--port",       type=int, default=8080)
@@ -2622,11 +2622,11 @@ def main():
     greet_user()
 
     parser = argparse.ArgumentParser(
-        description="DorkEye v5.0 | OSINT Dorking Tool",
+        description="DorkEye v5.0 | Ferramenta de Dorking (OSINT)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""Examples:
+        epilog="""Exemplos:
   %(prog)s --ui                 # Web Console (8080)
-  %(prog)s --ui --port          # Es: 9090
+  %(prog)s --ui --port          # Ex.: 9090
   %(prog)s --wizard
   %(prog)s -d "site:example.com filetype:pdf" -o results.json
   %(prog)s -d dorks.txt -c 100 -o output.html
@@ -2641,15 +2641,15 @@ def main():
 
     parser.add_argument("--wizard",          action="store_true")
     parser.add_argument("--ui",             action="store_true",
-                        help="Launch the Web Console (http://127.0.0.1:8080)")
+                        help="Abre o Console Web (http://127.0.0.1:8080)")
     parser.add_argument("--port",           type=int, default=8080,
-                        help="Web Console Port (default: 8080)")
-    parser.add_argument("-d", "--dork",      help="Single dork or file containing dorks")
-    parser.add_argument("-u", "--url",       help="Direct URL to test")
-    parser.add_argument("-f", "--file",      help="Load results from .json or .txt file")
-    parser.add_argument("-o", "--output",    help="Output filename")
+                        help="Porta do Console Web (padrão: 8080)")
+    parser.add_argument("-d", "--dork",      help="Dork único ou arquivo contendo dorks")
+    parser.add_argument("-u", "--url",       help="URL direta para testar")
+    parser.add_argument("-f", "--file",      help="Carrega resultados de arquivo .json ou .txt")
+    parser.add_argument("-o", "--output",    help="Nome do arquivo de saída")
     parser.add_argument("-c", "--count",     type=int, default=50)
-    parser.add_argument("--config",          help="Configuration file")
+    parser.add_argument("--config",          help="Arquivo de configuração")
     parser.add_argument("--no-analyze",      action="store_true")
     parser.add_argument("--sqli",            action="store_true")
     parser.add_argument("--xss",             action="store_true")
@@ -2671,22 +2671,22 @@ def main():
     add_crawler_args(parser)
     # ── DB Port Scanner ───────────────────────────────────────────────────────
     parser.add_argument("--dbscan",          action="store_true",
-                        help="Scan open DB ports on hosts found by dorks")
+                        help="Escaneia portas DB abertas em hosts encontrados pelos dorks")
     parser.add_argument("--dbscan-threads",  type=int, default=60,
-                        help="Worker threads per host for DB scan (default: 60)")
+                        help="Threads de trabalho por host para a varredura DB (padrão: 60)")
     parser.add_argument("--dbscan-timeout",  type=float, default=2.5,
-                        help="TCP connect timeout in seconds (default: 2.5)")
+                        help="Timeout de conexão TCP em segundos (padrão: 2.5)")
     parser.add_argument("--dbscan-ports",    type=int, nargs="+", default=None,
-                        help="Override DB ports to scan (default: all known DB ports)")
+                        help="Sobrepõe as portas DB a escanear (padrão: todas as portas DB conhecidas)")
     parser.add_argument("--dbscan-max-hosts",type=int, default=200,
-                        help="Max unique hosts to scan (default: 200)")
+                        help="Máximo de hosts únicos a escanear (padrão: 200)")
     # ─────────────────────────────────────────────────────────────────────────
 
     args = parser.parse_args()
 
     for arg in sys.argv:
         if arg.startswith("--templates") and not arg.startswith("--templates="):
-            console.print("[red][!] Use --templates=filename.yaml format[/red]")
+            console.print("[red][!] Use o formato --templates=arquivo.yaml[/red]")
             sys.exit(1)
 
     VALID_CATEGORIES: List[str] = []
@@ -2694,22 +2694,22 @@ def main():
         template_files_for_validation = resolve_templates_argument(args.templates)
         VALID_CATEGORIES = get_categories_from_templates(template_files_for_validation)
         if not VALID_CATEGORIES and args.dg:
-            parser.error("No categories found in template files.")
+            parser.error("Nenhuma categoria encontrada nos arquivos de template.")
 
     selected_categories = None
     if args.dg:
         if len(args.dg) > 1:
-            parser.error("Multiple --dg arguments are not allowed.")
+            parser.error("Múltiplos argumentos --dg não são permitidos.")
         dg_value = args.dg[0]
         if dg_value == "all":
             selected_categories = VALID_CATEGORIES
         else:
             if dg_value not in VALID_CATEGORIES:
-                parser.error(f"Invalid category '{dg_value}'. Available: {', '.join(VALID_CATEGORIES)}")
+                parser.error(f"Categoria inválida '{dg_value}'. Disponíveis: {', '.join(VALID_CATEGORIES)}")
             selected_categories = [dg_value]
 
     if args.mode not in VALID_MODES:
-        parser.error(f"Invalid mode '{args.mode}'. Available: {', '.join(VALID_MODES)}")
+        parser.error(f"Modo inválido '{args.mode}'. Disponíveis: {', '.join(VALID_MODES)}")
 
     print_banner()
 
@@ -2735,51 +2735,51 @@ def main():
     output_file = args.output
     if not output_file:
         output_file = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        console.print(f"[dim][~] No -o specified — saving to [bold]{output_file}[/bold][/dim]")
+        console.print(f"[dim][~] -o não especificado — salvando em [bold]{output_file}[/bold][/dim]")
 
     _is_json_output = str(output_file).lower().endswith(".json")
     _do_analyze     = args.analyze or _is_json_output
 
     if _is_json_output and not args.analyze and _ANALYZE_AVAILABLE:
-        console.print("\n[bold cyan]┌─[ RESULTS ANALYSIS ][/bold cyan]")
-        console.print("[bold cyan]│[/bold cyan]  .json output detected — analysis available after search.")
-        console.print("[bold cyan]│  Run analysis on results? [y/N]:[/bold cyan] ", end="")
+        console.print("\n[bold cyan]┌─[ ANÁLISE DE RESULTADOS ][/bold cyan]")
+        console.print("[bold cyan]│[/bold cyan]  .json detectado na saída — análise disponível após a busca.")
+        console.print("[bold cyan]│  Executar análise nos resultados? [y/N]:[/bold cyan] ", end="")
         try:
             _do_analyze = input("").strip().lower() in ("y", "yes")
         except KeyboardInterrupt:
             _do_analyze = False
         if _do_analyze:
-            console.print("[bold cyan]└─>[/bold cyan] [green]Analysis enabled.[/green]\n")
+            console.print("[bold cyan]└─>[/bold cyan] [green]Análise ativada.[/green]\n")
         else:
-            console.print("[bold cyan]└─>[/bold cyan] [dim]Analysis skipped.[/dim]\n")
+            console.print("[bold cyan]└─>[/bold cyan] [dim]Análise pulada.[/dim]\n")
     elif args.analyze and not _ANALYZE_AVAILABLE:
-        console.print("[yellow][!] dorkeye_agents.py not found — analysis not available.[/yellow]")
+        console.print("[yellow][!] dorkeye_agents.py não encontrado — análise indisponível.[/yellow]")
         _do_analyze = False
 
     dorkeye = DorkEyeEnhanced(config, output_file)
 
-    # ── -u / --url: direct test ───────────────────────────────────────────────
+    # ── -u / --url: teste direto ───────────────────────────────────────────────
     if getattr(args, "url", None):
         target_url   = args.url
         _do_url_sqli = config.get("sqli_detection", False)
         _do_url_xss  = config.get("xss_detection",  False)
 
         if getattr(args, "dbscan", False):
-            console.print("[yellow][!] --dbscan viene ignorato in modalità -u (URL diretto). "
-                          "Usa --dbscan con -d / --dg / -f per scansionare più host.[/yellow]")
+            console.print("[yellow][!] --dbscan é ignorado no modo -u (URL direto). "
+                          "Use --dbscan com -d / --dg / -f para escanear múltiplos hosts.[/yellow]")
 
-        console.print(f"\n[bold cyan]┌─[ DIRECT URL TEST ][/bold cyan]")
-        console.print(f"[bold cyan]│[/bold cyan]  Target → [cyan]{_rich_escape(target_url)}[/cyan]")
+        console.print(f"\n[bold cyan]┌─[ TESTE DE URL DIRETA ][/bold cyan]")
+        console.print(f"[bold cyan]│[/bold cyan]  Alvo → [cyan]{_rich_escape(target_url)}[/cyan]")
 
         if not _do_url_sqli and not _do_url_xss:
-            console.print("[bold cyan]│[/bold cyan]  [yellow][!] No test flag — enabling SQLi automatically[/yellow]")
+            console.print("[bold cyan]│[/bold cyan]  [yellow][!] Nenhuma flag de teste — ativando SQLi automaticamente[/yellow]")
             config["sqli_detection"] = True
             dorkeye.config["sqli_detection"] = True
             dorkeye.analyzer.config["sqli_detection"] = True
             _do_url_sqli = True
 
         tests_label = " + ".join(filter(None, ["SQLi" if _do_url_sqli else "", "XSS" if _do_url_xss else ""]))
-        console.print(f"[bold cyan]└─>[/bold cyan] Starting {tests_label} test...\n")
+        console.print(f"[bold cyan]└─>[/bold cyan] Iniciando teste {tests_label}...\n")
 
         _entry = {
             "url":       target_url,
@@ -2798,14 +2798,14 @@ def main():
             )
             _sqli_result = _detector.test_sqli(target_url)
             _entry["sqli_test"] = _sqli_result
-            console.print("\n[bold yellow]┌─[ SQLi Test Result ][/bold yellow]")
+            console.print("\n[bold yellow]┌─[ RESULTADO DO TESTE SQLi ][/bold yellow]")
             _tested = _sqli_result.get("tested", False)
             _vuln   = _sqli_result.get("vulnerable", False)
             _conf   = _sqli_result.get("overall_confidence", "none")
             _waf    = _sqli_result.get("waf_detected")
             _msg    = _sqli_result.get("message", "")
             if not _tested:
-                console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] Not tested — {_msg}[/yellow]")
+                console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] Não testado — {_msg}[/yellow]")
             elif _vuln:
                 _style = "bold magenta" if _conf == SQLiConfidence.CRITICAL.value else "bold red"
                 console.print(f"[bold yellow]│[/bold yellow]  [{_style}][!] VULNERABLE ({_conf})[/{_style}]  {_rich_escape(target_url)}")
@@ -2814,13 +2814,13 @@ def main():
                         _method = _t.get("method", "?")
                         _ev     = " | ".join(_t.get("evidence", [])[:2])
                         _param  = _t.get("parameter", "")
-                        _p_str  = f" [param: {_param}]" if _param else ""
-                        console.print(f"[bold yellow]│[/bold yellow]    [dim]↳ method: [yellow]{_method}[/yellow]{_p_str}  evidence: [italic]{_rich_escape(_ev[:120])}[/italic][/dim]")
+                        _p_str  = f" [parâmetro: {_param}]" if _param else ""
+                        console.print(f"[bold yellow]│[/bold yellow]    [dim]↳ método: [yellow]{_method}[/yellow]{_p_str}  evidência: [italic]{_rich_escape(_ev[:120])}[/italic][/dim]")
                 dorkeye.stats["sqli_vulnerable"] += 1
             else:
                 console.print(f"[bold yellow]│[/bold yellow]  [green][✓] SAFE[/green]  {_rich_escape(target_url)}")
             if _waf:
-                console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] WAF detected: {_waf}[/yellow]")
+                console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] WAF detectado: {_waf}[/yellow]")
                 dorkeye.stats["waf_detected"] += 1
             console.print(f"[bold yellow]└─>[/bold yellow]  {_msg}")
 
@@ -2834,41 +2834,41 @@ def main():
                 )
                 _xss_result = _xss_det.test_xss(target_url)
                 _entry["xss_test"] = _xss_result
-                console.print("\n[bold yellow]┌─[ XSS Test Result ][/bold yellow]")
+                console.print("\n[bold yellow]┌─[ RESULTADO DO TESTE XSS ][/bold yellow]")
                 _xvuln  = _xss_result.get("vulnerable", False)
                 _xconf  = _xss_result.get("overall_confidence", "none")
                 _xtypes = ", ".join(_xss_result.get("xss_types_found", []))
                 _xwaf   = _xss_result.get("waf_detected")
                 _xmsg   = _xss_result.get("message", "")
                 if not _xss_result.get("tested"):
-                    console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] Not tested — {_xmsg}[/yellow]")
+                    console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] Não testado — {_xmsg}[/yellow]")
                 elif _xvuln:
                     console.print(f"[bold yellow]│[/bold yellow]  [bold yellow][!] VULNERABLE ({_xconf}) [{_xtypes}][/bold yellow]  {_rich_escape(target_url)}")
                     dorkeye.stats["xss_vulnerable"] += 1
                 else:
                     console.print(f"[bold yellow]│[/bold yellow]  [green][✓] SAFE[/green]  {_rich_escape(target_url)}")
                 if _xwaf:
-                    console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] WAF detected: {_xwaf}[/yellow]")
+                    console.print(f"[bold yellow]│[/bold yellow]  [yellow][~] WAF detectado: {_xwaf}[/yellow]")
                 console.print(f"[bold yellow]└─>[/bold yellow]  {_xmsg}")
             except ImportError:
-                console.print("[yellow][!] xss.py not found — XSS test skipped.[/yellow]")
+                console.print("[yellow][!] xss.py não encontrado — teste XSS pulado.[/yellow]")
 
         if output_file:
             dorkeye.results.append(_entry)
             dorkeye.save_results()
-            console.print(f"\n[bold green][✓] Result saved → Dump/{output_file}[/bold green]")
+            console.print(f"\n[bold green][✓] Resultado salvo → Dump/{output_file}[/bold green]")
         return
 
     # ── -f / --file ───────────────────────────────────────────────────────────
     if getattr(args, "file", None):
         _file_path = args.file
-        console.print(f"\n[bold cyan]┌─[ FILE MODE ][/bold cyan]")
-        console.print(f"[bold cyan]│[/bold cyan]  Loading: [cyan]{_file_path}[/cyan]")
+        console.print(f"\n[bold cyan]┌─[ MODO DE ARQUIVO ][/bold cyan]")
+        console.print(f"[bold cyan]│[/bold cyan]  Carregando: [cyan]{_file_path}[/cyan]")
         _loaded = _load_results_from_file(_file_path)
         if not _loaded:
-            console.print("[bold cyan]└─>[/bold cyan] [red]No results loaded — aborting.[/red]")
+            console.print("[bold cyan]└─>[/bold cyan] [red]Nenhum resultado carregado — abortando.[/red]")
             return
-        console.print(f"[bold cyan]│[/bold cyan]  Loaded [green]{len(_loaded)}[/green] result(s)")
+        console.print(f"[bold cyan]│[/bold cyan]  Carregados [green]{len(_loaded)}[/green] resultado(s)")
 
         _do_sqli    = config.get("sqli_detection", False)
         _do_xss     = config.get("xss_detection", False)
@@ -2876,7 +2876,7 @@ def main():
         _do_crawl   = getattr(args, "crawl", False)
         _do_dbscan  = getattr(args, "dbscan", False)
 
-        console.print("[bold cyan]└─>[/bold cyan] Processing...\n")
+        console.print("[bold cyan]└─>[/bold cyan] Processando...\n")
 
         for _r in _loaded:
             _h = dorkeye._hash_url(_r.get("url", ""))
@@ -2892,7 +2892,7 @@ def main():
 
         if output_file:
             dorkeye.save_results()
-            console.print(f"\n[bold green][✓] Results saved → Dump/{output_file}[/bold green]")
+            console.print(f"\n[bold green][✓] Resultados salvos → Dump/{output_file}[/bold green]")
 
         if _do_analyze and dorkeye.results and _ANALYZE_AVAILABLE:
             ts         = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -2912,9 +2912,9 @@ def main():
             try:
                 _result_f = _run_agents_pipeline(results=dorkeye.results, llm_plugin=None, args=_analyze_args_f)
                 if _result_f.get("report_path"):
-                    console.print(f"[bold green][✓] Analysis report → {_result_f['report_path']}[/bold green]")
+                    console.print(f"[bold green][✓] Relatório de análise → {_result_f['report_path']}[/bold green]")
             except Exception as _fae:
-                console.print(f"[yellow][Analyzer] Error: {_fae}[/yellow]")
+                console.print(f"[yellow][Analyzer] Erro: {_fae}[/yellow]")
 
         if _do_crawl and _ANALYZE_AVAILABLE:
             _seed_dorks = list({r.get("dork", "") for r in dorkeye.results if r.get("dork")})
@@ -2928,19 +2928,19 @@ def main():
                     dorkeye.results.extend(_new_crawl)
                     if output_file:
                         dorkeye.save_results()
-                    console.print(f"\n[bold green][Crawl] Completed — +{len(_new_crawl)} new result(s)[/bold green]")
+                    console.print(f"\n[bold green][Crawl] Concluído — +{len(_new_crawl)} novo(s) resultado(s)[/bold green]")
             except Exception as _fce:
-                console.print(f"[yellow][Crawl] Error: {_fce}[/yellow]")
+                console.print(f"[yellow][Crawl] Erro: {_fce}[/yellow]")
 
         if _do_dbscan:
             if not _DBSCAN_AVAILABLE:
-                console.print("[yellow][!] db_portscan.py non trovato in Tools/ — DBScan non disponibile.[/yellow]")
+                console.print("[yellow][!] db_portscan.py não encontrado em Tools/ — DBScan indisponível.[/yellow]")
             elif not dorkeye.results:
-                console.print("[yellow][DBScan] Nessun risultato da scansionare.[/yellow]")
+                console.print("[yellow][DBScan] Nenhum resultado para escanear.[/yellow]")
             else:
                 console.print(
-                    f"\n[bold cyan]┌─[ DB Port Scanner ][/bold cyan]"
-                    f"\n[bold cyan]└─>[/bold cyan] Avvio su {len(dorkeye.results)} risultato/i...\n"
+                    f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
+                    f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
                 )
                 try:
                     _db_agent = DBPortScanAgent(
@@ -2952,20 +2952,20 @@ def main():
                     _db_report = _db_agent.run(dorkeye.results)
                     if _db_report:
                         _db_report.print_summary()
-                        # BUG FIX: output_file is just a filename; we must
-                        # pass the full Dump/ path so save_dbscan_report
-                        # writes next to the main results file and not in CWD.
+                        # CORREÇÃO: output_file é apenas um nome de arquivo; devemos
+                        # passar o path completo do Dump/ para que save_dbscan_report
+                        # grave ao lado do arquivo principal de resultados e não no CWD.
                         _dump_dir    = Path(__file__).parent / "Dump"
                         _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "dorkeye_dbscan.json")
                         _db_saved    = save_dbscan_report(_db_report, _db_out_base)
-                        console.print(f"[bold green][✓] DBScan report → {_db_saved}[/bold green]")
+                        console.print(f"[bold green][✓] Relatório DBScan → {_db_saved}[/bold green]")
                 except KeyboardInterrupt:
-                    console.print("\n[yellow][DBScan] Interrotto dall'utente.[/yellow]")
+                    console.print("\n[yellow][DBScan] Interrompido pelo usuário.[/yellow]")
                 except Exception as _dbe:
-                    console.print(f"[yellow][DBScan] Errore: {_rich_escape(str(_dbe))}[/yellow]")
+                    console.print(f"[yellow][DBScan] Erro: {_rich_escape(str(_dbe))}[/yellow]")
         return
 
-    # ── Dork source ───────────────────────────────────────────────────────────
+    # ── Origem dos dorks ───────────────────────────────────────────────────────────
     if args.dg:
         template_files = resolve_templates_argument(args.templates)
         all_dorks = []
@@ -2973,17 +2973,17 @@ def main():
             generator = DorkGenerator(str(template_file), max_combinations=args.dg_max)
             all_dorks.extend(generator.generate(categories=selected_categories, mode=args.mode))
         dorks = all_dorks
-        console.print(f"[cyan][*] Generated {len(dorks)} dorks (mode: {args.mode})[/cyan]")
+        console.print(f"[cyan][*] {len(dorks)} dorks gerados (modo: {args.mode})[/cyan]")
     else:
         dorks = dorkeye.process_dorks(args.dork)
 
-    console.print(f"[bold cyan]┌─[ LOADED {len(dorks)} DORK(s) ][/bold cyan]")
-    console.print(f"[bold cyan]└─>[/bold cyan] Starting...\n")
+    console.print(f"[bold cyan]┌─[ CARREGADOS {len(dorks)} DORK(S) ][/bold cyan]")
+    console.print(f"[bold cyan]└─>[/bold cyan] Iniciando...\n")
 
     try:
         dorkeye.run_search(dorks, args.count)
     except KeyboardInterrupt:
-        console.print("\n[red][!] Search interrupted by user![/red]")
+        console.print("\n[red][!] Busca interrompida pelo usuário![/red]")
 
     dorkeye.print_statistics()
 
@@ -3005,13 +3005,13 @@ def main():
         try:
             result = _run_agents_pipeline(results=dorkeye.results, llm_plugin=None, args=_analyze_args)
             if result.get("report_path"):
-                console.print(f"[bold green][✓] Analysis report → {result['report_path']}[/bold green]")
+                console.print(f"[bold green][✓] Relatório de análise → {result['report_path']}[/bold green]")
         except Exception as _ae:
-            console.print(f"[yellow][Agents] Error: {_ae}[/yellow]")
+            console.print(f"[yellow][Agents] Erro: {_ae}[/yellow]")
 
     if getattr(args, "crawl", False):
         if not _ANALYZE_AVAILABLE:
-            console.print("[yellow][!] dorkeye_agents.py not found — crawl not available.[/yellow]")
+            console.print("[yellow][!] dorkeye_agents.py não encontrado — crawl indisponível.[/yellow]")
         else:
             try:
                 crawl_out = run_crawl(seed_dorks=dorks, args=args, target="")
@@ -3022,26 +3022,26 @@ def main():
                     if dorkeye.output_file:
                         dorkeye.save_results()
                     console.print(
-                        f"\n[bold green][Crawl] Completed — "
-                        f"{crawl_out['rounds']} round(s) | "
-                        f"+{len(new_from_crawl)} new result(s)[/bold green]"
+                        f"\n[bold green][Crawl] Concluído — "
+                        f"{crawl_out['rounds']} rodada(s) | "
+                        f"+{len(new_from_crawl)} novo(s) resultado(s)[/bold green]"
                     )
             except Exception as _ce:
-                console.print(f"[yellow][Crawl] Error: {_ce}[/yellow]")
+                console.print(f"[yellow][Crawl] Erro: {_ce}[/yellow]")
 
     # ── DB Port Scanner ───────────────────────────────────────────────────────
     if getattr(args, "dbscan", False):
         if not _DBSCAN_AVAILABLE:
             console.print(
-                "[yellow][!] db_portscan.py not found in Tools — "
-                "copy the file to DorkEye/Tools/ and try again.[/yellow]"
+                "[yellow][!] db_portscan.py não encontrado em Tools — "
+                "copie o arquivo para DorkEye/Tools/ e tente novamente.[/yellow]"
             )
         elif not dorkeye.results:
-            console.print("[yellow][DBScan] No results to scan.[/yellow]")
+            console.print("[yellow][DBScan] Nenhum resultado para escanear.[/yellow]")
         else:
             console.print(
-                f"\n[bold cyan]┌─[ DB Port Scanner ][/bold cyan]"
-                f"\n[bold cyan]└─>[/bold cyan] Starting on {len(dorkeye.results)} result(s)...\n"
+                f"\n[bold cyan]┌─[ VARREDURA DE PORTAS DB ][/bold cyan]"
+                f"\n[bold cyan]└─>[/bold cyan] Iniciando em {len(dorkeye.results)} resultado(s)...\n"
             )
             try:
                 _db_agent = DBPortScanAgent(
@@ -3053,25 +3053,25 @@ def main():
                 _db_report = _db_agent.run(dorkeye.results)
                 if _db_report:
                     _db_report.print_summary()
-                    # BUG FIX: output_file is just a filename; we must
-                    # pass the full Dump/ path so save_dbscan_report
-                    # writes next to the main results file and not in CWD.
+                    # CORREÇÃO: output_file é apenas um nome de arquivo; devemos
+                    # passar o path completo do Dump/ para que save_dbscan_report
+                    # grave ao lado do arquivo principal de resultados e não no CWD.
                     _dump_dir    = Path(__file__).parent / "Dump"
                     _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "dorkeye_dbscan.json")
                     _db_saved    = save_dbscan_report(_db_report, _db_out_base)
                     console.print(
-                        f"[bold green][✓] DBScan report → {_db_saved}[/bold green]"
+                        f"[bold green][✓] Relatório DBScan → {_db_saved}[/bold green]"
                     )
             except KeyboardInterrupt:
-                console.print("\n[yellow][DBScan] Stopped by user.[/yellow]")
+                console.print("\n[yellow][DBScan] Interrompido pelo usuário.[/yellow]")
             except Exception as _dbe:
-                console.print(f"[yellow][DBScan] Error: {_rich_escape(str(_dbe))}[/yellow]")
+                console.print(f"[yellow][DBScan] Erro: {_rich_escape(str(_dbe))}[/yellow]")
     # ─────────────────────────────────────────────────────────────────────────
 
     if dorkeye.output_file:
-        console.print(f"\n[bold green][✓] Results saved → Dump/{output_file}[/bold green]")
+        console.print(f"\n[bold green][✓] Resultados salvos → Dump/{output_file}[/bold green]")
     else:
-        console.print(f"\n[dim][~] No output file specified.[/dim]")
+        console.print(f"\n[dim][~] Nenhum arquivo de saída especificado.[/dim]")
 
 
 if __name__ == "__main__":

@@ -2,26 +2,26 @@
 """
 DorkEye Analyzer 
 ======================
-Fully autonomous post-search analysis for DorkEye Project
+Análise pós-busca totalmente autônoma para o DorkEye Project
 
-Works with Python + requests + rich only (already in requirements.txt).
-Reads results saved by DorkEye (-o results.json) and produces:
+Funciona apenas com Python + requests + rich (já no requirements.txt).
+Lê resultados salvos pelo DorkEye (-o results.json) e produz:
 
-  1. Triage    — classifies each result with score 0-100 (pure regex)
-  2. Fetch     — downloads the real content of priority pages
-  3. Secrets   — credentials and sensitive data scan (40+ regex patterns)
-  4. Report    — HTML with dark theme / Markdown / JSON / text
+  1. Triage    — classifica cada resultado com pontuação 0-100 (regex puro)
+  2. Fetch     — baixa o conteúdo real das páginas prioritárias
+  3. Secrets   — scan de credenciais e dados sensíveis (40+ padrões regex)
+  4. Report    — HTML com tema escuro / Markdown / JSON / texto
 
-Es:
+Ex.:
     python dorkeye_analyze.py Dump/results.json
     python dorkeye_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
     python dorkeye_analyze.py Dump/results.json --fetch --fetch-max=30 --fmt=md
 
-Integrated into dorkeye.py with --analyze-local:
+Integrado ao dorkeye.py via --analyze-local:
     python dorkeye.py --dg=all -o results.html --analyze-local
     python dorkeye.py -d dorks.txt --analyze-local --analyze-local-fetch --analyze-local-fmt=html
 
-Autore: @xPloits3c
+Autor: @xPloits3c
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ import urllib3
 import requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ── Rich (optional but already in requirements.txt) ─────────────────────────
+# ── Rich (opcional, mas já no requirements.txt) ─────────────────────────
 try:
     from rich.console  import Console
     from rich.panel    import Panel
@@ -72,7 +72,7 @@ except ImportError:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  PATTERN LIBRARY — imported from dorkeye_patterns.py
+#  BIBLIOTECA DE PADRÕES — importada de dorkeye_patterns.py
 # ══════════════════════════════════════════════════════════════════════════════
 from dorkeye_patterns import (
     TRIAGE_RULES,
@@ -87,7 +87,7 @@ from dorkeye_patterns import (
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  HELPERS
+#  AUXILIARES
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _censor(value: str, show: int = 4) -> str:
@@ -95,11 +95,11 @@ def _censor(value: str, show: int = 4) -> str:
 
 
 class _ScriptStyleStripper(_HTMLParser):
-    """HTMLParser che rimuove blocchi <script> e <style> in modo sicuro.
+    """HTMLParser que remove blocos <script> e <style> de forma segura.
 
-    Replaces the bypassable regex (CWE-20/116) with the built-in parser
-    che gestisce correttamente tutte le varianti sintattiche valide del
-    tag di chiusura (es. </script  >, </SCRIPT\\n>, ecc.).
+    Substitui a regex bypassável (CWE-20/116) pelo parser embutido,
+    que lida corretamente com todas as variantes sintáticas válidas da
+    tag de fechamento (es. </script  >, </SCRIPT\n>, etc.).
     """
 
     def __init__(self):
@@ -132,16 +132,16 @@ class _ScriptStyleStripper(_HTMLParser):
         return "".join(self._parts)
 
 
-# Fallback regex — used ONLY if HTMLParser raises an exception on HTML
-# that is severely malformed. This is NOT the primary path.
+# Regex de fallback — usada SOMENTE se o HTMLParser levantar uma exceção em HTML
+# severamente malformado. Este NÃO é o caminho principal.
 #
 # FIX CWE-20/116/185/186 ("Bad HTML filtering regexp"):
-#   - Opening : `(?:[^>]*)` unchanged (handles attributes without unquoted `>`)
-#   - Closing : replaced `s*>` with `[^>]*>` to cover browser-accepted variants
-#               come `</script anything>` o `</  script  foo>` (spazi dopo `</`
-#               gestiti da `\s*` aggiunto prima del nome tag).
-# This path is intentionally a last-resort: the primary path uses
-# _ScriptStyleStripper (built-in HTMLParser) which is immune to these variants.
+#   - Abertura : `(?:[^>]*)` inalterada (lida com atributos sem `>` não quotado)
+#   - Fechamento: `s*>` substituído por `[^>]*>` para cobrir variantes aceitas
+#               por navegadores como `</script anything>` ou `</  script  foo>`
+#               (espaços após `</` tratados por `\s*` adicionado antes do nome da tag).
+# Este caminho é intencionalmente um último recurso: o caminho principal usa
+# _ScriptStyleStripper (HTMLParser embutido), que é imune a essas variantes.
 _SCRIPT_STYLE_RE_FALLBACK = re.compile(  # noqa: S608
     r"<(?:script|style)(?:[^>]*)>[\s\S]*?</\s*(?:script|style)[^>]*>",
     re.IGNORECASE,
@@ -149,11 +149,11 @@ _SCRIPT_STYLE_RE_FALLBACK = re.compile(  # noqa: S608
 
 
 def _strip_html(text: str) -> str:
-    """Rimuove tag HTML e comprime gli spazi.
+    """Remove tags HTML e comprime os espaços.
 
-    Uses HTMLParser to strip <script>/<style> (safe against
-    bypassable closing tag variants) and regex only for the
-    remaining generic tags, comments and HTML entities.
+    Usa HTMLParser para remover <script>/<style> (seguro contra
+    variantes bypassáveis de tag de fechamento) e regex apenas para as
+    tags genéricas restantes, comentários e entidades HTML.
     """
     stripper = _ScriptStyleStripper()
     try:
@@ -171,7 +171,7 @@ def _strip_html(text: str) -> str:
 
 
 def _dedup_secrets(secrets: List[dict]) -> List[dict]:
-    """Deduplication by (type, value)."""
+    """Deduplicação por (tipo, valor)."""
     seen, out = set(), []
     for s in secrets:
         key = (s.get("type",""), s.get("value",""))
@@ -187,11 +187,11 @@ def _dedup_secrets(secrets: List[dict]) -> List[dict]:
 
 def triage_results(results: List[dict]) -> List[dict]:
     """
-    Classifies each result with score 0-100 using only regex.
-    Adds: triage_score, triage_label, triage_reasons.
-    Sorts by descending score.
+    Classifica cada resultado com pontuação 0-100 usando apenas regex.
+    Adiciona: triage_score, triage_label, triage_reasons.
+    Ordena por pontuação decrescente.
     """
-    _log("[Triage] Classifying results...", style="bold cyan")
+    _log("[Triage] Classificando resultados...", style="bold cyan")
 
     for r in results:
         text   = " ".join(filter(None, [r.get("url",""), r.get("title",""), r.get("snippet","")]))
@@ -206,7 +206,7 @@ def triage_results(results: List[dict]) -> List[dict]:
         score = min(bonus, 100)
         r["triage_score"]   = score
         r["triage_label"]   = _label(score)
-        r["triage_reasons"] = list(dict.fromkeys(reasons))  # dedup preserving order
+        r["triage_reasons"] = list(dict.fromkeys(reasons))  # dedup preservando a ordem
 
     results.sort(key=lambda x: x.get("triage_score", 0), reverse=True)
 
@@ -226,7 +226,7 @@ def triage_results(results: List[dict]) -> List[dict]:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  PAGE FETCH
+#  FETCH DE PÁGINAS
 # ══════════════════════════════════════════════════════════════════════════════
 
 def fetch_pages(
@@ -238,8 +238,8 @@ def fetch_pages(
     delay_s:   float = 1.2,
 ) -> List[dict]:
     """
-    Downloads the real HTML content of priority pages.
-    Adds 'page_content' (str) to the processed results.
+    Baixa o conteúdo HTML real das páginas prioritárias.
+    Adiciona 'page_content' (str) aos resultados processados.
     """
     _label_rank = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "SKIP": 0}
     min_rank    = _label_rank.get(min_label.upper(), 3)
@@ -251,11 +251,11 @@ def fetch_pages(
     ][:max_pages]
 
     if not targets:
-        _log("[Fetch] No pages to download.", style="dim")
+        _log("[Fetch] Nenhuma página para baixar.", style="dim")
         return results
 
     _log(
-        f"[Fetch] Downloading {len(targets)} pages "
+        f"[Fetch] Baixando {len(targets)} páginas "
         f"(min={min_label}, timeout={timeout}s, delay={delay_s}s)...",
         style="bold cyan"
     )
@@ -266,7 +266,7 @@ def fetch_pages(
         if not url:
             continue
 
-        # Salta estensioni binarie
+        # Pula extensões binárias
         ext = Path(urlparse(url).path).suffix.lower()
         if ext in _SKIP_EXT:
             r["page_content"] = ""
@@ -291,7 +291,7 @@ def fetch_pages(
                 _log(f"[Fetch] {resp.status_code} — {url[:70]}", style="dim")
                 continue
 
-            # Leggi al massimo max_chars*3 byte
+            # Lê no máximo max_chars*3 bytes
             raw = b""
             for chunk in resp.iter_content(chunk_size=4096):
                 raw += chunk
@@ -317,31 +317,31 @@ def fetch_pages(
         except Exception as e:
             r["page_content"] = ""
             r["fetch_error"]  = str(e)[:80]
-            _log(f"[Fetch] Error — {url[:60]}: {e}", style="yellow")
+            _log(f"[Fetch] Erro — {url[:60]}: {e}", style="yellow")
 
         if idx < len(targets) - 1:
             time.sleep(delay_s)
 
     _log(
-        f"[Fetch] Completed: {fetched}/{len(targets)} pages downloaded.",
+        f"[Fetch] Concluído: {fetched}/{len(targets)} páginas baixadas.",
         style="green"
     )
     return results
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SECRETS SCAN
+#  SCAN DE SEGREDOS
 # ══════════════════════════════════════════════════════════════════════════════
 
 def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
     """
-    Regex scan on page_content (if available) or snippet.
-    Adds 'secrets' (list) to each result with findings.
+    Scan de regex em page_content (se disponível) ou snippet.
+    Adiciona 'secrets' (lista) a cada resultado com achados.
 
-    Returns:
+    Retorna:
         (updated_results, global_secrets_list)
     """
-    _log("[Secrets] Starting regex scan...", style="bold cyan")
+    _log("[Secrets] Iniciando scan de regex...", style="bold cyan")
 
     total_found   = 0
     all_secrets_g = []
@@ -353,7 +353,7 @@ def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
     ]
 
     if not candidates:
-        _log("[Secrets] No content available.", style="dim")
+        _log("[Secrets] Nenhum conteúdo disponível.", style="dim")
         return results, []
 
     for r in candidates:
@@ -371,7 +371,7 @@ def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
                 if not raw_val or len(raw_val) < 4:
                     continue
 
-                # Context: 70 characters around the match
+                # Contexto: 70 caracteres ao redor do match
                 s_ctx   = max(0, match.start() - 70)
                 e_ctx   = min(len(content), match.end() + 70)
                 context = content[s_ctx:e_ctx].replace("\n", " ").strip()
@@ -385,7 +385,7 @@ def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
                     "source":     url,
                 })
 
-        # Dedup by (type, value)
+        # Dedup por (tipo, valor)
         findings = _dedup_secrets(findings)
 
         if findings:
@@ -393,24 +393,24 @@ def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
             total_found += len(findings)
             all_secrets_g.extend(findings)
             _log(
-                f"[Secrets] {len(findings):>2} found "
+                f"[Secrets] {len(findings):>2} encontrados "
                 f"[{r.get('triage_label','?')}] {url[:70]}",
                 style="bold red"
             )
 
     _log(
-        f"[Secrets] Scan complete: {total_found} secrets in {len(candidates)} results.",
+        f"[Secrets] Scan concluído: {total_found} segredos em {len(candidates)} resultados.",
         style="bold green" if total_found == 0 else "bold red"
     )
 
     if total_found > 0 and HAS_RICH:
-        # Summary table by type
+        # Tabela-resumo por tipo
         by_type = defaultdict(int)
         for s in all_secrets_g:
             by_type[s["type"]] += 1
-        table = Table(title="Secrets by type", style="red")
-        table.add_column("Type",  style="bold red")
-        table.add_column("Count", style="bold white")
+        table = Table(title="Segredos por tipo", style="red")
+        table.add_column("Tipo",  style="bold red")
+        table.add_column("Total", style="bold white")
         for t, c in sorted(by_type.items(), key=lambda x: -x[1]):
             table.add_row(t, str(c))
         _con.print(table)
@@ -419,7 +419,7 @@ def scan_secrets(results: List[dict]) -> Tuple[List[dict], List[dict]]:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  REPORT
+#  RELATÓRIO
 # ══════════════════════════════════════════════════════════════════════════════
 
 def build_report(
@@ -429,7 +429,7 @@ def build_report(
     fmt:        str  = "html",
 ) -> str:
     """
-    Generates the report in the chosen format.
+    Gera o relatório no formato escolhido.
     fmt: "html" | "md" | "json" | "txt"
     """
     now    = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -488,8 +488,8 @@ def _report_html(results, all_secrets, counts, top, target, now) -> str:
     )
 
     return f"""<!DOCTYPE html>
-<html lang="it"><head><meta charset="UTF-8">
-<title>DorkEye Analyzer — {target or 'Report'}</title>
+<html lang="pt-BR"><head><meta charset="UTF-8">
+<title>DorkEye Analyzer — {target or 'Relatório'}</title>
 <style>
 :root{{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--text:#c9d1d9;--acc:#58a6ff;--brd:#30363d}}
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -511,26 +511,26 @@ code{{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:12px;fon
 footer{{margin-top:32px;font-size:11px;color:#8b949e;text-align:center}}
 .warn{{color:#ff8800;font-weight:bold}}
 </style></head><body>
-<h1>&#128065; DorkEye Analyzer Report</h1>
+<h1>&#128065; DorkEye Analyzer — Relatório</h1>
 <div class="meta">
-  Generated: {now} &nbsp;|&nbsp;
-  Target: <code>{target or 'N/A'}</code> &nbsp;|&nbsp;
+  Gerado: {now} &nbsp;|&nbsp;
+  Alvo: <code>{target or 'N/A'}</code> &nbsp;|&nbsp;
   DorkEye Analyzer v1.0 (no-AI)
 </div>
-<h2>Metrics</h2>
+<h2>Métricas</h2>
 <div class="metrics">
   <div class="metric"><div class="num" style="color:#ff4444">{counts['CRITICAL']}</div><div class="lbl">CRITICAL</div></div>
   <div class="metric"><div class="num" style="color:#ff8800">{counts['HIGH']}</div><div class="lbl">HIGH</div></div>
   <div class="metric"><div class="num" style="color:#ffcc00">{counts['MEDIUM']}</div><div class="lbl">MEDIUM</div></div>
   <div class="metric"><div class="num" style="color:#44cc44">{counts['LOW']}</div><div class="lbl">LOW</div></div>
   <div class="metric"><div class="num">{len(results)}</div><div class="lbl">TOTAL</div></div>
-  <div class="metric"><div class="num" style="color:#ff4444">{len(all_secrets)}</div><div class="lbl">SECRETS</div></div>
+  <div class="metric"><div class="num" style="color:#ff4444">{len(all_secrets)}</div><div class="lbl">SEGREDOS</div></div>
 </div>
-{'<h2 class="warn">&#9888; Top Findings — CRITICAL &amp; HIGH</h2><div class="card"><table><tr><th>Score</th><th>Label</th><th>URL</th><th>Reasons</th></tr>' + rows_top + '</table></div>' if top else ''}
-{'<h2 class="warn">&#128274; Secrets Found (' + str(len(all_secrets)) + ')</h2><div class="card"><table><tr><th>Type</th><th>Description</th><th>Value</th><th>Confidence</th><th>Source</th></tr>' + rows_sec + '</table></div>' if all_secrets else ''}
-<h2>All Results ({len(results)})</h2>
+{'<h2 class="warn">&#9888; Principais Achados — CRITICAL &amp; HIGH</h2><div class="card"><table><tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Motivos</th></tr>' + rows_top + '</table></div>' if top else ''}
+{'<h2 class="warn">&#128274; Segredos Encontrados (' + str(len(all_secrets)) + ')</h2><div class="card"><table><tr><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Confiança</th><th>Origem</th></tr>' + rows_sec + '</table></div>' if all_secrets else ''}
+<h2>Todos os Resultados ({len(results)})</h2>
 <div class="card"><table>
-<tr><th>Score</th><th>Label</th><th>URL</th><th>Title</th><th>&#128274;</th></tr>
+<tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Título</th><th>&#128274;</th></tr>
 {rows_all}
 </table></div>
 <footer>DorkEye Analyzer v1.0 (no-AI, pure regex) &mdash; {now}</footer>
@@ -539,11 +539,11 @@ footer{{margin-top:32px;font-size:11px;color:#8b949e;text-align:center}}
 
 def _report_md(results, all_secrets, counts, top, target, now) -> str:
     lines = [
-        "# DorkEye Analyzer Report",
-        f"\n> {now}  |  Target: `{target or 'N/A'}`  |  DorkEye Analyzer v1.0 (no-AI)\n",
+        "# DorkEye Analyzer — Relatório",
+        f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  DorkEye Analyzer v1.0 (no-AI)\n",
         "---\n",
-        "## Metrics\n",
-        "| Label | Count |", "|-------|-------|",
+        "## Métricas\n",
+        "| Label | Contagem |", "|-------|-------|",
         f"| 🔴 CRITICAL | {counts['CRITICAL']} |",
         f"| 🟠 HIGH     | {counts['HIGH']} |",
         f"| 🟡 MEDIUM   | {counts['MEDIUM']} |",
@@ -552,16 +552,16 @@ def _report_md(results, all_secrets, counts, top, target, now) -> str:
         f"| **SECRETS** | **{len(all_secrets)}** |",
     ]
     if top:
-        lines += ["\n---\n", "## Top Findings — CRITICAL & HIGH\n",
-                  "| Score | Label | URL | Reasons |", "|-------|-------|-----|---------|"]
+        lines += ["\n---\n", "## Principais Achados — CRITICAL & HIGH\n",
+                  "| Pontuação | Label | URL | Motivos |", "|-------|-------|-----|---------|"]
         for r in top[:30]:
             lines.append(
                 f"| {r.get('triage_score',0)} | **{r.get('triage_label','')}** "
                 f"| `{r.get('url','')[:80]}` | {', '.join(r.get('triage_reasons',[]))[:60]} |"
             )
     if all_secrets:
-        lines += ["\n---\n", f"## Secrets Found ({len(all_secrets)})\n",
-                  "| Type | Description | Value | Source |",
+        lines += ["\n---\n", f"## Segredos Encontrados ({len(all_secrets)})\n",
+                  "| Tipo | Descrição | Valor | Origem |",
                   "|------|-------------|-------|--------|"]
         for s in all_secrets:
             lines.append(
@@ -569,8 +569,8 @@ def _report_md(results, all_secrets, counts, top, target, now) -> str:
                 f"| `{s.get('value','?')}` | {s.get('source','?')[:60]} |"
             )
     lines += [
-        "\n---\n", f"## All Results ({len(results)})\n",
-        "| Score | Label | URL | Secrets |", "|-------|-------|-----|---------|",
+        "\n---\n", f"## Todos os Resultados ({len(results)})\n",
+        "| Pontuação | Label | URL | Segredos |", "|-------|-------|-----|---------|",
     ]
     for r in results:
         lines.append(
@@ -584,34 +584,34 @@ def _report_md(results, all_secrets, counts, top, target, now) -> str:
 def _report_txt(results, all_secrets, counts, top, target, now) -> str:
     lines = [
         "=" * 70,
-        "  DORKEYE ANALYZER REPORT",
-        f"  {now}  |  Target: {target or 'N/A'}",
+        "  RELATÓRIO DORKEYE ANALYZER",
+        f"  {now}  |  Alvo: {target or 'N/A'}",
         "=" * 70,
-        f"\nMETRICS:",
+        f"\nMÉTRICAS:",
         f"  CRITICAL : {counts['CRITICAL']}",
         f"  HIGH     : {counts['HIGH']}",
         f"  MEDIUM   : {counts['MEDIUM']}",
         f"  LOW      : {counts['LOW']}",
         f"  TOTAL    : {len(results)}",
-        f"  SECRETS  : {len(all_secrets)}",
+        f"  SEGREDOS : {len(all_secrets)}",
     ]
     if top:
-        lines += ["\n" + "─" * 70, "TOP FINDINGS (CRITICAL & HIGH):", "─" * 70]
+        lines += ["\n" + "─" * 70, "PRINCIPAIS ACHADOS (CRITICAL & HIGH):", "─" * 70]
         for r in top[:30]:
             lines.append(
                 f"  [{r.get('triage_score',0):>3}] [{r.get('triage_label','?'):<8}] "
                 f"{r.get('url','')[:75]}"
             )
             if r.get("triage_reasons"):
-                lines.append(f"       Reasons: {', '.join(r['triage_reasons'])}")
+                lines.append(f"       Motivos: {', '.join(r['triage_reasons'])}")
     if all_secrets:
-        lines += ["\n" + "─" * 70, f"SECRETS FOUND ({len(all_secrets)}):", "─" * 70]
+        lines += ["\n" + "─" * 70, f"SEGREDOS ENCONTRADOS ({len(all_secrets)}):", "─" * 70]
         for s in all_secrets:
             lines.append(f"  [{s.get('type','?'):<12}] {s.get('value','?'):<30}  {s.get('source','?')[:60]}")
-            lines.append(f"    Desc: {s.get('desc','')}  | Context: {s.get('context','')[:80]}")
-    lines += ["\n" + "─" * 70, f"ALL RESULTS ({len(results)}):", "─" * 70]
+            lines.append(f"    Descrição: {s.get('desc','')}  |  Contexto: {s.get('context','')[:80]}")
+    lines += ["\n" + "─" * 70, f"TODOS OS RESULTADOS ({len(results)}):", "─" * 70]
     for r in results:
-        sec_flag = " [SECRET]" if r.get("secrets") else ""
+        sec_flag = " [SEGREDO]" if r.get("secrets") else ""
         lines.append(
             f"  [{r.get('triage_score',0):>3}] [{r.get('triage_label','?'):<8}]{sec_flag} "
             f"{r.get('url','')[:75]}"
@@ -634,7 +634,7 @@ def _report_json(results, all_secrets, counts, target, now) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  PIPELINE PRINCIPALE
+#  PIPELINE PRINCIPAL
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_pipeline(
@@ -647,26 +647,26 @@ def run_pipeline(
     target:     str  = "",
 ) -> dict:
     """
-    Runs the full pipeline: triage → [fetch] → secrets → report.
+    Executa o pipeline completo: triage → [fetch] → segredos → relatório.
 
     Args:
-        results:         DorkEye results dict list
-        do_fetch:        True = download real pages
-        fetch_max:       max pages to download
-        fetch_min_label: minimum label for download (HIGH / MEDIUM)
-        fmt:             formato report ("html" | "md" | "json" | "txt")
-        out:             output path (None = do not save)
-        target:          target description for the report
+        results:         lista de dicts de resultados do DorkEye
+        do_fetch:        True = baixar páginas reais
+        fetch_max:       máximo de páginas para baixar
+        fetch_min_label: label mínimo para download (HIGH / MEDIUM)
+        fmt:             formato do relatório ("html" | "md" | "json" | "txt")
+        out:             path de saída (None = não salvar)
+        target:          descrição do alvo para o relatório
 
-    Returns:
-        dict con: triaged, all_secrets, report_path, counts
+    Retorna:
+        dict com: triaged, all_secrets, report_path, counts
     """
-    _rule(" DorkEye Analyzer v1.0 — no AI required ", style="bold cyan")
+    _rule(" DorkEye Analyzer v1.0 — sem IA necessária ", style="bold cyan")
 
     # 1. Triage
     results = triage_results(results)
 
-    # 2. Fetch (opzionale)
+    # 2. Fetch (opcional)
     if do_fetch:
         results = fetch_pages(
             results,
@@ -674,16 +674,16 @@ def run_pipeline(
             min_label  = fetch_min_label,
         )
 
-    # 3. Secrets scan
+    # 3. Scan de segredos
     results, all_secrets = scan_secrets(results)
 
-    # 4. Report
-    _log(f"[Report] Generating report (fmt={fmt})...", style="bold cyan")
+    # 4. Relatório
+    _log(f"[Relatório] Gerando relatório (fmt={fmt})...", style="bold cyan")
     content = build_report(results, all_secrets, target=target, fmt=fmt)
 
     report_path = None
     if out:
-        # Aggiusta estensione
+        # Ajusta a extensão
         ext_map = {"html": ".html", "md": ".md", "json": ".json", "txt": ".txt"}
         p = Path(out)
         if p.suffix.lower() not in ext_map.values():
@@ -691,16 +691,16 @@ def run_pipeline(
         try:
             p.write_text(content, encoding="utf-8")
             report_path = str(p)
-            _log(f"[Report] Saved: {report_path}", style="bold green")
+            _log(f"[Relatório] Salvo: {report_path}", style="bold green")
         except IOError as e:
-            _log(f"[Report] Save error: {e}", style="red")
+            _log(f"[Relatório] Erro ao salvar: {e}", style="red")
 
     counts = defaultdict(int)
     for r in results:
         counts[r.get("triage_label", "LOW")] += 1
 
-    # Riepilogo finale
-    _rule(" Analysis Complete ", style="bold green")
+    # Resumo final
+    _rule(" Análise Concluída ", style="bold green")
     _log(
         f"CRITICAL:{counts['CRITICAL']}  HIGH:{counts['HIGH']}  "
         f"MEDIUM:{counts['MEDIUM']}  LOW:{counts['LOW']}  "
@@ -708,7 +708,7 @@ def run_pipeline(
         style="bold white"
     )
     if report_path:
-        _log(f"Report: {report_path}", style="bold green")
+        _log(f"Relatório: {report_path}", style="bold green")
 
     return {
         "triaged":     results,
@@ -719,51 +719,51 @@ def run_pipeline(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  INTEGRAZIONE CLI dorkeye.py
-#  Queste funzioni vengono importate da dorkeye.py
+#  INTEGRAÇÃO CLI dorkeye.py
+#  Estas funções são importadas pelo dorkeye.py
 # ══════════════════════════════════════════════════════════════════════════════
 
 def add_local_analyze_args(parser) -> object:
     """
-    Adds --analyze-local-* flags to the dorkeye.py CLI parser.
-    Does not require --llm.
+    Adiciona as flags --analyze-local-* ao parser do CLI dorkeye.py.
+    Não requer --llm.
     """
     g = parser.add_argument_group(
-        "Local Analysis (no AI — pure regex, does not require --llm)"
+        "Análise Local (sem IA — regex puro, não requer --llm)"
     )
     g.add_argument(
         "--analyze-local",
         action="store_true",
-        help="Analisi post-ricerca: triage + secrets scan (regex, no AI)",
+        help="Análise pós-busca: triage + scan de segredos (regex, sem IA)",
     )
     g.add_argument(
         "--analyze-local-fetch",
         action="store_true",
-        help="Downloads the real content of HIGH/CRITICAL pages",
+        help="Baixa o conteúdo real das páginas HIGH/CRITICAL",
     )
     g.add_argument(
         "--analyze-local-fetch-max",
         type=int, default=20,
-        help="Max pages to download (default: 20)",
+        help="Máximo de páginas para baixar (padrão: 20)",
     )
     g.add_argument(
         "--analyze-local-fmt",
         choices=["html", "md", "json", "txt"],
         default="html",
-        help="Formato report: html | md | json | txt (default: html)",
+        help="Formato do relatório: html | md | json | txt (padrão: html)",
     )
     g.add_argument(
         "--analyze-local-out",
         type=str, default=None,
-        help="Path output report (default: dorkeye_local_analysis_<ts>.<fmt>)",
+        help="Path de saída do relatório (padrão: dorkeye_local_analysis_<ts>.<fmt>)",
     )
     return parser
 
 
 def run_local_analysis(results: List[dict], args, target: str = "") -> dict:
     """
-    Entry point for dorkeye.py — called when --analyze-local is active.
-    Does not require llm_plugin.
+    Entry point para o dorkeye.py — chamado quando --analyze-local está ativo.
+    Não requer llm_plugin.
     """
     fmt = getattr(args, "analyze_local_fmt", "html")
     out = getattr(args, "analyze_local_out", None)
@@ -782,53 +782,53 @@ def run_local_analysis(results: List[dict], args, target: str = "") -> dict:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  ENTRY POINT CLI STANDALONE
+#  PONTO DE ENTRADA CLI STANDALONE
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="DorkEye Analyzer v1.0 — Post-search analysis without AI",
+        description="DorkEye Analyzer v1.0 — Análise pós-busca sem IA",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""Esempi:
+        epilog="""Exemplos:
 
-  # Basic analysis (triage + secrets regex)
+  # Análise básica (triage + regex de segredos)
     python dorkeye_analyze.py Dump/results.json
 
-  # With page download + HTML report
+  # Com download de páginas + relatório HTML
     python dorkeye_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
 
-  # Markdown report with target context
+  # Relatório Markdown com contexto do alvo
     python dorkeye_analyze.py results.json --target "gov.it admin panels" --fmt=md
 
-  # Download up to 40 pages (more accurate for secrets)
+  # Baixa até 40 páginas (mais preciso para segredos)
     python dorkeye_analyze.py results.json --fetch --fetch-max=40 --fmt=html
 
-  # Output JSON machine-readable
+  # Saída JSON legível por máquina
     python dorkeye_analyze.py results.json --fmt=json --out=analisi.json
 """,
     )
 
-    parser.add_argument("results_file",    help="DorkEye JSON results file")
-    parser.add_argument("--target",        default="", help="Descrizione target (opzionale)")
-    parser.add_argument("--fetch",         action="store_true", help="Download HIGH/CRITICAL pages")
-    parser.add_argument("--fetch-max",     type=int,  default=20,   help="Max pages to download (default: 20)")
-    parser.add_argument("--fetch-label",   default="HIGH",          help="Minimum label for fetch (default: HIGH)")
-    parser.add_argument("--fmt",           choices=["html","md","json","txt"], default="html", help="Formato report")
-    parser.add_argument("--out",           default=None, help="Path output report")
-    parser.add_argument("--no-report",     action="store_true", help="Do not generate a report file, output to console only")
+    parser.add_argument("results_file",    help="Arquivo JSON de resultados do DorkEye")
+    parser.add_argument("--target",        default="", help="Descrição do alvo (opcional)")
+    parser.add_argument("--fetch",         action="store_true", help="Baixa páginas HIGH/CRITICAL")
+    parser.add_argument("--fetch-max",     type=int,  default=20,   help="Máximo de páginas para baixar (padrão: 20)")
+    parser.add_argument("--fetch-label",   default="HIGH",          help="Label mínimo para fetch (padrão: HIGH)")
+    parser.add_argument("--fmt",           choices=["html","md","json","txt"], default="html", help="Formato do relatório")
+    parser.add_argument("--out",           default=None, help="Path de saída do relatório")
+    parser.add_argument("--no-report",     action="store_true", help="Não gera arquivo de relatório, exibe apenas no console")
 
     args = parser.parse_args()
 
-    # Load results
+    # Carrega os resultados
     p = Path(args.results_file)
     if not p.exists():
-        print(f"[!] File not found: {p}", file=sys.stderr)
+        print(f"[!] Arquivo não encontrado: {p}", file=sys.stderr)
         sys.exit(1)
 
     try:
         raw = json.loads(p.read_text(encoding="utf-8"))
     except Exception as e:
-        print(f"[!] Errore lettura file: {e}", file=sys.stderr)
+        print(f"[!] Erro ao ler o arquivo: {e}", file=sys.stderr)
         sys.exit(1)
 
     if isinstance(raw, list):
@@ -839,15 +839,15 @@ def main() -> None:
         results = []
 
     if not results:
-        print(f"[!] No results found in '{p}'.", file=sys.stderr)
-        print("    Save DorkEye results with: -o results.json", file=sys.stderr)
+        print(f"[!] Nenhum resultado encontrado em '{p}'.", file=sys.stderr)
+        print("    Salve resultados do DorkEye com: -o results.json", file=sys.stderr)
         sys.exit(1)
 
-    _log(f"[*] Loaded {len(results)} results from '{p.name}'", style="bold cyan")
+    _log(f"[*] Carregados {len(results)} resultados de '{p.name}'", style="bold cyan")
     if args.target:
-        _log(f"[*] Target: {args.target}", style="cyan")
+        _log(f"[*] Alvo: {args.target}", style="cyan")
 
-    # Determina path output
+    # Determina o path de saída
     out = None
     if not args.no_report:
         out = args.out
