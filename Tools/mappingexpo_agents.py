@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import io
 import math
 import os
 import re

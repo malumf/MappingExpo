@@ -6,6 +6,7 @@ Author: xPloits3c I.C.W.T| https://github.com/xPloits3c/DorkEye
 
 import os
 import sys
+import io
 import time
 import json
 import yaml
@@ -28,6 +29,13 @@ import requests
 import urllib3
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except (AttributeError, io.UnsupportedOperation):
+        pass
 
 # ── Injeção do path do sub-pacote Tools ─────────────────────────────────────────
 _TOOLS_DIR = Path(__file__).parent / "Tools"

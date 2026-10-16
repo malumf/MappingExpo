@@ -30,6 +30,7 @@ import argparse
 import hashlib
 import json
 import re
+import io
 import sys
 import time
 from collections import defaultdict

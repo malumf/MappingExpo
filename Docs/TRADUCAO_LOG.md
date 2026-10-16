@@ -603,6 +603,12 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - Marker MPXSS7x: 83 (xss.py) + 84 (xss.md) + 1 (USAGE.md) = 168; DEXSS7x: 0
 - **Pendência (operador)**: teste visual do Console Web pós-rename — `python Tools/mappingexpo_web.py --port 7777` → conferir arte MAPPING EXPO no launcher, título, labels e coloração (colorLine verificada como não-afetada)
 
+## 2026-10-16 — FIX PÓS-FASE 3: encoding UTF-8 no Console Web (JobManager)
+- **Bug**: `UnicodeDecodeError: 'charmap' codec can't decode byte 0x90` em `JobManager._run` (Tools/mappingexpo_web.py) ao iniciar scan pela UI — subprocess emite UTF-8 (stdout reconfigurado em mappingexpo.py) mas `Popen(text=True)` decodificava com o codec padrão do Windows (cp1252)
+- **Fix 1 (anterior, mappingexpo.py)**: `sys.stdout/stderr.reconfigure(encoding='utf-8')` no boot — saída do subprocess sempre UTF-8
+- **Fix 2 (este, Tools/mappingexpo_web.py L107-109)**: `Popen(..., text=True, encoding='utf-8', errors='replace')` — decodificação UTF-8 com fallback na leitura de stdout/stderr; única leitura de subprocess do repo (audit: 1 ocorrência de `subprocess.Popen` em todo o código)
+- **Backup**: `Tools/mappingexpo_web.py.pre_utf8_fix2.bak` (ignorado pelo .gitignore `*.bak`) · py_compile OK · teste manual de scan via UI confirmado pelo operador (sem crash; saída legível no terminal web)
+
 
 
 

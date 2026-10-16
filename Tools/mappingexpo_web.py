@@ -4,7 +4,7 @@ Web Console para o MappingExpo Project
 
 """
 
-import os, sys, re, json, time, uuid, socket, threading, subprocess, webbrowser
+import os, sys, io, re, json, time, uuid, socket, threading, subprocess, webbrowser
 import logging, traceback
 from pathlib import Path
 from datetime import datetime
@@ -106,6 +106,7 @@ class JobManager:
             try:
                 proc=subprocess.Popen([str(c) for c in cmd],stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,
+                    encoding='utf-8',errors='replace',
                     bufsize=1,env=env,cwd=str(ROOT))
                 job.proc=proc
                 try: proc.stdin.write('n\n'); proc.stdin.flush(); proc.stdin.close()

@@ -47,7 +47,7 @@ Changelog v2.0
 
 from __future__ import annotations
 
-import re
+import re, io
 from typing import List, Tuple
 
 # ── Aliases de tipo ──────────────────────────────────────────────────────────────
