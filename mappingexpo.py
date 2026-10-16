@@ -2130,7 +2130,7 @@ def load_config(config_file: str = None) -> Dict:
 
 
 def create_sample_config():
-    """Grava um dorkeye_config.yaml de exemplo em disco."""
+    """Grava um mappingexpo_config.yaml de exemplo em disco."""
     config_yaml = """# Configuração do DorkEye
 
 extensions:
@@ -2153,9 +2153,9 @@ max_retries: 3
 user_agent_rotation: true
 extended_delay_every_n_results: 100
 """
-    with open("dorkeye_config.yaml", "w") as f:
+    with open("mappingexpo_config.yaml", "w") as f:
         f.write(config_yaml)
-    console.print("[green][✓] Config de exemplo criada: dorkeye_config.yaml[/green]")
+    console.print("[green][✓] Config de exemplo criada: mappingexpo_config.yaml[/green]")
 
 
 def resolve_templates_argument(template_arg):
@@ -2356,7 +2356,7 @@ def run_wizard():
         ts          = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_path = None
         if crawl_opts["do_report"]:
-            base        = os.path.splitext(output)[0] if output else f"dorkeye_crawl_{ts}"
+            base        = os.path.splitext(output)[0] if output else f"mappingexpo_crawl_{ts}"
             report_path = f"{base}_crawl_{ts}.html"
         _crawl_args = type("A", (), {
             "crawl_rounds":   crawl_opts["rounds"],
@@ -2382,7 +2382,7 @@ def run_wizard():
     MAIN_MENU = [
         ("Busca de Google Dorks",   "Buscar no DuckDuckGo com dork(s)"),
         ("Gerador de Dorks",       "Gerar dorks automaticamente a partir de templates"),
-        ("Criar config de exemplo", "Gravar dorkeye_config.yaml em disco"),
+        ("Criar config de exemplo", "Gravar mappingexpo_config.yaml em disco"),
         ("Sair",                 ""),
     ]
 
@@ -2474,7 +2474,7 @@ def run_wizard():
                     if _db_wiz_report:
                         _db_wiz_report.print_summary()
                         _dump_dir_wiz  = Path(__file__).parent / "Dump"
-                        _db_wiz_base   = str(_dump_dir_wiz / str(output)) if output else str(_dump_dir_wiz / "dorkeye_dbscan.json")
+                        _db_wiz_base   = str(_dump_dir_wiz / str(output)) if output else str(_dump_dir_wiz / "mappingexpo_dbscan.json")
                         _db_wiz_saved  = save_dbscan_report(_db_wiz_report, _db_wiz_base)
                         console.print(f"[bold green][✓] Relatório DBScan → {_db_wiz_saved}[/bold green]")
                 except KeyboardInterrupt:
@@ -2572,7 +2572,7 @@ def run_wizard():
                     if _db_wiz2_report:
                         _db_wiz2_report.print_summary()
                         _dump_dir_wiz2  = Path(__file__).parent / "Dump"
-                        _db_wiz2_base   = str(_dump_dir_wiz2 / str(output)) if output else str(_dump_dir_wiz2 / "dorkeye_dbscan.json")
+                        _db_wiz2_base   = str(_dump_dir_wiz2 / str(output)) if output else str(_dump_dir_wiz2 / "mappingexpo_dbscan.json")
                         _db_wiz2_saved  = save_dbscan_report(_db_wiz2_report, _db_wiz2_base)
                         console.print(f"[bold green][✓] Relatório DBScan → {_db_wiz2_saved}[/bold green]")
                 except KeyboardInterrupt:
@@ -2956,7 +2956,7 @@ def main():
                         # passar o path completo do Dump/ para que save_dbscan_report
                         # grave ao lado do arquivo principal de resultados e não no CWD.
                         _dump_dir    = Path(__file__).parent / "Dump"
-                        _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "dorkeye_dbscan.json")
+                        _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "mappingexpo_dbscan.json")
                         _db_saved    = save_dbscan_report(_db_report, _db_out_base)
                         console.print(f"[bold green][✓] Relatório DBScan → {_db_saved}[/bold green]")
                 except KeyboardInterrupt:
@@ -3057,7 +3057,7 @@ def main():
                     # passar o path completo do Dump/ para que save_dbscan_report
                     # grave ao lado do arquivo principal de resultados e não no CWD.
                     _dump_dir    = Path(__file__).parent / "Dump"
-                    _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "dorkeye_dbscan.json")
+                    _db_out_base = str(_dump_dir / str(output_file)) if output_file else str(_dump_dir / "mappingexpo_dbscan.json")
                     _db_saved    = save_dbscan_report(_db_report, _db_out_base)
                     console.print(
                         f"[bold green][✓] Relatório DBScan → {_db_saved}[/bold green]"

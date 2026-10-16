@@ -486,7 +486,7 @@ def create_app(port: int) -> 'Flask':
                     dorks.extend(gen.generate(categories=cats, mode=mode))
             dorks = list(dict.fromkeys(dorks))[:limit]
             text  = '\n'.join(dorks)
-            fname = f'dorkeye_dorks_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
+            fname = f'mappingexpo_dorks_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
             return Response(text, mimetype='text/plain',
                             headers={'Content-Disposition':f'attachment; filename="{fname}"'})
         except Exception as e:
@@ -725,7 +725,7 @@ input[type=number]{-moz-appearance:textfield}
         <div class="fg"><label>Blacklist — separada por espaços (--blacklist)</label><input type="text" id="s-bl" placeholder="ads.tracker.io bad.domain.com"></div>
         <div class="fg"><label>Whitelist — separada por espaços (--whitelist)</label><input type="text" id="s-wl" placeholder="target.com"></div>
       </div>
-      <div class="fr"><div class="fg"><label>Arquivo de config (--config)</label><input type="text" id="s-cfg" placeholder="dorkeye_config.yaml"></div></div>
+      <div class="fr"><div class="fg"><label>Arquivo de config (--config)</label><input type="text" id="s-cfg" placeholder="mappingexpo_config.yaml"></div></div>
     </div>
   </div>
   <div class="fs">
@@ -1117,7 +1117,7 @@ function previewDorks(){
 function exportDorks(){
   const p={templates:qs('#dg-tpl').value,category:qs('#dg-cat').value,mode:qs('#dg-mode').value,max:+qs('#dg-max').value||800};
   fetch('/api/dorkgen/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)})
-  .then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dorkeye_dorks.txt';a.click();});
+  .then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mappingexpo_dorks.txt';a.click();});
 }
 function post(url,data,cb){
   fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})

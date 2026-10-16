@@ -755,7 +755,7 @@ def add_local_analyze_args(parser) -> object:
     g.add_argument(
         "--analyze-local-out",
         type=str, default=None,
-        help="Path de saída do relatório (padrão: dorkeye_local_analysis_<ts>.<fmt>)",
+        help="Path de saída do relatório (padrão: mappingexpo_local_analysis_<ts>.<fmt>)",
     )
     return parser
 
@@ -769,7 +769,7 @@ def run_local_analysis(results: List[dict], args, target: str = "") -> dict:
     out = getattr(args, "analyze_local_out", None)
     if not out:
         ts  = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out = f"dorkeye_local_analysis_{ts}.{fmt}"
+        out = f"mappingexpo_local_analysis_{ts}.{fmt}"
 
     return run_pipeline(
         results   = results,
@@ -853,7 +853,7 @@ def main() -> None:
         out = args.out
         if not out:
             ts  = datetime.now().strftime("%Y%m%d_%H%M%S")
-            out = f"dorkeye_analysis_{ts}.{args.fmt}"
+            out = f"mappingexpo_analysis_{ts}.{args.fmt}"
 
     run_pipeline(
         results   = results,

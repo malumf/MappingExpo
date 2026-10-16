@@ -172,12 +172,12 @@ class BaseAgent(ABC):
         return self.plugin is not None
 
     def _safe_json(self, raw: str, expected_type: type = dict):
-        """Parser JSON robusto — não depende de dorkeye_llm_plugin."""
+        """Parser JSON robusto — não depende de mappingexpo_llm_plugin."""
         return _safe_json_local(raw, expected_type=expected_type)
 
     @staticmethod
     def _label(score: int) -> str:
-        """Delega para dorkeye_patterns.label_from_score() — fonte única de verdade."""
+        """Delega para mappingexpo_patterns.label_from_score() — fonte única de verdade."""
         return label_from_score(score)
 
     @abstractmethod
@@ -1433,7 +1433,7 @@ def security_scan_hook(
 # AGENTE DE SEGREDOS
 # ══════════════════════════════════════════════════════════════════════════════
 
-# _censor importado como _censor_shared de dorkeye_patterns — alias local
+# _censor importado como _censor_shared de mappingexpo_patterns — alias local
 def _censor(value: str, visible: int = 4) -> str:
     return _censor_shared(value, show=visible)
 
@@ -2920,7 +2920,7 @@ def add_crawler_args(parser) -> object:
     g.add_argument("--crawl-report", action="store_true",
                    help="Gera relatório HTML ao final do crawl")
     g.add_argument("--crawl-out", type=str, default=None,
-                   help="Path do relatório do crawl (padrão: dorkeye_crawl_<timestamp>.html)")
+                   help="Path do relatório do crawl (padrão: mappingexpo_crawl_<timestamp>.html)")
     return parser
 
 
@@ -2935,7 +2935,7 @@ def add_security_args(parser) -> object:
                    choices=["active", "passive"],
                    help="active: bloqueia DANGEROUS/CRITICAL | passive: apenas relata (padrão: passive)")
     g.add_argument("--security-quarantine", action="store_true",
-                   help="Salva conteúdo em quarentena em dorkeye_quarantine/")
+                   help="Salva conteúdo em quarentena em mappingexpo_quarantine/")
     return parser
 
 
@@ -2961,7 +2961,7 @@ def run_crawl(
         out = getattr(args, "crawl_out", None)
         if not out:
             ts  = datetime.now().strftime("%Y%m%d_%H%M%S")
-            out = f"dorkeye_crawl_{ts}.{fmt}"
+            out = f"mappingexpo_crawl_{ts}.{fmt}"
 
         reporter = ReportAgent()
         reporter.run(
@@ -3071,7 +3071,7 @@ def run_analysis_pipeline(
     sec_agent = None
     if not getattr(args, "no_security", False):
         sec_mode       = getattr(args, "security_mode", "passive")
-        sec_quarantine = "dorkeye_quarantine" if getattr(args, "security_quarantine", False) else None
+        sec_quarantine = "mappingexpo_quarantine" if getattr(args, "security_quarantine", False) else None
 
         sec_agent = SecurityAgent(mode=sec_mode, quarantine_dir=sec_quarantine)
         triaged   = sec_agent.run(triaged)
@@ -3220,7 +3220,7 @@ def run_analysis_pipeline(
         out = getattr(args, "analyze_out", None)
         if not out:
             ts  = datetime.now().strftime("%Y%m%d_%H%M%S")
-            out = f"dorkeye_analysis_{ts}.{fmt}"
+            out = f"mappingexpo_analysis_{ts}.{fmt}"
 
         sec_html = ""
         if sec_agent:

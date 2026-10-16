@@ -2,15 +2,15 @@
 # DorkEye .gitignore
 
 # Virtual Environments
-dorkeye_env/
+mappingexpo_env/
 venv/
 env/
 ENV/
 .venv/
 
 # Auto-generated scripts (created by setup.sh/setup.bat)
-run_dorkeye.sh
-run_dorkeye.bat
+run_mappingexpo.sh
+run_mappingexpo.bat
 test_installation.sh
 test_installation.bat
 
@@ -45,7 +45,7 @@ wheels/
 MANIFEST
 
 # Config files (user-specific)
-dorkeye_config.yaml
+mappingexpo_config.yaml
 custom_config.yaml
 custom_config.json
 my_dorks.txt
