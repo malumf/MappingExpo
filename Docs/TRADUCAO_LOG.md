@@ -551,6 +551,17 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   - Contagens: DorkEyeEnhanced==0 · `\bdorkeye\b`==0 · `\bMappingExpo\b`==6 (5 renames + L2607 marca camada A) · `\bmappingexpo\b`==57 · total case-insensitive==63
   - Integridade das 6 linhas comprimidas na exibição (L2913/2920/2922/2926/3006/3019) — completas no arquivo real, sem "..." literal; contagem total de "..." idêntica ao backup (27)
 
+## 2026-10-16 — CAMADA C: marker MPXSS7x (commit fase-3c)
+- **Backups**: `.traducao_backup/xss.py.20261016_133309.pre_f3_c.bak`, `xss.md.20261016_133309.pre_f3_c.bak`
+- **Decisão do mantenedor**: marker **MPXSS7x** (supersede o MEXSS7x proposto — "MP" = MappingExpo explícito; evita leitura "MEX = México"); 7 chars = DEXSS7x
+- **Diff aprovado**: xss.py 79 linhas / 83 ocorrências (L550 e L1398 com 3 markers cada) + Docs/xss.md 84 linhas — substituição uniforme, zero variantes de caixa (verificado antes)
+- **Verificações** (todas PASSARAM):
+  - py_compile SINTAXE OK (SyntaxWarning `\s` L1270 preexistente)
+  - **Prova byte-identity**: `backup.replace('DEXSS7x','MPXSS7x')` == arquivo atual — xss.py e xss.md — nada além do marker mudou
+  - **Comprimentos de payloads preservados** (multiset via AST, corrigido para AnnAssign após falso vazio): _REFLECTED 44 (Σ2057), _BYPASS 26 (Σ1133), _STORED 5 (Σ180), _HEADER 4 (Σ136) — idênticos
+  - Refs `self._MARKER` intocadas (OOB L614-616, detecção L830/837/842/905) · `_ENCODED_MARKERS` sem o marker
+  - Contagens: MPXSS7x==83 (xss.py)/84 (xss.md); DEXSS7x==0 em ambos; marker ausente nos demais 7 arquivos de código
+
 
 
 

