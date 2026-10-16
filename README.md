@@ -1,12 +1,4 @@
 
-
-<div align="center">
-
-![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=22&pause=1200&color=39FF14&background=000000&center=true&vCenter=true&width=700&lines=MappingExpo+%7C+ASM+Defensivo;Mapeamento+de+exposi%C3%A7%C3%A3o+em+PT-BR;Fork+traduzido+e+reenquadrado+do+DorkEye)
-
-</div>
-
-<!-- ── Row 1: Identidade do projeto ── -->
 ![Python](https://img.shields.io/badge/Python-3.9%2B-3670A0?style=flat-square&logo=python&logoColor=ffdd54)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Stable-brightgreen?style=flat-square)
