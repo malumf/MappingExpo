@@ -599,7 +599,7 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 
 ### VERIFICAÇÃO FINAL DA FASE 3 (pós-G)
 - Repositório: única marca DorkEye restante = **linhas de atribuição intencional** (URLs do autor original, linhas "Author/Autor: xPloits3c", "created for DorkEye Project", badges "Baseado em") + TRADUCAO_LOG.md (registro histórico da Fase 1) + FUNDING.yml
-- py_compile ×9 exit 0 · smoke tests funcionais: `--help` dos 4 CLIs
+- py_compile ×9 exit 0 · **smoke tests funcionais: 4/4 PASSARAM** — `mappingexpo.py --help` (welcome PT-BR + usage, importa mappingexpo_agents/sqli/dork_generator/db_portscan em runtime) · `Tools/mappingexpo_agents.py --help` · `Tools/mappingexpo_analyze.py --help` · `Tools/mappingexpo_web.py --help` (description "MappingExpo Web Dashboard") · `Tools/db_portscan.py --help` — todos exit 0
 - Marker MPXSS7x: 83 (xss.py) + 84 (xss.md) + 1 (USAGE.md) = 168; DEXSS7x: 0
 - **Pendência (operador)**: teste visual do Console Web pós-rename — `python Tools/mappingexpo_web.py --port 7777` → conferir arte MAPPING EXPO no launcher, título, labels e coloração (colorLine verificada como não-afetada)
 
