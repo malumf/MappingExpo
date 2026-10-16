@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DorkEye v5.0 | Ferramenta de Dorking OSINT
+MappingExpo v5.0 | Ferramenta de Dorking (OSINT)
 Author: xPloits3c I.C.W.T| https://github.com/xPloits3c/DorkEye
 """
 
@@ -1190,7 +1190,7 @@ class MappingExpo:
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>DorkEye | Relatório</title>
+    <title>MappingExpo | Relatório</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Courier New', monospace; background: #000; color: #00ff41; min-height: 100vh; overflow-x: hidden; }
@@ -1399,7 +1399,7 @@ class MappingExpo:
 <canvas id="matrix-canvas"></canvas>
 <div id="content">
     <div class="header">
-        <h1>&#9632; DorkEye | Relatório <span class="blink">_</span></h1>
+        <h1>&#9632; MappingExpo | Relatório <span class="blink">_</span></h1>
 """)
         parts.append(f'        <div class="subtitle">&#10132; Gerado: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} &nbsp;|&nbsp; xploits3c.github.io/DorkEye</div>\n')
         parts.append("    </div>\n")
@@ -1748,7 +1748,7 @@ class MappingExpo:
         parts.append(f"""        </tbody>
     </table>
     </div>
-    <div class="footer">DorkEye v5.0 &nbsp;|&nbsp; xploits3c &nbsp;|&nbsp; Apenas para pesquisa de segurança autorizada</div>
+    <div class="footer">MappingExpo v5.0 &nbsp;|&nbsp; xploits3c &nbsp;|&nbsp; Apenas para pesquisa de segurança autorizada</div>
 </div>
 
 <div id="toast"></div>
@@ -1949,7 +1949,7 @@ function doExport(fmt,scope){{
   const base=REPORT_BASE+'_links_'+_scopeLabel(scope)+'_'+ts;
   if(fmt==='txt'){{
     const lines=rows.map((r,i)=>{{let s=(i+1)+'. '+r.url+'\\n';if(r.title)s+='   Título: '+r.title+'\\n';if(r.sqli&&r.sqli!=='untested')s+='   SQLi: '+r.sqli.toUpperCase()+'\\n';if(r.xss&&r.xss!=='untested')s+='   XSS: '+r.xss.toUpperCase()+'\\n';s+='   Data/Hora: '+r.timestamp+'\\n';return s;}});
-    _download('Exportação DorkEye\\nEscopo: '+scope+'\\nGerado: '+ts+'\\nTotal: '+rows.length+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
+    _download('Exportação MappingExpo\\nEscopo: '+scope+'\\nGerado: '+ts+'\\nTotal: '+rows.length+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
     _showToast('Exportados '+rows.length+' links');
   }}else if(fmt==='json'){{
     _download(JSON.stringify({{meta:{{generated:ts,scope:scope,total:rows.length}},results:rows}},null,2),base+'.json','application/json');
@@ -1976,7 +1976,7 @@ function exportSelectedFiles(fmt){{
   const base=REPORT_BASE+'_files_selected_'+ts;
   if(fmt==='list'){{
     const lines=rows.map((r,i)=>(i+1)+'. '+r.url+'\\n   Categoria: '+r.category+'\\n   Tamanho: '+r.size_str+'\\n');
-    _download('Lista de Arquivos DorkEye\\nGerado: '+ts+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
+    _download('Lista de Arquivos MappingExpo\\nGerado: '+ts+'\\n\\n'+lines.join('\\n'),base+'.txt','text/plain');
     _showToast('Lista de arquivos ('+rows.length+') exportada');
   }}else if(fmt==='json'){{
     _download(JSON.stringify({{meta:{{generated:ts,total:rows.length}},files:rows}},null,2),base+'.json','application/json');
@@ -2074,7 +2074,7 @@ document.addEventListener('keydown',(e)=>{{if(_infoOpen&&e.key==='Escape')closeI
 # ══════════════════════════════════════════════════════════════
 
 def _load_results_from_file(path: str) -> List[Dict]:
-    """Carrega resultados do DorkEye de um arquivo .json ou .txt."""
+    """Carrega resultados do MappingExpo de um arquivo .json ou .txt."""
     p = Path(path)
     if not p.exists():
         alt = Path(__file__).parent / "Dump" / path
@@ -2131,7 +2131,7 @@ def load_config(config_file: str = None) -> Dict:
 
 def create_sample_config():
     """Grava um mappingexpo_config.yaml de exemplo em disco."""
-    config_yaml = """# Configuração do DorkEye
+    config_yaml = """# Configuração do MappingExpo
 
 extensions:
   documents: [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"]
@@ -2201,7 +2201,7 @@ def run_wizard():
         "[bold green]Wizard interativo[/bold green] — Navegue com números, ENTER para confirmar\n"
         "[dim]Pressione Ctrl+C a qualquer momento para abortar[/dim]",
         border_style="green",
-        title="[bold yellow][ DorkEye Wizard ][/bold yellow]"
+        title="[bold yellow][ MappingExpo Wizard ][/bold yellow]"
     ))
 
     def ask_yes_no(prompt: str, default_yes: bool = False) -> bool:
@@ -2622,7 +2622,7 @@ def main():
     greet_user()
 
     parser = argparse.ArgumentParser(
-        description="DorkEye v5.0 | Ferramenta de Dorking (OSINT)",
+        description="MappingExpo v5.0 | Ferramenta de Dorking (OSINT)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Exemplos:
   %(prog)s --ui                 # Web Console (8080)
@@ -3034,7 +3034,7 @@ def main():
         if not _DBSCAN_AVAILABLE:
             console.print(
                 "[yellow][!] db_portscan.py não encontrado em Tools — "
-                "copie o arquivo para DorkEye/Tools/ e tente novamente.[/yellow]"
+                "copie o arquivo para MappingExpo/Tools/ e tente novamente.[/yellow]"
             )
         elif not mappingexpo.results:
             console.print("[yellow][DBScan] Nenhum resultado para escanear.[/yellow]")

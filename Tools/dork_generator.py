@@ -1,5 +1,5 @@
 # Google Dork Generator I.C.W.T 2026
-# DorkEye Project
+# MappingExpo Project
 import yaml
 import itertools
 import re

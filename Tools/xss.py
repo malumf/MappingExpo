@@ -1,7 +1,7 @@
 """
-DorkEye XSS
+MappingExpo XSS
 ═══════════════════════════════════════════════════════════════
-Engine de teste XSS multi-método para o DorkEye Project
+Engine de teste XSS multi-método para o MappingExpo Project
 
 Métodos de detecção:
   1. reflected  — injeta payloads em parâmetros GET; verifica reflexão sem escape
@@ -281,7 +281,7 @@ class _FallbackFingerprintRotator:
 
 class XSSDetector:
     """
-    Detector XSS multi-método para o DorkEye.
+    Detector XSS multi-método para o MappingExpo.
 
     Métodos de detecção (executados em ordem por request):
       1. reflected  — injeção em parâmetro GET + verificação de reflexão sem escape
@@ -583,7 +583,7 @@ class XSSDetector:
             timeout:      Timeout de leitura em segundos.
             xss_type:     Um entre "reflected", "stored", "dom", "header", "all".
             oob_url:      URL de callback para payloads blind/OOB XSS.
-            waf_detected: Nome do WAF pré-detectado pelo probe_waf() do DorkEye.  [NEW-B]
+            waf_detected: Nome do WAF pré-detectado pelo probe_waf() do MappingExpo.  [NEW-B]
                           Quando definido, todo método _test_* retorna imediatamente
                           em vez de executar — evita requests redundantes contra
                           alvos já conhecidos como protegidos por WAF.
@@ -595,7 +595,7 @@ class XSSDetector:
         self.xss_type         = xss_type
         self.oob_url          = oob_url
 
-        # [NEW-B] Override de WAF — definido pelo pipeline do DorkEye, pula probes de WAF por método
+        # [NEW-B] Override de WAF — definido pelo pipeline do MappingExpo, pula probes de WAF por método
         self._waf_override: Optional[str] = waf_detected
 
         self.circuit_breaker     = (

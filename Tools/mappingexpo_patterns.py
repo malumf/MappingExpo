@@ -1,5 +1,5 @@
 """
-DorkEye Patterns
+MappingExpo Patterns
 ======================
 mappingexpo_patterns.py — Shared pattern library for MappingExpo Project
 ===============================================================

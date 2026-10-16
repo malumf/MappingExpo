@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Web Console para o DorkEye Project
+Web Console para o MappingExpo Project
 
 """
 
@@ -505,7 +505,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DorkEye | Console Web</title>
+<title>MappingExpo | Console Web</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -654,7 +654,7 @@ input[type=number]{-moz-appearance:textfield}
   <div class="nav" data-s="dorkgen" onclick="nav(this)"><span>⊞</span> Dork Gen</div>
   <div class="nav" data-s="jobs"    onclick="nav(this)"><span>▣</span> Jobs <span class="nbadge" id="jnb">0</span></div>
   <div class="nav" data-s="results" onclick="nav(this)"><span>◧</span> Resultados <span class="nbadge" id="rnb">0</span></div>
-  <div id="sb-ft">DorkEye Web<br><b>127.0.0.1:{{ port }}</b></div>
+  <div id="sb-ft">MappingExpo Web<br><b>127.0.0.1:{{ port }}</b></div>
 </div>
 <div id="cnt">
 <!-- DASHBOARD -->
@@ -856,7 +856,7 @@ input[type=number]{-moz-appearance:textfield}
       <div id="trm-prog-info"></div>
     </div>
     <div id="tb-log">
-      <div class="tl t-d">Console Web DorkEye — Pronto.</div>
+      <div class="tl t-d">Console Web MappingExpo — Pronto.</div>
       <div class="tl t-d">Inicie um scan ou selecione um job para ver a saída aqui.</div>
       <span class="tcur"></span>
     </div>
@@ -1156,12 +1156,12 @@ def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
     port = find_free_port(start_port)
     app  = create_app(port)
     url  = f'http://127.0.0.1:{port}'
-    print(f'\n  ██████╗  ██████╗ ██████╗ ██╗  ██╗███████╗██╗   ██╗███████╗')
-    print(f'  ██╔══██╗██╔═══██╗██╔══██╗██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔════╝')
-    print(f'  ██║  ██║██║   ██║██████╔╝█████╔╝ █████╗   ╚████╔╝ █████╗  ')
-    print(f'  ██║  ██║██║   ██║██╔══██╗██╔═██╗ ██╔══╝    ╚██╔╝  ██╔══╝  ')
-    print(f'  ██████╔╝╚██████╔╝██║  ██║██║  ██╗███████╗   ██║   ███████╗')
-    print(f'  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝')
+    print(f'  ███╗   ██╗ █████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗    ███████╗██╗  ██╗██████╗  ██████╗ ')
+    print(f'  ████╗  ██║██╔══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝    ██╔════╝╚██╗██╔╝██╔══██╗██╔═══██╗')
+    print(f'  ██╔██╗ ██║███████║██████╔╝██████╔╝██║██╔██╗ ██║██║  ███╗   █████╗   ╚███╔╝ ██████╔╝██║   ██║')
+    print(f'  ██║╚██╗██║██╔══██║██╔═══╝ ██╔═══╝ ██║██║ ██╗██║██║   ██║   ██╔══╝   ██╔██╗ ██╔═══╝ ██║   ██║')
+    print(f'  ██║ ╚████║██║  ██║██║     ██║     ██║██║ ╚████║╚██████╔╝   ███████╗██╔╝ ██╗██║     ╚██████╔╝')
+    print(f'  ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝     ╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝    ╚══════╝╚═╝  ╚═╝╚═╝      ╚═════╝ ')
     print(f'\n  [ CONSOLE WEB ]\n')
     print(f'  ▸ URL   →  {url}')
     print(f'  ▸ Porta →  {port}{"  (selecionada automaticamente)" if port != start_port else ""}')
@@ -1196,7 +1196,7 @@ def launch_web(start_port: int = 8080, no_browser: bool = False) -> None:
 
 if __name__ == '__main__':
     import argparse
-    p = argparse.ArgumentParser(description='DorkEye Web Dashboard')
+    p = argparse.ArgumentParser(description='MappingExpo Web Dashboard')
     p.add_argument('--port', type=int, default=8080)
     p.add_argument('--no-browser', action='store_true')
     a = p.parse_args()

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-DorkEye Analyzer 
+MappingExpo Analyzer 
 ======================
-Análise pós-busca totalmente autônoma para o DorkEye Project
+Análise pós-busca totalmente autônoma para o MappingExpo Project
 
 Funciona apenas com Python + requests + rich (já no requirements.txt).
-Lê resultados salvos pelo DorkEye (-o results.json) e produz:
+Lê resultados salvos pelo MappingExpo (-o results.json) e produz:
 
   1. Triage    — classifica cada resultado com pontuação 0-100 (regex puro)
   2. Fetch     — baixa o conteúdo real das páginas prioritárias
@@ -489,7 +489,7 @@ def _report_html(results, all_secrets, counts, top, target, now) -> str:
 
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8">
-<title>DorkEye Analyzer — {target or 'Relatório'}</title>
+<title>MappingExpo Analyzer — {target or 'Relatório'}</title>
 <style>
 :root{{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--text:#c9d1d9;--acc:#58a6ff;--brd:#30363d}}
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -511,11 +511,11 @@ code{{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:12px;fon
 footer{{margin-top:32px;font-size:11px;color:#8b949e;text-align:center}}
 .warn{{color:#ff8800;font-weight:bold}}
 </style></head><body>
-<h1>&#128065; DorkEye Analyzer — Relatório</h1>
+<h1>&#128065; MappingExpo Analyzer — Relatório</h1>
 <div class="meta">
   Gerado: {now} &nbsp;|&nbsp;
   Alvo: <code>{target or 'N/A'}</code> &nbsp;|&nbsp;
-  DorkEye Analyzer v1.0 (no-AI)
+  MappingExpo Analyzer v1.0 (no-AI)
 </div>
 <h2>Métricas</h2>
 <div class="metrics">
@@ -533,14 +533,14 @@ footer{{margin-top:32px;font-size:11px;color:#8b949e;text-align:center}}
 <tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Título</th><th>&#128274;</th></tr>
 {rows_all}
 </table></div>
-<footer>DorkEye Analyzer v1.0 (no-AI, pure regex) &mdash; {now}</footer>
+<footer>MappingExpo Analyzer v1.0 (no-AI, pure regex) &mdash; {now}</footer>
 </body></html>"""
 
 
 def _report_md(results, all_secrets, counts, top, target, now) -> str:
     lines = [
-        "# DorkEye Analyzer — Relatório",
-        f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  DorkEye Analyzer v1.0 (no-AI)\n",
+        "# MappingExpo Analyzer — Relatório",
+        f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  MappingExpo Analyzer v1.0 (no-AI)\n",
         "---\n",
         "## Métricas\n",
         "| Label | Contagem |", "|-------|-------|",
@@ -577,14 +577,14 @@ def _report_md(results, all_secrets, counts, top, target, now) -> str:
             f"| {r.get('triage_score',0)} | {r.get('triage_label','?')} "
             f"| `{r.get('url','')[:75]}` | {'🔴' if r.get('secrets') else ''} |"
         )
-    lines.append(f"\n\n---\n*DorkEye Analyzer v1.0 (no-AI) — {now}*")
+    lines.append(f"\n\n---\n*MappingExpo Analyzer v1.0 (no-AI) — {now}*")
     return "\n".join(lines)
 
 
 def _report_txt(results, all_secrets, counts, top, target, now) -> str:
     lines = [
         "=" * 70,
-        "  RELATÓRIO DORKEYE ANALYZER",
+        "  RELATÓRIO MAPPINGEXPO ANALYZER",
         f"  {now}  |  Alvo: {target or 'N/A'}",
         "=" * 70,
         f"\nMÉTRICAS:",
@@ -616,7 +616,7 @@ def _report_txt(results, all_secrets, counts, top, target, now) -> str:
             f"  [{r.get('triage_score',0):>3}] [{r.get('triage_label','?'):<8}]{sec_flag} "
             f"{r.get('url','')[:75]}"
         )
-    lines.append(f"\nDorkEye Analyzer v1.0 (no-AI) — {now}")
+    lines.append(f"\nMappingExpo Analyzer v1.0 (no-AI) — {now}")
     return "\n".join(lines)
 
 
@@ -625,7 +625,7 @@ def _report_json(results, all_secrets, counts, target, now) -> str:
         "meta": {
             "generated_at": now,
             "target": target,
-            "engine": "DorkEye Analyzer v1.0 (no-AI, pure regex)",
+            "engine": "MappingExpo Analyzer v1.0 (no-AI, pure regex)",
         },
         "metrics":  {"total": len(results), "by_label": dict(counts), "secrets": len(all_secrets)},
         "secrets":  all_secrets,
@@ -650,7 +650,7 @@ def run_pipeline(
     Executa o pipeline completo: triage → [fetch] → segredos → relatório.
 
     Args:
-        results:         lista de dicts de resultados do DorkEye
+        results:         lista de dicts de resultados do MappingExpo
         do_fetch:        True = baixar páginas reais
         fetch_max:       máximo de páginas para baixar
         fetch_min_label: label mínimo para download (HIGH / MEDIUM)
@@ -661,7 +661,7 @@ def run_pipeline(
     Retorna:
         dict com: triaged, all_secrets, report_path, counts
     """
-    _rule(" DorkEye Analyzer v1.0 — sem IA necessária ", style="bold cyan")
+    _rule(" MappingExpo Analyzer v1.0 — sem IA necessária ", style="bold cyan")
 
     # 1. Triage
     results = triage_results(results)
@@ -719,13 +719,13 @@ def run_pipeline(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  INTEGRAÇÃO CLI dorkeye.py
-#  Estas funções são importadas pelo dorkeye.py
+#  INTEGRAÇÃO CLI mappingexpo.py
+#  Estas funções são importadas pelo mappingexpo.py
 # ══════════════════════════════════════════════════════════════════════════════
 
 def add_local_analyze_args(parser) -> object:
     """
-    Adiciona as flags --analyze-local-* ao parser do CLI dorkeye.py.
+    Adiciona as flags --analyze-local-* ao parser do CLI mappingexpo.py.
     Não requer --llm.
     """
     g = parser.add_argument_group(
@@ -762,7 +762,7 @@ def add_local_analyze_args(parser) -> object:
 
 def run_local_analysis(results: List[dict], args, target: str = "") -> dict:
     """
-    Entry point para o dorkeye.py — chamado quando --analyze-local está ativo.
+    Entry point para o mappingexpo.py — chamado quando --analyze-local está ativo.
     Não requer llm_plugin.
     """
     fmt = getattr(args, "analyze_local_fmt", "html")
@@ -787,7 +787,7 @@ def run_local_analysis(results: List[dict], args, target: str = "") -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="DorkEye Analyzer v1.0 — Análise pós-busca sem IA",
+        description="MappingExpo Analyzer v1.0 — Análise pós-busca sem IA",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Exemplos:
 
@@ -808,7 +808,7 @@ def main() -> None:
 """,
     )
 
-    parser.add_argument("results_file",    help="Arquivo JSON de resultados do DorkEye")
+    parser.add_argument("results_file",    help="Arquivo JSON de resultados do MappingExpo")
     parser.add_argument("--target",        default="", help="Descrição do alvo (opcional)")
     parser.add_argument("--fetch",         action="store_true", help="Baixa páginas HIGH/CRITICAL")
     parser.add_argument("--fetch-max",     type=int,  default=20,   help="Máximo de páginas para baixar (padrão: 20)")
@@ -840,7 +840,7 @@ def main() -> None:
 
     if not results:
         print(f"[!] Nenhum resultado encontrado em '{p}'.", file=sys.stderr)
-        print("    Salve resultados do DorkEye com: -o results.json", file=sys.stderr)
+        print("    Salve resultados do MappingExpo com: -o results.json", file=sys.stderr)
         sys.exit(1)
 
     _log(f"[*] Carregados {len(results)} resultados de '{p.name}'", style="bold cyan")

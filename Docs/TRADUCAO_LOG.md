@@ -562,6 +562,30 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   - Refs `self._MARKER` intocadas (OOB L614-616, detecção L830/837/842/905) · `_ENCODED_MARKERS` sem o marker
   - Contagens: MPXSS7x==83 (xss.py)/84 (xss.md); DEXSS7x==0 em ambos; marker ausente nos demais 7 arquivos de código
 
+## 2026-10-16 — CAMADA D: user-agent (commit fase-3d 6f67373)
+- **Backup**: `db_portscan.py.20261016_134016.pre_f3_d.bak`
+- **Diff**: L355 `"Mozilla/5.0 DorkEye DBScan/1.0"` → `"Mozilla/5.0 MappingExpo DBScan/1.0"` (única UA com marca no repo)
+- **Verificação**: DorkEye DBScan/1.0==0 · MappingExpo DBScan/1.0==1 · py_compile OK
+
+## 2026-10-16 — CAMADA E: paths de saída (commit fase-3e e0fcbf2)
+- **Backups**: `mappingexpo.py`, `mappingexpo_agents.py`, `mappingexpo_analyze.py`, `mappingexpo_web.py`, `.gitignore` — `.20261016_134128.pre_f3_e.bak`
+- **Diff aprovado**: 22 substituições — mappingexpo_config.yaml ×4 (mappingexpo.py) + ×1 web + ×1 .gitignore · mappingexpo_crawl_{ts} ×1 + mappingexpo_crawl_<timestamp>.html help ×1 + mappingexpo_crawl_{ts}.{fmt} ×1 (agents) · mappingexpo_dbscan.json ×4 · mappingexpo_quarantine ×2 · mappingexpo_analysis_{ts} ×1 (agents) + ×1 (analyze) · mappingexpo_local_analysis_ ×2 (analyze) · mappingexpo_dorks_{ts}.txt + mappingexpo_dorks.txt (web) · .gitignore: mappingexpo_env/, run_mappingexpo.sh/bat
+- **Correção incluída (resíduos da Camada A em docstrings, pegados pela verificação E)**: agents L175 `dorkeye_llm_plugin`, L180 `dorkeye_patterns.label_from_score()`, L1436 `de dorkeye_patterns — alias local` → mappingexpo_*
+- **Verificações** (todas PASSARAM): py_compile ×4 · **grep `dorkeye_` em TODO o código == ZERO** · contagens dos novos paths idênticas ao aprovado · residual dorkeye no código = só marca "DorkEye" (camada F pendente: mappingexpo.py 15 · agents 21 · analyze 22 · web 5 · patterns 1 · dork_generator 1 · db_portscan 7 · sqli 3 · xss 6)
+
+## 2026-10-16 — CAMADA F: marca visível MappingExpo + arte (commit fase-3f)
+- **Backups**: 9 arquivos `.20261016_135806.pre_f3_f.bak`
+- **Diff aprovado**: 73 renomes (`DorkEye`→`MappingExpo`, `DORKEYE`→`MAPPINGEXPO`, `dorkeye.py`→`mappingexpo.py`) em 9 arquivos (mappingexpo.py 11 · agents 20 · analyze 22 · web 5 · patterns 1 · dork_generator 1 · db_portscan 6 · sqli 2 · xss 5) + **arte ASCII do launcher (web L1159–1164): "DORK EYE" → "MAPPING EXPO"** (mesma fonte ANSI Shadow, 94 col, 5 linhas de glifos + 1 sombra, CRLF preservado)
+- **Casos especiais**: mappingexpo.py L3 uniformizada para "Ferramenta de Dorking (OSINT)" (consistente com description) · agents L1644/L1741 mantêm o "v4.8" pré-existente (só a marca muda) · analyze L722/723/728/765 + agents L1419 = 5 refs de módulo `dorkeye.py` residuais da Camada A (incluídas aqui com nota) · dork_generator L2 `# DorkEye Project` → `# MappingExpo Project` (header sem autor)
+- **8 linhas de atribuição INTACTAS (decisão aprovada)**: mappingexpo.py L4 (Author+URL), L201 (github), L202 (t.me), L1404 (github.io) · agents L40 · db_portscan L21 · sqli L18 · xss L12 (Author | DorkEye Project)
+- **Verificações** (todas PASSARAM):
+  - py_compile ×9 exit 0 (SyntaxWarning `\s` xss.py L1270 preexistente; nota: `2>$null` no PS 5.1 marca `$?=false` com warning no stderr — usar `$LASTEXITCODE`)
+  - **Prova transformacional**: backup + transformação idêntica (skip das 8 linhas + arte) == arquivo atual, byte a byte, nos 9 arquivos
+  - Marca fora das 8 linhas de atribuição == 0 · `\bdorkeye\b` em código == 0 · URLs de atribuição intactas (github ×2 — L4 docstring + L201 banner —, t.me ×1, github.io ×1) · autores ×4 intactos
+  - **colorLine: nenhuma regex contém a marca; zero mudanças necessárias** (verificado contra as 5 regex estendidas da Fase 1)
+  - Arte: 5 linhas de blocos + 1 sombra; contagem de linhas do web inalterada (1203); charset matrix e estruturas vizinhas intactos
+- **Residual dorkeye em código após F: ZERO** (só as 8 linhas de atribuição). Restam: Docs/README/Templates/meta (camada G)
+
 
 
 

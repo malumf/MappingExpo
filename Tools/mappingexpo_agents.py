@@ -1,8 +1,8 @@
 """
-DorkEye Agents
-Post-search analysis pipeline for DorkEye Project+
+MappingExpo Agents
+Post-search analysis pipeline for MappingExpo Project+
 
-Os agentes são invocados DEPOIS que o DorkEye conclui a busca.
+Os agentes são invocados DEPOIS que o MappingExpo conclui a busca.
 Eles não interferem no fluxo de busca — trabalham sobre resultados já coletados.
 
 Pipeline (ativado com --analyze):
@@ -146,7 +146,7 @@ def _safe_json_local(raw: str, expected_type: type = dict):
 
 class BaseAgent(ABC):
     """
-    Classe base para todos os agentes do DorkEye.
+    Classe base para todos os agentes do MappingExpo.
     Funciona sem LLM (plugin=None) — agentes usam regex por padrão.
     Se um plugin for fornecido, as etapas de LLM são ativadas como melhorias.
     """
@@ -1078,7 +1078,7 @@ class _HeaderSecurityAnalyzer:
 
 class SecurityAgent(BaseAgent):
     """
-    Agente de segurança do DorkEye — detecta phishing, malware, exploits
+    Agente de segurança do MappingExpo — detecta phishing, malware, exploits
     e payloads ofuscados nos resultados do scan.
 
     Dois modos:
@@ -1390,7 +1390,7 @@ _global_security_agent: Optional[SecurityAgent] = None
 def get_security_agent(**kwargs) -> SecurityAgent:
     """
     Retorna o singleton global do SecurityAgent.
-    Chamável de qualquer módulo do DorkEye.
+    Chamável de qualquer módulo do MappingExpo.
 
     Uso:
         from mappingexpo_agents import get_security_agent
@@ -1416,7 +1416,7 @@ def security_scan_hook(
     """
     Hook rápido para integração inline no fluxo de scan.
 
-    Uso no dorkeye.py (loop de scan):
+    Uso no mappingexpo.py (loop de scan):
         from mappingexpo_agents import security_scan_hook
         verdict = security_scan_hook(result_url, response_text, resp_headers)
         if verdict.blocked:
@@ -1640,8 +1640,8 @@ class ReportAgent(BaseAgent):
         sec_threats = extra.get("security_threats", [])
 
         lines = [
-            "# DorkEye — Relatório de Análise",
-            f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  DorkEye v4.8 + Agents v3.1\n",
+            "# MappingExpo — Relatório de Análise",
+            f"\n> {now}  |  Alvo: `{target or 'N/A'}`  |  MappingExpo v4.8 + Agents v3.1\n",
             "---\n",
             "## Resumo\n",
             analysis.get("summary", "_Análise LLM não disponível._"),
@@ -1738,7 +1738,7 @@ class ReportAgent(BaseAgent):
                 f"| {r.get('triage_score',0)} | {r.get('triage_label','?')} "
                 f"| `{r.get('url','')[:70]}` | {r.get('title','N/A')[:50]} |"
             )
-        lines.append(f"\n\n---\n*DorkEye v4.8 + Agents v3.1 — {now}*")
+        lines.append(f"\n\n---\n*MappingExpo v4.8 + Agents v3.1 — {now}*")
         return "\n".join(lines)
 
     def _html(self, results, analysis, secrets, counts, target, extra=None) -> str:
@@ -1827,7 +1827,7 @@ class ReportAgent(BaseAgent):
 
         return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8">
-<title>DorkEye Agents — Relatório — {target or 'Sessão'}</title>
+<title>MappingExpo Agents — Relatório — {target or 'Sessão'}</title>
 <style>
 :root{{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--text:#c9d1d9;--acc:#58a6ff;--brd:#30363d}}
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -1850,8 +1850,8 @@ code{{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:12px}}
 ul{{padding-left:18px}}li{{margin:3px 0}}
 footer{{margin-top:36px;font-size:11px;color:#8b949e;text-align:center}}
 </style></head><body>
-<h1>&#128065; DorkEye — Relatório</h1>
-<div class="meta">Gerado: {now} &nbsp;|&nbsp; Alvo: <code>{target or 'N/A'}</code> &nbsp;|&nbsp; DorkEye Project</div>
+<h1>&#128065; MappingExpo — Relatório</h1>
+<div class="meta">Gerado: {now} &nbsp;|&nbsp; Alvo: <code>{target or 'N/A'}</code> &nbsp;|&nbsp; MappingExpo Project</div>
 {'<h2>Resumo</h2><div class="card">'+summary+'</div>' if summary else ''}
 <h2>Métricas</h2>
 <div class="metrics">
@@ -1875,7 +1875,7 @@ footer{{margin-top:36px;font-size:11px;color:#8b949e;text-align:center}}
 {'<h2>Recomendações</h2><div class="card"><ul>'+recs_html+'</ul></div>' if recs else ''}
 <h2>Todos os Resultados ({len(results)})</h2>
 <div class="card"><table><tr><th>Pontuação</th><th>Label</th><th>URL</th><th>Título</th></tr>{rows_all}</table></div>
-<footer>DorkEye Project | Agents v3.1 &mdash; {now}</footer>
+<footer>MappingExpo Project | Agents v3.1 &mdash; {now}</footer>
 </body></html>"""
 
     def _json(self, results, analysis, secrets, counts, target, extra=None) -> str:
@@ -1884,7 +1884,7 @@ footer{{margin-top:36px;font-size:11px;color:#8b949e;text-align:center}}
             "meta": {
                 "generated_at": datetime.now().isoformat(),
                 "target":       target or "",
-                "engine":       "DorkEye v5.0 + Agents v3.1",
+                "engine":       "MappingExpo v5.0 + Agents v3.1",
             },
             "metrics": {
                 "total":     len(results),
@@ -2903,7 +2903,7 @@ class DorkCrawlerAgent(BaseAgent):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def add_crawler_args(parser) -> object:
-    """Adiciona as flags --crawl-* ao parser do CLI do DorkEye."""
+    """Adiciona as flags --crawl-* ao parser do CLI do MappingExpo."""
     g = parser.add_argument_group(
         "Crawl Recursivo — dorking multi-rodada adaptativo (sem IA)"
     )
@@ -2925,7 +2925,7 @@ def add_crawler_args(parser) -> object:
 
 
 def add_security_args(parser) -> object:
-    """Adiciona as flags --security-* ao parser do CLI do DorkEye."""
+    """Adiciona as flags --security-* ao parser do CLI do MappingExpo."""
     g = parser.add_argument_group(
         "Security Agent — detecção de ameaças para phishing, malware, exploits"
     )
@@ -3260,7 +3260,7 @@ def run_analysis_pipeline(
     return output
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STANDALONE — analisa um arquivo JSON de resultados do DorkEye
+# STANDALONE — analisa um arquivo JSON de resultados do MappingExpo
 # ══════════════════════════════════════════════════════════════════════════════
 
 # FIX #1 (continuação): **name** → __name__
@@ -3269,7 +3269,7 @@ if __name__ == "__main__":
     import sys
 
     parser = _ap.ArgumentParser(
-        description="DorkEye Agents v3.1 — Análise standalone sobre arquivo de resultados",
+        description="MappingExpo Agents v3.1 — Análise standalone sobre arquivo de resultados",
         formatter_class=_ap.RawDescriptionHelpFormatter,
         epilog=(
             "Exemplos:\n"
@@ -3286,7 +3286,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "results_file",
-        help="Arquivo JSON de resultados do DorkEye (produzido com -o results.json)",
+        help="Arquivo JSON de resultados do MappingExpo (produzido com -o results.json)",
     )
     parser.add_argument("--target", default="", help="Descrição do alvo (opcional)")
     parser.add_argument("--analyze-fetch",     action="store_true",

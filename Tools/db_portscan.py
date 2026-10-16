@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-DB Port Scanner for DorkEye Project
+DB Port Scanner for MappingExpo Project
 Escaneia portas de banco de dados expostas em hosts extraídos de resultados de dorks.
 
-Localização: DorkEye/Tools/db_portscan.py
+Localização: MappingExpo/Tools/db_portscan.py
 
 Detecta:
   - Portas de banco de dados abertas: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch,
@@ -456,7 +456,7 @@ _skip_current:   bool  = False
 
 class DBPortScanAgent:
     """
-    Extrai hosts de dicts de resultados do DorkEye e os escaneia em busca de
+    Extrai hosts de dicts de resultados do MappingExpo e os escaneia em busca de
     portas de banco de dados expostas.
 
     Uso:
@@ -778,7 +778,7 @@ class DBScanReport:
         lista de referência para ferramentas de follow-up.
         """
         lines = [
-            "# DorkEye — Relatório de Varredura de Portas DB",
+            "# MappingExpo — Relatório de Varredura de Portas DB",
             f"# Gerado em : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"# Hosts     : {self.stats.get('hosts_scanned', 0)}",
             f"# Portas abertas: {self.stats.get('open_ports', 0)}",
@@ -843,7 +843,7 @@ if __name__ == "__main__":
     import sys
 
     p = argparse.ArgumentParser(
-        description="DorkEye DB Port Scanner v1.0 — modo standalone",
+        description="MappingExpo DB Port Scanner v1.0 — modo standalone",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Exemplos:\n"
@@ -854,7 +854,7 @@ if __name__ == "__main__":
         ),
     )
     p.add_argument("results_file",
-                   help="Arquivo JSON de resultados do DorkEye")
+                   help="Arquivo JSON de resultados do MappingExpo")
     p.add_argument("--timeout",   type=float, default=2.5,
                    help="Timeout de conexão TCP em segundos (padrão: 2.5)")
     p.add_argument("--threads",   type=int,   default=60,

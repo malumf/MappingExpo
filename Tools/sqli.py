@@ -1,7 +1,7 @@
 """
-DorkEye SQLi Detector
+MappingExpo SQLi Detector
 ═══════════════════════════════════════════════════════════════
-SQL injection multi-método para o DorkEye Project
+SQL injection multi-método para o MappingExpo Project
 
 Contém:
   - SQLiConfidence         enum
