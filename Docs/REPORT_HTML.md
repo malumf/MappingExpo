@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/17c738da-27e5-490b-8938-749377458d11" />
 
-# DorkEye — HTML Report Interface
+# MappingExpo — HTML Report Interface
 
 > **File:** `report_YYYYMMDD_HHMMSS.html` (generated automatically, or via `-o filename.html`)
 > **Engine:** self-contained single-file HTML — no external dependencies, no server required.
@@ -33,7 +33,7 @@
 
 ## Overview
 
-The HTML report is a **fully interactive, self-contained single-file** dashboard generated at the end of every DorkEye scan. It embeds all result data as inline JavaScript constants (`EXPORT_DATA`, `FILE_DATA`) so it remains fully functional offline and without any backend.
+The HTML report is a **fully interactive, self-contained single-file** dashboard generated at the end of every MappingExpo scan. It embeds all result data as inline JavaScript constants (`EXPORT_DATA`, `FILE_DATA`) so it remains fully functional offline and without any backend.
 
 ```
 report_20260314_090118.html   ← auto-named when -o is not specified
@@ -84,8 +84,8 @@ The Matrix rain animation is rendered on a `<canvas id="matrix-canvas">` fixed b
 
 ```html
 <div class="header">
-  <h1>■ DorkEye | Report _</h1>
-  <div class="subtitle">→ Generated: YYYY-MM-DD HH:MM:SS | xploits3c.github.io/DorkEye</div>
+  <h1>■ MappingExpo | Report _</h1>
+  <div class="subtitle">→ Generated: YYYY-MM-DD HH:MM:SS | xploits3c.github.io/MappingExpo</div>
 </div>
 ```
 
@@ -479,7 +479,7 @@ The table wraps in `.table-wrap { overflow-x: auto }` so on very narrow screens 
 ### Python → HTML data flow
 
 ```
-DorkEyeEnhanced.results[]
+MappingExpoEnhanced.results[]
         │
         ├─ export_rows[]  ──→  EXPORT_DATA  (Links panel)
         └─ file_rows[]    ──→  FILE_DATA    (Files panel)
@@ -522,4 +522,4 @@ time.time() - self.start_time   → EXECUTION TIME card
 
 ---
 
-*DorkEye v4.6 — For authorized security research only.*
+*MappingExpo v4.6 — For authorized security research only.*

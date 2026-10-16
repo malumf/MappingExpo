@@ -1,8 +1,8 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/642bbee1-c6f3-4bd5-98b7-4c7186089fd8" />
 
-# File Categories — DorkEye Project
+# File Categories — MappingExpo Project
 
-DorkEye automatically categorizes every URL it finds by examining the file extension. Categories drive filtering in the HTML report, export scopes, and the file analysis pipeline.
+MappingExpo automatically categorizes every URL it finds by examining the file extension. Categories drive filtering in the HTML report, export scopes, and the file analysis pipeline.
 
 ---
 
@@ -28,30 +28,30 @@ URLs with no recognized extension are categorized as **webpage**.
 
 ```bash
 # Only scripts
-python dorkeye.py -d "site:example.com" --whitelist .php .asp .aspx .jsp -o scripts.json
+python mappingexpo.py -d "site:example.com" --whitelist .php .asp .aspx .jsp -o scripts.json
 
 # Only documents
-python dorkeye.py -d "site:example.com" --whitelist .pdf .doc .docx .xls .xlsx -o docs.json
+python mappingexpo.py -d "site:example.com" --whitelist .pdf .doc .docx .xls .xlsx -o docs.json
 
 # Only credentials and configs
-python dorkeye.py -d "site:example.com" --whitelist .env .git .htpasswd .yaml .conf -o sensitive.json
+python mappingexpo.py -d "site:example.com" --whitelist .env .git .htpasswd .yaml .conf -o sensitive.json
 ```
 
 ### Blacklist (exclude)
 
 ```bash
 # Exclude images and media
-python dorkeye.py -d "site:example.com" --blacklist .jpg .jpeg .png .gif .svg .mp4 .mp3
+python mappingexpo.py -d "site:example.com" --blacklist .jpg .jpeg .png .gif .svg .mp4 .mp3
 
 # Exclude large archive files
-python dorkeye.py -d "site:example.com" --blacklist .zip .rar .tar .gz .7z
+python mappingexpo.py -d "site:example.com" --blacklist .zip .rar .tar .gz .7z
 ```
 
 ### Combine
 
 ```bash
 # Only PHP files, excluding known framework paths
-python dorkeye.py -d "site:example.com" --whitelist .php --blacklist .svg .css .js -o php_only.json
+python mappingexpo.py -d "site:example.com" --whitelist .php --blacklist .svg .css .js -o php_only.json
 ```
 
 ---
@@ -74,7 +74,7 @@ The `📁 FILES` export panel lists all non-webpage results and lets you select 
 
 ## Customize Extensions
 
-Edit `dorkeye_config.yaml` to add or remove extensions from any category:
+Edit `mappingexpo_config.yaml` to add or remove extensions from any category:
 
 ```yaml
 extensions:
@@ -132,11 +132,11 @@ extensions:
 Load the custom config:
 
 ```bash
-python dorkeye.py -d "site:example.com" --config dorkeye_config.yaml -o results.html
+python mappingexpo.py -d "site:example.com" --config mappingexpo_config.yaml -o results.html
 ```
 
 Generate the default config as a starting point:
 
 ```bash
-python dorkeye.py --create-config
+python mappingexpo.py --create-config
 ```

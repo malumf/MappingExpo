@@ -1,6 +1,6 @@
-# DorkEye on Termux
+# MappingExpo on Termux
 
-> Run the full DorkEye pipeline directly from your Android device.
+> Run the full MappingExpo pipeline directly from your Android device.
 > Termux is auto-detected — no extra flags needed. Battery-saver tuning activates automatically.
 
 -----
@@ -35,7 +35,7 @@ pkg install -y python git libxml2 libxslt
 
 |Package  |Why it’s needed                               |
 |---------|----------------------------------------------|
-|`python` |Runtime for DorkEye                           |
+|`python` |Runtime for MappingExpo                           |
 |`git`    |Clone the repository                          |
 |`libxml2`|Required by `lxml` (HTML parser) — C extension|
 |`libxslt`|Required by `lxml` — C extension              |
@@ -46,11 +46,11 @@ pkg install -y python git libxml2 libxslt
 
 -----
 
-### Step 3 — Clone DorkEye
+### Step 3 — Clone MappingExpo
 
 ```bash
 git clone https://github.com/xPloits3c/DorkEye
-cd DorkEye
+cd MappingExpo
 ```
 
 -----
@@ -78,17 +78,17 @@ This installs all required libraries:
 ### Step 5 — Verify the installation
 
 ```bash
-python dorkeye.py -h
+python mappingexpo.py -h
 ```
 
 Expected output: the full help banner with all available flags.
-If you see it, DorkEye is ready.
+If you see it, MappingExpo is ready.
 
 -----
 
 ## Termux Auto-Detection
 
-When DorkEye detects it is running inside Termux, the banner displays:
+When MappingExpo detects it is running inside Termux, the banner displays:
 
 ```
 Platform: Android / Termux ⚡ battery-saver active
@@ -113,7 +113,7 @@ No flags required — this tuning is applied automatically.
 ### Interactive wizard (recommended for beginners)
 
 ```bash
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 ```
 
 Guided menus for every option. The easiest way to start.
@@ -123,7 +123,7 @@ Guided menus for every option. The easiest way to start.
 ### Single dork search
 
 ```bash
-python dorkeye.py -d "inurl:login.php" -o results.html
+python mappingexpo.py -d "inurl:login.php" -o results.html
 ```
 
 Searches DuckDuckGo for the dork and saves an interactive HTML report in `Dump/`.
@@ -133,7 +133,7 @@ Searches DuckDuckGo for the dork and saves an interactive HTML report in `Dump/`
 ### Load dorks from a file
 
 ```bash
-python dorkeye.py -d dorks.txt -c 100 -o results.json
+python mappingexpo.py -d dorks.txt -c 100 -o results.json
 ```
 
 `dorks.txt` — one dork per line, lines starting with `#` are ignored.
@@ -144,7 +144,7 @@ python dorkeye.py -d dorks.txt -c 100 -o results.json
 ### Direct URL test (SQLi + XSS, no search)
 
 ```bash
-python dorkeye.py -u "https://target.com/page.php?id=1"
+python mappingexpo.py -u "https://target.com/page.php?id=1"
 ```
 
 Runs the full vulnerability pipeline directly against a single URL.
@@ -157,25 +157,25 @@ Runs the full vulnerability pipeline directly against a single URL.
 ### SQL Injection
 
 ```bash
-python dorkeye.py -d "inurl:.php?id=" --sqli -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.json
 ```
 
 ### XSS
 
 ```bash
-python dorkeye.py -d "inurl:search.php?q=" --xss -o results.json
+python mappingexpo.py -d "inurl:search.php?q=" --xss -o results.json
 ```
 
 ### SQLi + XSS combined
 
 ```bash
-python dorkeye.py -d "inurl:.php?id=" --sqli --xss -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli --xss -o results.json
 ```
 
 ### With stealth mode
 
 ```bash
-python dorkeye.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
 ```
 
 `--stealth` adds longer delays between requests (1.4×–1.8×) to reduce detection and rate-limiting.
@@ -196,10 +196,10 @@ All output files are saved inside the `Dump/` folder (auto-created).
 
 ```bash
 # HTML report (default, recommended for reading)
-python dorkeye.py -d "inurl:config.php" -o report.html
+python mappingexpo.py -d "inurl:config.php" -o report.html
 
 # JSON (required for --analyze, --crawl, --dbscan re-processing)
-python dorkeye.py -d "inurl:config.php" -o results.json
+python mappingexpo.py -d "inurl:config.php" -o results.json
 ```
 
 If no extension is provided, `.json` is appended automatically.
@@ -210,13 +210,13 @@ If no extension is provided, `.json` is appended automatically.
 
 ```bash
 # Add SQLi scan to existing results
-python dorkeye.py -f Dump/results.json --sqli -o retest.json
+python mappingexpo.py -f Dump/results.json --sqli -o retest.json
 
 # Add XSS scan
-python dorkeye.py -f Dump/results.json --xss -o retest.json
+python mappingexpo.py -f Dump/results.json --xss -o retest.json
 
 # Run full analysis on saved results
-python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
 ```
 
 Useful to avoid repeating the search — reuse results and add new scan layers.
@@ -229,10 +229,10 @@ Generate dorks from built-in templates and search immediately.
 
 ```bash
 # Generate all categories, search, detect SQLi
-python dorkeye.py --dg=all --sqli -o results.json
+python mappingexpo.py --dg=all --sqli -o results.json
 
 # Generate SQLi-focused dorks, medium intensity
-python dorkeye.py --dg=sqli --mode=medium --sqli -o results.json
+python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
 ```
 
 |`--mode` value|Behaviour                                  |
@@ -248,11 +248,11 @@ python dorkeye.py --dg=sqli --mode=medium --sqli -o results.json
 
 ## Analysis Pipeline
 
-Requires `Tools/dorkeye_agents.py`. Automatically skipped if the file is missing.
+Requires `Tools/mappingexpo_agents.py`. Automatically skipped if the file is missing.
 
 ```bash
-python dorkeye.py -d dorks.txt --analyze -o results.json
-python dorkeye.py -d dorks.txt --analyze --analyze-fetch -o results.json
+python mappingexpo.py -d dorks.txt --analyze -o results.json
+python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
 ```
 
 `--analyze` — runs triage, secrets detection, and generates a report after the search.
@@ -261,7 +261,7 @@ python dorkeye.py -d dorks.txt --analyze --analyze-fetch -o results.json
 Output format options: `html` (default), `md`, `json`, `txt`.
 
 ```bash
-python dorkeye.py -d dorks.txt --analyze --analyze-fmt md -o results.json
+python mappingexpo.py -d dorks.txt --analyze --analyze-fmt md -o results.json
 ```
 
 -----
@@ -272,7 +272,7 @@ Requires `Tools/db_portscan.py`. Scans hosts extracted from results for exposed 
 
 ```bash
 # Integrated — runs after the search
-python dorkeye.py -d dorks.txt --dbscan -o results.json
+python mappingexpo.py -d dorks.txt --dbscan -o results.json
 
 # Standalone — on saved results
 python Tools/db_portscan.py Dump/results.json
@@ -290,7 +290,7 @@ python Tools/db_portscan.py Dump/results.json --timeout 3 --threads 40
 Launches a local Flask-based dashboard in your browser.
 
 ```bash
-python dorkeye.py --ui
+python mappingexpo.py --ui
 ```
 
 > **Termux note:** The browser will not open automatically on Android.
@@ -300,7 +300,7 @@ python dorkeye.py --ui
 > http://127.0.0.1:8080
 > ```
 > 
-> If port 8080 is busy, DorkEye auto-increments. Check the terminal output for the actual port.
+> If port 8080 is busy, MappingExpo auto-increments. Check the terminal output for the actual port.
 
 `--ui` cannot be combined with any other input flag (`-d`, `-u`, `-f`, `--dg`) in the same command.
 
@@ -319,22 +319,22 @@ python dorkeye.py --ui
 
 ```bash
 # Quickest start — guided wizard
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 
 # Search + SQLi + HTML report
-python dorkeye.py -d "inurl:.php?id=" --sqli -o results.html
+python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.html
 
 # Search + SQLi + XSS + stealth
-python dorkeye.py -d dorks.txt --sqli --xss --stealth -o results.json
+python mappingexpo.py -d dorks.txt --sqli --xss --stealth -o results.json
 
 # Direct URL vulnerability test
-python dorkeye.py -u "https://target.com/page.php?id=1"
+python mappingexpo.py -u "https://target.com/page.php?id=1"
 
 # Generate dorks + scan + analyze
-python dorkeye.py --dg=sqli --mode=medium --sqli --analyze -o results.json
+python mappingexpo.py --dg=sqli --mode=medium --sqli --analyze -o results.json
 
 # Re-process saved results — add analysis
-python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
 
 # DB port scan on saved results (reduced threads for mobile)
 python Tools/db_portscan.py Dump/results.json --threads 40 --timeout 3

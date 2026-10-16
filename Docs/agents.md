@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/391a4aeb-a91d-44e5-b493-ad4821f0c606" />
 
-# AI Agents | DorkEye Project
+# AI Agents | MappingExpo Project
 
 The Agents pipeline runs automatically after a dork search when `--analyze` is active (or when the output file is `.json`). It requires no external AI — every step uses regex, heuristics, and structural analysis only.
 
@@ -10,16 +10,16 @@ The Agents pipeline runs automatically after a dork search when `--analyze` is a
 
 ```bash
 # Automatic (output .json triggers a prompt)
-python dorkeye.py -d "site:example.com" -o results.json
+python mappingexpo.py -d "site:example.com" -o results.json
 
 # Explicit
-python dorkeye.py -d "site:example.com" -o results.json --analyze
+python mappingexpo.py -d "site:example.com" -o results.json --analyze
 
 # With page content download
-python dorkeye.py -d "site:example.com" -o results.json --analyze --analyze-fetch
+python mappingexpo.py -d "site:example.com" -o results.json --analyze --analyze-fetch
 
 # Standalone on saved results
-python dorkeye_agents.py Dump/results.json --analyze-fetch --analyze-fmt html
+python mappingexpo_agents.py Dump/results.json --analyze-fetch --analyze-fmt html
 ```
 
 ---
@@ -37,7 +37,7 @@ python dorkeye_agents.py Dump/results.json --analyze-fetch --analyze-fmt html
 | 7 | **PiiDetectorAgent** | `page_content` + snippet | `pii_found` list with type, censored value, context |
 | 8 | **EmailHarvesterAgent** | `page_content` + snippet | `emails_found` list, global dedup |
 | 9 | **SubdomainHarvesterAgent** | All text fields | `subdomains` list per result, global map |
-| 10 | **LLM Analysis** | All triaged results | `analysis` dict (optional — requires `dorkeye_llm_plugin.py`) |
+| 10 | **LLM Analysis** | All triaged results | `analysis` dict (optional — requires `mappingexpo_llm_plugin.py`) |
 | 11 | **ReportAgent** | Everything above | HTML / MD / JSON / TXT report |
 | 12 | **DBScanAgent** | Hosts extracted from results | `db_scan` per-host findings, `DBScanReport` |
 | 13 | **DorkCrawlerAgent** | CVE dorks + subdomain seeds | Follow-up dork results merged into pipeline |
@@ -134,7 +134,7 @@ DANGEROUS and CRITICAL results are automatically blocked in `active` mode.
 ```bash
 --no-security                  # Disable SecurityAgent entirely
 --security-mode active         # active: block DANGEROUS/CRITICAL | passive: report only (default)
---security-quarantine          # Save blocked content to dorkeye_quarantine/
+--security-quarantine          # Save blocked content to mappingexpo_quarantine/
 ```
 
 **Output per result:**
@@ -172,7 +172,7 @@ DANGEROUS and CRITICAL results are automatically blocked in `active` mode.
 **Inline usage (scanning flow):**
 
 ```python
-from dorkeye_agents import security_scan_hook, get_security_agent
+from mappingexpo_agents import security_scan_hook, get_security_agent
 
 # Quick hook (uses global singleton)
 verdict = security_scan_hook(url, response_text, resp_headers)
@@ -180,7 +180,7 @@ if verdict.blocked:
     continue  # skip malicious result
 
 # Fine-grained control
-agent = get_security_agent(mode="active", quarantine_dir="dorkeye_quarantine")
+agent = get_security_agent(mode="active", quarantine_dir="mappingexpo_quarantine")
 verdict = agent.scan_single(url, content, headers)
 ```
 
@@ -392,7 +392,7 @@ These are merged with TechFingerprintAgent's CVE dorks and passed to DorkCrawler
 
 Scans exposed database ports on all unique hosts extracted from dork results. Runs after the main analysis pipeline and produces a dedicated `DBScanReport` saved alongside the main output file.
 
-**Location:** `DorkEye/Tools/db_portscan.py`
+**Location:** `MappingExpo/Tools/db_portscan.py`
 
 **Detection coverage:**
 
@@ -543,7 +543,7 @@ agent = DBPortScanAgent(
     stealth   = False,
     max_hosts = 200,
 )
-report = agent.run(results)          # results: list[dict] from DorkEye pipeline
+report = agent.run(results)          # results: list[dict] from MappingExpo pipeline
 report.print_summary()               # terminal summary with CRITICAL highlights
 save_dbscan_report(report, out_path) # writes .json + .txt
 ```
@@ -569,7 +569,7 @@ Produces the final analysis report. Accepts `html`, `md`, `json`, `txt`.
 
 ```json
 {
-  "meta":       { "generated_at": "...", "target": "...", "engine": "DorkEye + Agents" },
+  "meta":       { "generated_at": "...", "target": "...", "engine": "MappingExpo + Agents" },
   "metrics":    { "total": N, "by_label": {...}, "secrets": N, "pii": N, "emails": N, "subdomains": N },
   "analysis":   {},
   "secrets":    [...],
@@ -586,25 +586,25 @@ Produces the final analysis report. Accepts `html`, `md`, `json`, `txt`.
 
 ## Standalone Usage
 
-`dorkeye_agents.py` can run directly on any existing DorkEye result file:
+`mappingexpo_agents.py` can run directly on any existing MappingExpo result file:
 
 ```bash
 # Basic analysis
-python dorkeye_agents.py Dump/results.json
+python mappingexpo_agents.py Dump/results.json
 
 # With page fetch
-python dorkeye_agents.py Dump/results.json --analyze-fetch --analyze-fetch-max 50
+python mappingexpo_agents.py Dump/results.json --analyze-fetch --analyze-fetch-max 50
 
 # HTML report to specific path
-python dorkeye_agents.py Dump/results.json \
+python mappingexpo_agents.py Dump/results.json \
   --analyze-fetch --analyze-fmt html --analyze-out report.html
 
 # With target label for the report title
-python dorkeye_agents.py Dump/results.json --target "example.com" --analyze-fetch
+python mappingexpo_agents.py Dump/results.json --target "example.com" --analyze-fetch
 
 # Skip LLM triage (regex only, even if LLM plugin available)
-python dorkeye_agents.py Dump/results.json --analyze-no-llm-triage
+python mappingexpo_agents.py Dump/results.json --analyze-no-llm-triage
 
 # Full pipeline including DB port scan
-python dorkeye_agents.py Dump/results.json --analyze-fetch --dbscan --dbscan-stealth
+python mappingexpo_agents.py Dump/results.json --analyze-fetch --dbscan --dbscan-stealth
 ```

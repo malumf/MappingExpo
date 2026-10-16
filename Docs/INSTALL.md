@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/6f4db1bb-6d7b-4225-af92-31060c14989d" />
 
-# 📦 DorkEye — Installation Guide
+# 📦 MappingExpo — Installation Guide
 
 -----
 
@@ -26,7 +26,7 @@ Or download the latest release:
 1. [Verification](#-verification)
 1. [Project Structure](#-project-structure)
 1. [Troubleshooting](#-troubleshooting)
-1. [Updating DorkEye](#-updating-dorkeye)
+1. [Updating MappingExpo](#-updating-mappingexpo)
 1. [Uninstallation](#-uninstallation)
 1. [Support](#-support)
 
@@ -41,7 +41,7 @@ Or download the latest release:
 |git              |`git --version`    |
 
 
-> **Note:** `git` is only required for source installation. If you install via `pip install dorkeye`, you only need Python and pip.
+> **Note:** `git` is only required for source installation. If you install via `pip install mappingexpo`, you only need Python and pip.
 
 **System Requirements:**
 
@@ -50,7 +50,7 @@ Or download the latest release:
 - 100 MB free disk space
 - Internet connection
 
-**Key Python Dependencies** (installed automatically via `pip install dorkeye` or `requirements.txt`):
+**Key Python Dependencies** (installed automatically via `pip install mappingexpo` or `requirements.txt`):
 
 - `ddgs` — DuckDuckGo search engine
 - `requests` — HTTP client
@@ -60,7 +60,7 @@ Or download the latest release:
 
 **Optional Dependencies** (for full feature support):
 
-- `dorkeye_agents.py` in `Tools/` — Enables `--analyze` and `--crawl` features
+- `mappingexpo_agents.py` in `Tools/` — Enables `--analyze` and `--crawl` features
 - `dork_generator.py` in `Tools/` — Enables `--dg` dork generator
 - `http_fingerprints.json` — Enables HTTP fingerprint rotation
 
@@ -72,17 +72,17 @@ This method works on **Linux**, **macOS**, and **Windows**.
 ```
 # Clone the repository
 git clone https://github.com/xPloits3c/DorkEye.git
-cd DorkEye
+cd MappingExpo
 
 # Create virtual environment
-python3 -m venv dorkeye_env
+python3 -m venv mappingexpo_env
 
 # Activate virtual environment
 # Linux / macOS:
-source dorkeye_env/bin/activate
+source mappingexpo_env/bin/activate
 
 # Windows:
-# dorkeye_env\Scripts\activate
+# mappingexpo_env\Scripts\activate
 
 # Upgrade pip
 pip install --upgrade pip
@@ -91,14 +91,14 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Verify installation
-python dorkeye.py -h
+python mappingexpo.py -h
 ```
 
 -----
 
 ## 📱 Termux / Android Installation
 
-DorkEye auto-detects Termux and activates battery-saver mode (reduced timeouts, fewer probe samples). No additional flags needed.
+MappingExpo auto-detects Termux and activates battery-saver mode (reduced timeouts, fewer probe samples). No additional flags needed.
 
 ### From Source
 
@@ -109,21 +109,21 @@ pkg install python git
 
 # Clone and install
 git clone https://github.com/xPloits3c/DorkEye.git
-cd DorkEye
+cd MappingExpo
 
 # Create virtual environment (recommended to avoid Termux package conflicts)
-python -m venv dorkeye_env
-source dorkeye_env/bin/activate
+python -m venv mappingexpo_env
+source mappingexpo_env/bin/activate
 
 # Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 
 # Run
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 ```
 
-💡 On Termux, DorkEye automatically:
+💡 On Termux, MappingExpo automatically:
 
 - Reduces connect timeouts (3s vs 4s)
 - Lowers SQLi probe/boolean/time-based sample counts
@@ -137,37 +137,37 @@ python dorkeye.py --wizard
 
 ```
 # Show help and all available flags
-python dorkeye.py -h
+python mappingexpo.py -h
 
 # Create a sample config file
-python dorkeye.py --create-config
+python mappingexpo.py --create-config
 
 # Quick test search
-python dorkeye.py -d "python programming" -c 5 -o test.html
+python mappingexpo.py -d "python programming" -c 5 -o test.html
 
 # Test dork generator (if templates are present)
-python dorkeye.py --dg=all --mode=soft -c 5 -o dg_test.html
+python mappingexpo.py --dg=all --mode=soft -c 5 -o dg_test.html
 
 # Launch the interactive wizard
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 ```
 -----
 
 ## 📁 Project Structure
 
 ```
-DorkEye/
-├── dorkeye.py                  # Main script
+MappingExpo/
+├── mappingexpo.py                  # Main script
 ├── pyproject.toml              # PyPI package configuration
 ├── requirements.txt            # Python dependencies
 ├── setup.py                    # CLI install config (editable mode)
-├── dorkeye_config.yaml         # Config (generated with --create-config)
+├── mappingexpo_config.yaml         # Config (generated with --create-config)
 ├── http_fingerprints.json      # Browser fingerprint profiles
 ├── Tools/
 │   ├── dork_generator.py       # Dork Generator engine (--dg)
-│   ├── dorkeye_agents.py       # Analysis + Crawl agents (--analyze, --crawl)
-│   ├── dorkeye_analyze.py      # Standalone analysis script (executable directly)
-│   └── dorkeye_patterns.py     # Pattern matching utilities
+│   ├── mappingexpo_agents.py       # Analysis + Crawl agents (--analyze, --crawl)
+│   ├── mappingexpo_analyze.py      # Standalone analysis script (executable directly)
+│   └── mappingexpo_patterns.py     # Pattern matching utilities
 ├── Templates/
 │   ├── dorks_templates.yaml    # Default dork templates
 │   └── *.yaml                  # Additional template files
@@ -195,8 +195,8 @@ pip install ddgs
 Modern Debian-based systems block global pip installs. Use a virtual environment:
 
 ```
-python3 -m venv dorkeye_env
-source dorkeye_env/bin/activate
+python3 -m venv mappingexpo_env
+source mappingexpo_env/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -208,15 +208,15 @@ The `--templates` flag requires `=` syntax (no space):
 
 ```
 # ✅ Correct
-python dorkeye.py --dg=sqli --templates=dorks_templates.yaml
+python mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
 
 # ❌ Wrong
-python dorkeye.py --dg=sqli --templates dorks_templates.yaml
+python mappingexpo.py --dg=sqli --templates dorks_templates.yaml
 ```
 
-### `dorkeye_agents.py not found` warning
+### `mappingexpo_agents.py not found` warning
 
-The `--analyze` and `--crawl` features require `dorkeye_agents.py` in the `Tools/` directory. If missing, DorkEye runs normally but these features are disabled. Ensure your clone is up to date:
+The `--analyze` and `--crawl` features require `mappingexpo_agents.py` in the `Tools/` directory. If missing, MappingExpo runs normally but these features are disabled. Ensure your clone is up to date:
 
 ```
 git pull origin master
@@ -226,20 +226,20 @@ git pull origin master
 
 ### HTTP Fingerprinting disabled warning
 
-If `http_fingerprints.json` is missing or malformed, DorkEye falls back to basic User-Agent rotation. Re-download the file from the repository.
+If `http_fingerprints.json` is missing or malformed, MappingExpo falls back to basic User-Agent rotation. Re-download the file from the repository.
 
 ### SSL/TLS warnings
 
-DorkEye disables SSL verification for maximum compatibility during OSINT scanning. `InsecureRequestWarning` messages are suppressed automatically.
+MappingExpo disables SSL verification for maximum compatibility during OSINT scanning. `InsecureRequestWarning` messages are suppressed automatically.
 
 -----
 
-## 🔄 Updating DorkEye
+## 🔄 Updating MappingExpo
 
 ### Source install:
 
 ```
-cd DorkEye
+cd MappingExpo
 git pull origin master
 pip install --upgrade -r requirements.txt
 ```
@@ -248,25 +248,25 @@ pip install --upgrade -r requirements.txt
 ## 🗑️ Uninstallation
 
 ```
-rm -rf DorkEye
+rm -rf MappingExpo
 ```
 
 **Windows:**
 
 ```
-rmdir /s /q DorkEye
+rmdir /s /q MappingExpo
 ```
 
 **Remove only the virtual environment:**
 
 ```
-rm -rf dorkeye_env
+rm -rf mappingexpo_env
 ```
 
 **If installed in CLI mode (source):**
 
 ```
-pip uninstall dorkeye
+pip uninstall mappingexpo
 ```
 
 -----
@@ -294,8 +294,8 @@ Please include:
 - ✔ Python 3.9+
 - ✔ Virtual environment active
 - ✔ Dependencies installed (`pip install -r requirements.txt`)
-- ✔ `python dorkeye.py -h` shows help
-- ✔ `python dorkeye.py --create-config` creates config
+- ✔ `python mappingexpo.py -h` shows help
+- ✔ `python mappingexpo.py --create-config` creates config
 - ✔ Test search works (`-d "test" -c 5 -o test.html`)
 - ✔ Dork generator works (`--dg=all -c 5 -o dg_test.html`)
 - ✔ Wizard launches (`--wizard`)
@@ -304,4 +304,4 @@ Please include:
 
 ## 🎯 Installation Complete
 
-DorkEye is ready! Happy hunting. 🔍
+MappingExpo is ready! Happy hunting. 🔍

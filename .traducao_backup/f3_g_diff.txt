@@ -1,0 +1,764 @@
+README.md L5    | - ![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=22&pause=1200&color=39FF14&background=000000&center=true&vCenter=t
+            | + ![Typing SVG](https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=600&size=22&pause=1200&color=39FF14&background=000000&center=true&vCenter=t
+README.md L67   | - | **Base sólida** | Herda maturidade técnica do DorkEye original |
+            | + | **Base sólida** | Herda maturidade técnica do MappingExpo original |
+requirements.txt L1    | - # DorkEye Requirements
+            | + # MappingExpo Requirements
+requirements.txt L6    | - # in dorkeye.py and Tools/dorkeye_analyze.py (not only as a dependency of requests)
+            | + # in mappingexpo.py and Tools/mappingexpo_analyze.py (not only as a dependency of requests)
+requirements.txt L28   | - # Required only if you use: python dorkeye.py --ui
+            | + # Required only if you use: python mappingexpo.py --ui
+.gitignore L2    | - # DorkEye .gitignore
+            | + # MappingExpo .gitignore
+http_fingerprints.json L3    | -     "name": "DorkEye Advanced HTTP Fingerprints",
+            | +     "name": "MappingExpo Advanced HTTP Fingerprints",
+.github\ISSUE_TEMPLATE\bug_report.md L3    | - about: Create a report to help us improve DorkEye
+            | + about: Create a report to help us improve MappingExpo
+.github\ISSUE_TEMPLATE\bug_report.md L28   | -  - DorkEye Version: [e.g. 1.0.2]
+            | +  - MappingExpo Version: [e.g. 1.0.2]
+.github\ISSUE_TEMPLATE\feature_request.md L3    | - about: Suggest an idea for DorkEye
+            | + about: Suggest an idea for MappingExpo
+.github\workflows\claude-dorkeye.yml L2    | - # 🦅 DorkEye — Claude Code Agent
+            | + # 🦅 MappingExpo — Claude Code Agent
+.github\workflows\claude-dorkeye.yml L5    | - name: 🦅 DorkEye AI Agent
+            | + name: 🦅 MappingExpo AI Agent
+.github\workflows\claude-dorkeye.yml L21   | -   group: dorkeye-ai-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+            | +   group: mappingexpo-ai-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+.github\workflows\claude-dorkeye.yml L46   | -             --append-system-prompt "Sei il Senior Security Auditor di DorkEye. Focus: XSS nei report, SQLi logic, e compatibilità Python 3.8. DDGS DEV
+            | +             --append-system-prompt "Sei il Senior Security Auditor di MappingExpo. Focus: XSS nei report, SQLi logic, e compatibilità Python 3.8. DDGS
+.github\workflows\claude-dorkeye.yml L49   | -             Verifica la sicurezza di dorkeye.py e Tools/dorkeye_analyze.py.
+            | +             Verifica la sicurezza di mappingexpo.py e Tools/mappingexpo_analyze.py.
+.github\workflows\claude-dorkeye.yml L103  | -             --append-system-prompt "Esegui l'audit di DorkEye. Hai a disposizione bandit_summary.json e pip_summary.json per i dati grezzi. Crea una i
+            | +             --append-system-prompt "Esegui l'audit di MappingExpo. Hai a disposizione bandit_summary.json e pip_summary.json per i dati grezzi. Crea u
+.github\workflows\claude-dorkeye.yml L106  | -             1. Controlla gap di confidenza in dorkeye_analyze.py.
+            | +             1. Controlla gap di confidenza in mappingexpo_analyze.py.
+.github\workflows\claude-dorkeye.yml L107  | -             2. Verifica sanitizzazione XSS in dorkeye_report.py.
+            | +             2. Verifica sanitizzazione XSS in mappingexpo_report.py.
+Templates\dorks_templates.yaml L2    | - #  DorkEye | Default Dork Templates
+            | + #  MappingExpo | Default Dork Templates
+Templates\dorks_templates.yaml L7    | - #   required for the DorkEye tool to operate.
+            | + #   required for the MappingExpo tool to operate.
+Templates\dorks_templates.yaml L31   | - #    python dorkeye.py --dg=sqli --mode=soft
+            | + #    python mappingexpo.py --dg=sqli --mode=soft
+Templates\dorks_templates.yaml L32   | - #    python dorkeye.py --dg=cctv --mode=aggressive --stealth
+            | + #    python mappingexpo.py --dg=cctv --mode=aggressive --stealth
+Templates\dorks_templates.yaml L33   | - #    python dorkeye.py --dg=all  --mode=aggressive --stealth
+            | + #    python mappingexpo.py --dg=all  --mode=aggressive --stealth
+Docs\INSTALL.md L3    | - # 📦 DorkEye — Installation Guide
+            | + # 📦 MappingExpo — Installation Guide
+Docs\INSTALL.md L29   | - 1. [Updating DorkEye](#-updating-dorkeye)
+            | + 1. [Updating MappingExpo](#-updating-mappingexpo)
+Docs\INSTALL.md L44   | - > **Note:** `git` is only required for source installation. If you install via `pip install dorkeye`, you only need Python and pip.
+            | + > **Note:** `git` is only required for source installation. If you install via `pip install mappingexpo`, you only need Python and pip.
+Docs\INSTALL.md L53   | - **Key Python Dependencies** (installed automatically via `pip install dorkeye` or `requirements.txt`):
+            | + **Key Python Dependencies** (installed automatically via `pip install mappingexpo` or `requirements.txt`):
+Docs\INSTALL.md L63   | - - `dorkeye_agents.py` in `Tools/` — Enables `--analyze` and `--crawl` features
+            | + - `mappingexpo_agents.py` in `Tools/` — Enables `--analyze` and `--crawl` features
+Docs\INSTALL.md L75   | - cd DorkEye
+            | + cd MappingExpo
+Docs\INSTALL.md L78   | - python3 -m venv dorkeye_env
+            | + python3 -m venv mappingexpo_env
+Docs\INSTALL.md L82   | - source dorkeye_env/bin/activate
+            | + source mappingexpo_env/bin/activate
+Docs\INSTALL.md L85   | - # dorkeye_env\Scripts\activate
+            | + # mappingexpo_env\Scripts\activate
+Docs\INSTALL.md L94   | - python dorkeye.py -h
+            | + python mappingexpo.py -h
+Docs\INSTALL.md L101  | - DorkEye auto-detects Termux and activates battery-saver mode (reduced timeouts, fewer probe samples). No additional flags needed.
+            | + MappingExpo auto-detects Termux and activates battery-saver mode (reduced timeouts, fewer probe samples). No additional flags needed.
+Docs\INSTALL.md L112  | - cd DorkEye
+            | + cd MappingExpo
+Docs\INSTALL.md L115  | - python -m venv dorkeye_env
+            | + python -m venv mappingexpo_env
+Docs\INSTALL.md L116  | - source dorkeye_env/bin/activate
+            | + source mappingexpo_env/bin/activate
+Docs\INSTALL.md L123  | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\INSTALL.md L126  | - 💡 On Termux, DorkEye automatically:
+            | + 💡 On Termux, MappingExpo automatically:
+Docs\INSTALL.md L140  | - python dorkeye.py -h
+            | + python mappingexpo.py -h
+Docs\INSTALL.md L143  | - python dorkeye.py --create-config
+            | + python mappingexpo.py --create-config
+Docs\INSTALL.md L146  | - python dorkeye.py -d "python programming" -c 5 -o test.html
+            | + python mappingexpo.py -d "python programming" -c 5 -o test.html
+Docs\INSTALL.md L149  | - python dorkeye.py --dg=all --mode=soft -c 5 -o dg_test.html
+            | + python mappingexpo.py --dg=all --mode=soft -c 5 -o dg_test.html
+Docs\INSTALL.md L152  | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\INSTALL.md L159  | - DorkEye/
+            | + MappingExpo/
+Docs\INSTALL.md L160  | - ├── dorkeye.py                  # Main script
+            | + ├── mappingexpo.py                  # Main script
+Docs\INSTALL.md L164  | - ├── dorkeye_config.yaml         # Config (generated with --create-config)
+            | + ├── mappingexpo_config.yaml         # Config (generated with --create-config)
+Docs\INSTALL.md L168  | - │   ├── dorkeye_agents.py       # Analysis + Crawl agents (--analyze, --crawl)
+            | + │   ├── mappingexpo_agents.py       # Analysis + Crawl agents (--analyze, --crawl)
+Docs\INSTALL.md L169  | - │   ├── dorkeye_analyze.py      # Standalone analysis script (executable directly)
+            | + │   ├── mappingexpo_analyze.py      # Standalone analysis script (executable directly)
+Docs\INSTALL.md L170  | - │   └── dorkeye_patterns.py     # Pattern matching utilities
+            | + │   └── mappingexpo_patterns.py     # Pattern matching utilities
+Docs\INSTALL.md L198  | - python3 -m venv dorkeye_env
+            | + python3 -m venv mappingexpo_env
+Docs\INSTALL.md L199  | - source dorkeye_env/bin/activate
+            | + source mappingexpo_env/bin/activate
+Docs\INSTALL.md L211  | - python dorkeye.py --dg=sqli --templates=dorks_templates.yaml
+            | + python mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
+Docs\INSTALL.md L214  | - python dorkeye.py --dg=sqli --templates dorks_templates.yaml
+            | + python mappingexpo.py --dg=sqli --templates dorks_templates.yaml
+Docs\INSTALL.md L217  | - ### `dorkeye_agents.py not found` warning
+            | + ### `mappingexpo_agents.py not found` warning
+Docs\INSTALL.md L219  | - The `--analyze` and `--crawl` features require `dorkeye_agents.py` in the `Tools/` directory. If missing, DorkEye runs normally but these features are
+            | + The `--analyze` and `--crawl` features require `mappingexpo_agents.py` in the `Tools/` directory. If missing, MappingExpo runs normally but these feat
+Docs\INSTALL.md L229  | - If `http_fingerprints.json` is missing or malformed, DorkEye falls back to basic User-Agent rotation. Re-download the file from the repository.
+            | + If `http_fingerprints.json` is missing or malformed, MappingExpo falls back to basic User-Agent rotation. Re-download the file from the repository.
+Docs\INSTALL.md L233  | - DorkEye disables SSL verification for maximum compatibility during OSINT scanning. `InsecureRequestWarning` messages are suppressed automatically.
+            | + MappingExpo disables SSL verification for maximum compatibility during OSINT scanning. `InsecureRequestWarning` messages are suppressed automatically.
+Docs\INSTALL.md L237  | - ## 🔄 Updating DorkEye
+            | + ## 🔄 Updating MappingExpo
+Docs\INSTALL.md L242  | - cd DorkEye
+            | + cd MappingExpo
+Docs\INSTALL.md L251  | - rm -rf DorkEye
+            | + rm -rf MappingExpo
+Docs\INSTALL.md L257  | - rmdir /s /q DorkEye
+            | + rmdir /s /q MappingExpo
+Docs\INSTALL.md L263  | - rm -rf dorkeye_env
+            | + rm -rf mappingexpo_env
+Docs\INSTALL.md L269  | - pip uninstall dorkeye
+            | + pip uninstall mappingexpo
+Docs\INSTALL.md L297  | - - ✔ `python dorkeye.py -h` shows help
+            | + - ✔ `python mappingexpo.py -h` shows help
+Docs\INSTALL.md L298  | - - ✔ `python dorkeye.py --create-config` creates config
+            | + - ✔ `python mappingexpo.py --create-config` creates config
+Docs\INSTALL.md L307  | - DorkEye is ready! Happy hunting. 🔍
+            | + MappingExpo is ready! Happy hunting. 🔍
+Docs\REPORT_HTML.md L3    | - # DorkEye — HTML Report Interface
+            | + # MappingExpo — HTML Report Interface
+Docs\REPORT_HTML.md L36   | - The HTML report is a **fully interactive, self-contained single-file** dashboard generated at the end of every DorkEye scan. It embeds all result data
+            | + The HTML report is a **fully interactive, self-contained single-file** dashboard generated at the end of every MappingExpo scan. It embeds all result 
+Docs\REPORT_HTML.md L87   | -   <h1>■ DorkEye | Report _</h1>
+            | +   <h1>■ MappingExpo | Report _</h1>
+Docs\REPORT_HTML.md L88   | -   <div class="subtitle">→ Generated: YYYY-MM-DD HH:MM:SS | xploits3c.github.io/DorkEye</div>
+            | +   <div class="subtitle">→ Generated: YYYY-MM-DD HH:MM:SS | xploits3c.github.io/MappingExpo</div>
+Docs\REPORT_HTML.md L482  | - DorkEyeEnhanced.results[]
+            | + MappingExpoEnhanced.results[]
+Docs\REPORT_HTML.md L525  | - *DorkEye v4.6 — For authorized security research only.*
+            | + *MappingExpo v4.6 — For authorized security research only.*
+Docs\USAGE.md L3    | - # DorkEye — Complete Usage Reference
+            | + # MappingExpo — Complete Usage Reference
+Docs\USAGE.md L9    | - __H__       xploits3c.github.io/DorkEye
+            | + __H__       xploits3c.github.io/MappingExpo
+Docs\USAGE.md L12   | -  [;]    DorkEye Project
+            | +  [;]    MappingExpo Project
+Docs\USAGE.md L38   | - python3 dorkeye.py [OPTIONS]
+            | + python3 mappingexpo.py [OPTIONS]
+Docs\USAGE.md L41   | - DorkEye operates in **five distinct modes**, each triggered by different flags:
+            | + MappingExpo operates in **five distinct modes**, each triggered by different flags:
+Docs\USAGE.md L64   | - python3 dorkeye.py --wizard
+            | + python3 mappingexpo.py --wizard
+Docs\USAGE.md L85   | - python3 dorkeye.py -d "inurl:admin filetype:php" -o output.html
+            | + python3 mappingexpo.py -d "inurl:admin filetype:php" -o output.html
+Docs\USAGE.md L88   | - python3 dorkeye.py -d dorks.txt -c 100 -o output.json
+            | + python3 mappingexpo.py -d dorks.txt -c 100 -o output.json
+Docs\USAGE.md L102  | - python3 dorkeye.py -u "https://example.com/page.php?id=1" --sqli
+            | + python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli
+Docs\USAGE.md L105  | - python3 dorkeye.py -u "https://target.com/search?q=test" --xss
+            | + python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
+Docs\USAGE.md L108  | - python3 dorkeye.py -u "https://example.com/page.php?id=1" --sqli --xss --stealth -o result.json
+            | + python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli --xss --stealth -o result.json
+Docs\USAGE.md L128  | - python3 dorkeye.py -f Dump/results.json --sqli -o retest.json
+            | + python3 mappingexpo.py -f Dump/results.json --sqli -o retest.json
+Docs\USAGE.md L131  | - python3 dorkeye.py -f Dump/results.json --xss --xss-type=reflected -o xss_retest.json
+            | + python3 mappingexpo.py -f Dump/results.json --xss --xss-type=reflected -o xss_retest.json
+Docs\USAGE.md L134  | - python3 dorkeye.py -f Dump/results.json --analyze -o reanalyzed.json
+            | + python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
+Docs\USAGE.md L137  | - python3 dorkeye.py -f Dump/results.json --sqli --xss --analyze --crawl -o full_retest.json
+            | + python3 mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full_retest.json
+Docs\USAGE.md L142  | - - `.json` — DorkEye JSON output (supports both `{"results": [...]}` and raw `[...]`)
+            | + - `.json` — MappingExpo JSON output (supports both `{"results": [...]}` and raw `[...]`)
+Docs\USAGE.md L155  | - python3 dorkeye.py -d dorks.txt -o results.json
+            | + python3 mappingexpo.py -d dorks.txt -o results.json
+Docs\USAGE.md L156  | - python3 dorkeye.py -d dorks.txt -o report.html
+            | + python3 mappingexpo.py -d dorks.txt -o report.html
+Docs\USAGE.md L157  | - python3 dorkeye.py -d dorks.txt -o export.csv
+            | + python3 mappingexpo.py -d dorks.txt -o export.csv
+Docs\USAGE.md L158  | - python3 dorkeye.py -d dorks.txt -o links.txt
+            | + python3 mappingexpo.py -d dorks.txt -o links.txt
+Docs\USAGE.md L168  | - If `-o` is omitted, DorkEye auto-generates `report_YYYYMMDD_HHMMSS.html`.
+            | + If `-o` is omitted, MappingExpo auto-generates `report_YYYYMMDD_HHMMSS.html`.
+Docs\USAGE.md L179  | - python3 dorkeye.py -d dorks.txt -c 200 -o output.html
+            | + python3 mappingexpo.py -d dorks.txt -c 200 -o output.html
+Docs\USAGE.md L186  | - - DorkEye automatically applies extended delays every 100 results (configurable)
+            | + - MappingExpo automatically applies extended delays every 100 results (configurable)
+Docs\USAGE.md L195  | - python3 dorkeye.py -d dorks.txt --config custom_config.yaml -o scan.json
+            | + python3 mappingexpo.py -d dorks.txt --config custom_config.yaml -o scan.json
+Docs\USAGE.md L206  | - Writes a sample `dorkeye_config.yaml` to disk.
+            | + Writes a sample `mappingexpo_config.yaml` to disk.
+Docs\USAGE.md L209  | - python3 dorkeye.py --create-config
+            | + python3 mappingexpo.py --create-config
+Docs\USAGE.md L223  | - python3 dorkeye.py -d dorks.txt --stealth -o stealth_scan.html
+            | + python3 mappingexpo.py -d dorks.txt --stealth -o stealth_scan.html
+Docs\USAGE.md L242  | - python3 dorkeye.py -d dorks.txt --no-fingerprint -o output.html
+            | + python3 mappingexpo.py -d dorks.txt --no-fingerprint -o output.html
+Docs\USAGE.md L245  | - By default, DorkEye loads `http_fingerprints.json` and rotates full browser profiles (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fetch-
+            | + By default, MappingExpo loads `http_fingerprints.json` and rotates full browser profiles (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fe
+Docs\USAGE.md L254  | - python3 dorkeye.py -d dorks.txt --no-analyze -o fast_scan.txt
+            | + python3 mappingexpo.py -d dorks.txt --no-analyze -o fast_scan.txt
+Docs\USAGE.md L269  | - python3 dorkeye.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.html
+            | + python3 mappingexpo.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.html
+Docs\USAGE.md L279  | - python3 dorkeye.py -d "site:target.com" --whitelist .pdf .xls .docx -o documents.html
+            | + python3 mappingexpo.py -d "site:target.com" --whitelist .pdf .xls .docx -o documents.html
+Docs\USAGE.md L294  | - python3 dorkeye.py -d "inurl:search?q=" --xss -o xss_scan.html
+            | + python3 mappingexpo.py -d "inurl:search?q=" --xss -o xss_scan.html
+Docs\USAGE.md L297  | - python3 dorkeye.py -d dorks.txt --sqli --xss -o full_scan.json
+            | + python3 mappingexpo.py -d dorks.txt --sqli --xss -o full_scan.json
+Docs\USAGE.md L300  | - python3 dorkeye.py -u "https://target.com/search?q=test" --xss
+            | + python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
+Docs\USAGE.md L303  | - python3 dorkeye.py -f Dump/results.json --xss -o xss_retest.json
+            | + python3 mappingexpo.py -f Dump/results.json --xss -o xss_retest.json
+Docs\USAGE.md L313  | - python3 dorkeye.py -d dorks.txt --xss --xss-type=reflected -o reflected.json
+            | + python3 mappingexpo.py -d dorks.txt --xss --xss-type=reflected -o reflected.json
+Docs\USAGE.md L314  | - python3 dorkeye.py -d dorks.txt --xss --xss-type=stored    -o stored.json
+            | + python3 mappingexpo.py -d dorks.txt --xss --xss-type=stored    -o stored.json
+Docs\USAGE.md L315  | - python3 dorkeye.py -d dorks.txt --xss --xss-type=dom       -o dom.json
+            | + python3 mappingexpo.py -d dorks.txt --xss --xss-type=dom       -o dom.json
+Docs\USAGE.md L316  | - python3 dorkeye.py -d dorks.txt --xss --xss-type=all       -o full_xss.json
+            | + python3 mappingexpo.py -d dorks.txt --xss --xss-type=all       -o full_xss.json
+Docs\USAGE.md L430  | - python3 dorkeye.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
+            | + python3 mappingexpo.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
+Docs\USAGE.md L492  | - python3 dorkeye.py --dg
+            | + python3 mappingexpo.py --dg
+Docs\USAGE.md L495  | - python3 dorkeye.py --dg=sqli
+            | + python3 mappingexpo.py --dg=sqli
+Docs\USAGE.md L496  | - python3 dorkeye.py --dg=backups
+            | + python3 mappingexpo.py --dg=backups
+Docs\USAGE.md L497  | - python3 dorkeye.py --dg=sensitive
+            | + python3 mappingexpo.py --dg=sensitive
+Docs\USAGE.md L498  | - python3 dorkeye.py --dg=admin
+            | + python3 mappingexpo.py --dg=admin
+Docs\USAGE.md L501  | - python3 dorkeye.py --dg=all
+            | + python3 mappingexpo.py --dg=all
+Docs\USAGE.md L508  | - python3 dorkeye.py --dg=sqli --sqli --xss --mode=aggressive -o report.html
+            | + python3 mappingexpo.py --dg=sqli --sqli --xss --mode=aggressive -o report.html
+Docs\USAGE.md L524  | - python3 dorkeye.py --dg=all --mode=aggressive -o results.json
+            | + python3 mappingexpo.py --dg=all --mode=aggressive -o results.json
+Docs\USAGE.md L535  | - python3 dorkeye.py --dg=sqli --templates=dorks_templates.yaml
+            | + python3 mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
+Docs\USAGE.md L538  | - python3 dorkeye.py --dg=all --templates=all
+            | + python3 mappingexpo.py --dg=all --templates=all
+Docs\USAGE.md L541  | - python3 dorkeye.py --dg=backups --templates=dorks_templates_research.yaml
+            | + python3 mappingexpo.py --dg=backups --templates=dorks_templates_research.yaml
+Docs\USAGE.md L551  | - python3 dorkeye.py --dg=all --dg-max=10000 -o big_scan.json
+            | + python3 mappingexpo.py --dg=all --dg-max=10000 -o big_scan.json
+Docs\USAGE.md L560  | - The analysis pipeline is powered by `dorkeye_agents.py` and runs autonomous post-search analysis: triage, page fetching, secrets detection, and report
+            | + The analysis pipeline is powered by `mappingexpo_agents.py` and runs autonomous post-search analysis: triage, page fetching, secrets detection, and re
+Docs\USAGE.md L568  | - python3 dorkeye.py -d dorks.txt -o results.json --analyze
+            | + python3 mappingexpo.py -d dorks.txt -o results.json --analyze
+Docs\USAGE.md L571  | - python3 dorkeye.py -f Dump/results.json --analyze -o reanalyzed.json
+            | + python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
+Docs\USAGE.md L588  | - python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fetch
+            | + python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fetch
+Docs\USAGE.md L598  | - python3 dorkeye.py --dg=sqli -o results.json --analyze --analyze-fetch --analyze-fetch-max=5000
+            | + python3 mappingexpo.py --dg=sqli -o results.json --analyze --analyze-fetch --analyze-fetch-max=5000
+Docs\USAGE.md L615  | - python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
+            | + python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
+Docs\USAGE.md L625  | - python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-out=custom_report.html
+            | + python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-out=custom_report.html
+Docs\USAGE.md L641  | - python3 dorkeye.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+            | + python3 mappingexpo.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+Docs\USAGE.md L651  | - python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
+            | + python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
+Docs\USAGE.md L659  | - python3 dorkeye.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
+            | + python3 mappingexpo.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
+Docs\USAGE.md L667  | - python3 dorkeye.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
+            | + python3 mappingexpo.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
+Docs\USAGE.md L677  | - python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
+            | + python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
+Docs\USAGE.md L685  | - python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.json
+            | + python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.json
+Docs\USAGE.md L693  | - python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report.html -o crawl.json
+            | + python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report.html -o crawl.json
+Docs\USAGE.md L702  | - DorkEye supports graceful interrupt handling throughout all operations:
+            | + MappingExpo supports graceful interrupt handling throughout all operations:
+Docs\USAGE.md L717  | - DorkEye auto-detects Termux on Android and activates battery-saver mode:
+            | + MappingExpo auto-detects Termux on Android and activates battery-saver mode:
+Docs\USAGE.md L735  | - python3 dorkeye.py -d dorks.txt --stealth --sqli --xss -c 150 -o pro_scan.json --analyze --analyze-fetch
+            | + python3 mappingexpo.py -d dorks.txt --stealth --sqli --xss -c 150 -o pro_scan.json --analyze --analyze-fetch
+Docs\USAGE.md L741  | - python3 dorkeye.py -d "inurl:search?q=" --xss --xss-type=reflected --stealth -o xss_reflected.html
+            | + python3 mappingexpo.py -d "inurl:search?q=" --xss --xss-type=reflected --stealth -o xss_reflected.html
+Docs\USAGE.md L747  | - python3 dorkeye.py --dg=all --mode=aggressive --sqli --xss -c 80 -o full_scan.json
+            | + python3 mappingexpo.py --dg=all --mode=aggressive --sqli --xss -c 80 -o full_scan.json
+Docs\USAGE.md L753  | - python3 dorkeye.py -d dorks.txt --no-analyze -c 200 -o recon.txt
+            | + python3 mappingexpo.py -d dorks.txt --no-analyze -c 200 -o recon.txt
+Docs\USAGE.md L759  | - python3 dorkeye.py -d "site:.gov" --whitelist .pdf .docx .xlsx -o docs.html
+            | + python3 mappingexpo.py -d "site:.gov" --whitelist .pdf .docx .xlsx -o docs.html
+Docs\USAGE.md L765  | - python3 dorkeye.py \
+            | + python3 mappingexpo.py \
+Docs\USAGE.md L783  | - python3 dorkeye.py -f Dump/old_results.json --sqli --xss --analyze --crawl -o retested.json
+            | + python3 mappingexpo.py -f Dump/old_results.json --sqli --xss --analyze --crawl -o retested.json
+Docs\USAGE.md L789  | - python3 dorkeye.py -u "https://target.com/item.php?id=42" --sqli --xss --stealth -o direct_test.json
+            | + python3 mappingexpo.py -u "https://target.com/item.php?id=42" --sqli --xss --stealth -o direct_test.json
+Docs\USAGE.md L795  | - python3 dorkeye_analyze.py Dump/results.json --fetch --fmt=html
+            | + python3 mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
+Docs\USAGE.md L813  | - | `--create-config` | flag | — | Generate sample `dorkeye_config.yaml` |
+            | + | `--create-config` | flag | — | Generate sample `mappingexpo_config.yaml` |
+Docs\agents.md L3    | - # AI Agents | DorkEye Project
+            | + # AI Agents | MappingExpo Project
+Docs\agents.md L13   | - python dorkeye.py -d "site:example.com" -o results.json
+            | + python mappingexpo.py -d "site:example.com" -o results.json
+Docs\agents.md L16   | - python dorkeye.py -d "site:example.com" -o results.json --analyze
+            | + python mappingexpo.py -d "site:example.com" -o results.json --analyze
+Docs\agents.md L19   | - python dorkeye.py -d "site:example.com" -o results.json --analyze --analyze-fetch
+            | + python mappingexpo.py -d "site:example.com" -o results.json --analyze --analyze-fetch
+Docs\agents.md L22   | - python dorkeye_agents.py Dump/results.json --analyze-fetch --analyze-fmt html
+            | + python mappingexpo_agents.py Dump/results.json --analyze-fetch --analyze-fmt html
+Docs\agents.md L40   | - | 10 | **LLM Analysis** | All triaged results | `analysis` dict (optional — requires `dorkeye_llm_plugin.py`) |
+            | + | 10 | **LLM Analysis** | All triaged results | `analysis` dict (optional — requires `mappingexpo_llm_plugin.py`) |
+Docs\agents.md L137  | - --security-quarantine          # Save blocked content to dorkeye_quarantine/
+            | + --security-quarantine          # Save blocked content to mappingexpo_quarantine/
+Docs\agents.md L175  | - from dorkeye_agents import security_scan_hook, get_security_agent
+            | + from mappingexpo_agents import security_scan_hook, get_security_agent
+Docs\agents.md L183  | - agent = get_security_agent(mode="active", quarantine_dir="dorkeye_quarantine")
+            | + agent = get_security_agent(mode="active", quarantine_dir="mappingexpo_quarantine")
+Docs\agents.md L395  | - **Location:** `DorkEye/Tools/db_portscan.py`
+            | + **Location:** `MappingExpo/Tools/db_portscan.py`
+Docs\agents.md L546  | - report = agent.run(results)          # results: list[dict] from DorkEye pipeline
+            | + report = agent.run(results)          # results: list[dict] from MappingExpo pipeline
+Docs\agents.md L572  | -   "meta":       { "generated_at": "...", "target": "...", "engine": "DorkEye + Agents" },
+            | +   "meta":       { "generated_at": "...", "target": "...", "engine": "MappingExpo + Agents" },
+Docs\agents.md L589  | - `dorkeye_agents.py` can run directly on any existing DorkEye result file:
+            | + `mappingexpo_agents.py` can run directly on any existing MappingExpo result file:
+Docs\agents.md L593  | - python dorkeye_agents.py Dump/results.json
+            | + python mappingexpo_agents.py Dump/results.json
+Docs\agents.md L596  | - python dorkeye_agents.py Dump/results.json --analyze-fetch --analyze-fetch-max 50
+            | + python mappingexpo_agents.py Dump/results.json --analyze-fetch --analyze-fetch-max 50
+Docs\agents.md L599  | - python dorkeye_agents.py Dump/results.json \
+            | + python mappingexpo_agents.py Dump/results.json \
+Docs\agents.md L603  | - python dorkeye_agents.py Dump/results.json --target "example.com" --analyze-fetch
+            | + python mappingexpo_agents.py Dump/results.json --target "example.com" --analyze-fetch
+Docs\agents.md L606  | - python dorkeye_agents.py Dump/results.json --analyze-no-llm-triage
+            | + python mappingexpo_agents.py Dump/results.json --analyze-no-llm-triage
+Docs\agents.md L609  | - python dorkeye_agents.py Dump/results.json --analyze-fetch --dbscan --dbscan-stealth
+            | + python mappingexpo_agents.py Dump/results.json --analyze-fetch --dbscan --dbscan-stealth
+Docs\cli.md L3    | - # CLI Reference — DorkEye Project
+            | + # CLI Reference — MappingExpo Project
+Docs\cli.md L17   | - |`-f FILE`, `--file`|str |Load saved DorkEye results (`.json` or `.txt`) for re-processing                  |
+            | + |`-f FILE`, `--file`|str |Load saved MappingExpo results (`.json` or `.txt`) for re-processing                  |
+Docs\cli.md L19   | - |`--create-config`  |bool|Write sample `dorkeye_config.yaml` to disk and exit                               |
+            | + |`--create-config`  |bool|Write sample `mappingexpo_config.yaml` to disk and exit                               |
+Docs\cli.md L40   | - |`--create-config`|Generate sample `dorkeye_config.yaml` and exit                 |
+            | + |`--create-config`|Generate sample `mappingexpo_config.yaml` and exit                 |
+Docs\cli.md L142  | - Requires `dorkeye_agents.py` in `Tools/`. If missing, `--analyze` and `--crawl` are silently disabled.
+            | + Requires `mappingexpo_agents.py` in `Tools/`. If missing, `--analyze` and `--crawl` are silently disabled.
+Docs\cli.md L168  | - ### Integrated flags (via `dorkeye.py`)
+            | + ### Integrated flags (via `mappingexpo.py`)
+Docs\cli.md L181  | - |`results_file`|*(required)*|DorkEye `.json` results file                          |
+            | + |`results_file`|*(required)*|MappingExpo `.json` results file                          |
+Docs\cli.md L226  | - that wraps the full `dorkeye.py` pipeline in a browser UI.
+            | + that wraps the full `mappingexpo.py` pipeline in a browser UI.
+Docs\cli.md L228  | - ### Flags (via `dorkeye.py`)
+            | + ### Flags (via `mappingexpo.py`)
+Docs\cli.md L235  | - ### Standalone (`python Tools/dorkeye_web.py`)
+            | + ### Standalone (`python Tools/mappingexpo_web.py`)
+Docs\cli.md L322  | - - Requires `dorkeye_agents.py` in `Tools/` — otherwise silently skipped
+            | + - Requires `mappingexpo_agents.py` in `Tools/` — otherwise silently skipped
+Docs\cli.md L333  | - When `-o` ends in `.json` and `--analyze` is **not** explicitly set, DorkEye displays an interactive prompt:
+            | + When `-o` ends in `.json` and `--analyze` is **not** explicitly set, MappingExpo displays an interactive prompt:
+Docs\cli.md L379  | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\cli.md L382  | - python dorkeye.py --ui
+            | + python mappingexpo.py --ui
+Docs\cli.md L383  | - python dorkeye.py --ui --port 9090
+            | + python mappingexpo.py --ui --port 9090
+Docs\cli.md L384  | - python Tools/dorkeye_web.py --port 9090 --no-browser
+            | + python Tools/mappingexpo_web.py --port 9090 --no-browser
+Docs\cli.md L387  | - python dorkeye.py -d "site:example.com filetype:pdf" -o results.html
+            | + python mappingexpo.py -d "site:example.com filetype:pdf" -o results.html
+Docs\cli.md L388  | - python dorkeye.py -d dorks.txt -c 100 -o results.json
+            | + python mappingexpo.py -d dorks.txt -c 100 -o results.json
+Docs\cli.md L389  | - python dorkeye.py -d "inurl:.php?id=" --sqli --stealth -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli --stealth -o results.json
+Docs\cli.md L390  | - python dorkeye.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+Docs\cli.md L391  | - python dorkeye.py -d dorks.txt --analyze --analyze-fetch -o results.json
+            | + python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
+Docs\cli.md L392  | - python dorkeye.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # full pipeline
+            | + python mappingexpo.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # full pipeline
+Docs\cli.md L395  | - python dorkeye.py --dg=all
+            | + python mappingexpo.py --dg=all
+Docs\cli.md L396  | - python dorkeye.py --dg=sqli --mode=medium --sqli -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
+Docs\cli.md L397  | - python dorkeye.py --dg=all --mode=aggressive --dg-max=10000 -o results.json
+            | + python mappingexpo.py --dg=all --mode=aggressive --dg-max=10000 -o results.json
+Docs\cli.md L398  | - python dorkeye.py --dg=sqli --sqli --xss --analyze --analyze-fetch -o results.json
+            | + python mappingexpo.py --dg=sqli --sqli --xss --analyze --analyze-fetch -o results.json
+Docs\cli.md L401  | - python dorkeye.py -u "https://target.com/page.php?id=1"
+            | + python mappingexpo.py -u "https://target.com/page.php?id=1"
+Docs\cli.md L402  | - python dorkeye.py -u "https://target.com/page.php?id=1" --sqli --xss --stealth -o out.json
+            | + python mappingexpo.py -u "https://target.com/page.php?id=1" --sqli --xss --stealth -o out.json
+Docs\cli.md L403  | - python dorkeye.py -u "https://target.com/page.php?id=1" --xss --xss-type reflected -o out.json
+            | + python mappingexpo.py -u "https://target.com/page.php?id=1" --xss --xss-type reflected -o out.json
+Docs\cli.md L406  | - python dorkeye.py -f Dump/results.json --sqli -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --sqli -o retest.json
+Docs\cli.md L407  | - python dorkeye.py -f Dump/results.json --sqli --xss -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --sqli --xss -o retest.json
+Docs\cli.md L408  | - python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o reanalysis.json
+            | + python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o reanalysis.json
+Docs\cli.md L409  | - python dorkeye.py -f Dump/results.json --sqli --xss --analyze --crawl -o full.json
+            | + python mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full.json
+Docs\cli.md L410  | - python dorkeye.py -f Dump/results.json --dbscan --dbscan-timeout 3 -o dbscan.json
+            | + python mappingexpo.py -f Dump/results.json --dbscan --dbscan-timeout 3 -o dbscan.json
+Docs\cli.md L413  | - python dorkeye.py -d dorks.txt --dbscan -o results.json
+            | + python mappingexpo.py -d dorks.txt --dbscan -o results.json
+Docs\cli.md L414  | - python dorkeye.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+            | + python mappingexpo.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+Docs\cli.md L421  | - python dorkeye.py -d dorks.txt --xss --xss-type reflected -o results.json
+            | + python mappingexpo.py -d dorks.txt --xss --xss-type reflected -o results.json
+Docs\cli.md L422  | - python dorkeye.py -d dorks.txt --xss --xss-type dom -o results.json
+            | + python mappingexpo.py -d dorks.txt --xss --xss-type dom -o results.json
+Docs\cli.md L425  | - python dorkeye_analyze.py Dump/results.json --fetch --fmt=html
+            | + python mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
+Docs\cli.md L428  | - python dorkeye.py \
+            | + python mappingexpo.py \
+Docs\crawler.md L3    | - # Adaptive Recursive Crawler — DorkEye Project
+            | + # Adaptive Recursive Crawler — MappingExpo Project
+Docs\crawler.md L13   | - python dorkeye.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+            | + python mappingexpo.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+Docs\crawler.md L16   | - python dorkeye.py --dg=sqli --crawl -o crawl.json
+            | + python mappingexpo.py --dg=sqli --crawl -o crawl.json
+Docs\crawler.md L19   | - python dorkeye.py -f Dump/results.json --crawl -o crawl.json
+            | + python mappingexpo.py -f Dump/results.json --crawl -o crawl.json
+Docs\crawler.md L34   | - | `--crawl-out FILE` | auto | Path for the crawl report (default: `dorkeye_crawl_TIMESTAMP.html`) |
+            | + | `--crawl-out FILE` | auto | Path for the crawl report (default: `mappingexpo_crawl_TIMESTAMP.html`) |
+Docs\crawler.md L116  | - python dorkeye.py -d "site:target.com" --sqli --crawl -o results.json
+            | + python mappingexpo.py -d "site:target.com" --sqli --crawl -o results.json
+Docs\crawler.md L119  | - python dorkeye.py -d "site:target.com" \
+            | + python mappingexpo.py -d "site:target.com" \
+Docs\crawler.md L125  | - python dorkeye.py --dg=all --mode=aggressive \
+            | + python mappingexpo.py --dg=all --mode=aggressive \
+Docs\dbscan.md L3    | - # DB Port Scanner — DorkEye
+            | + # DB Port Scanner — MappingExpo
+Docs\dbscan.md L12   | - `db_portscan.py` is a multi-threaded database port scanner integrated into the DorkEye pipeline.
+            | + `db_portscan.py` is a multi-threaded database port scanner integrated into the MappingExpo pipeline.
+Docs\dbscan.md L20   | - **Lives in:** `DorkEye/Tools/db_portscan.py`
+            | + **Lives in:** `MappingExpo/Tools/db_portscan.py`
+Docs\dbscan.md L26   | - ### Integrated (via `dorkeye.py`)
+            | + ### Integrated (via `mappingexpo.py`)
+Docs\dbscan.md L30   | - python dorkeye.py -d dorks.txt --dbscan -o results.json
+            | + python mappingexpo.py -d dorks.txt --dbscan -o results.json
+Docs\dbscan.md L33   | - python dorkeye.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+            | + python mappingexpo.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+Docs\dbscan.md L36   | - python dorkeye.py -f Dump/results.json --dbscan -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --dbscan -o retest.json
+Docs\dbscan.md L39   | - python dorkeye.py \
+            | + python mappingexpo.py \
+Docs\dbscan.md L64   | - ### Integrated flags (via `dorkeye.py`)
+            | + ### Integrated flags (via `mappingexpo.py`)
+Docs\dbscan.md L77   | - |`results_file`|*(required)*|DorkEye `.json` results file                                      |
+            | + |`results_file`|*(required)*|MappingExpo `.json` results file                                      |
+Docs\dbscan.md L201  | - The scanner respects DorkEye’s global interrupt flags:
+            | + The scanner respects MappingExpo’s global interrupt flags:
+Docs\dbscan.md L262  | - # DorkEye DB Port Scan Report
+            | + # MappingExpo DB Port Scan Report
+Docs\dbscan.md L314  | - - The DBScan agent is instantiated by `dorkeye.py` after the main search/analysis pipeline
+            | + - The DBScan agent is instantiated by `mappingexpo.py` after the main search/analysis pipeline
+Docs\dork_generator.md L3    | - # Dork Generator — DorkEye Project
+            | + # Dork Generator — MappingExpo Project
+Docs\dork_generator.md L5    | - The Dork Generator produces structured Google dorks automatically from YAML template files. Instead of writing dorks manually, you define variables an
+            | + The Dork Generator produces structured Google dorks automatically from YAML template files. Instead of writing dorks manually, you define variables an
+Docs\dork_generator.md L13   | - python dorkeye.py --dg=all -o results.html
+            | + python mappingexpo.py --dg=all -o results.html
+Docs\dork_generator.md L16   | - python dorkeye.py --dg=sqli --mode=medium -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium -o results.json
+Docs\dork_generator.md L19   | - python dorkeye.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+            | + python mappingexpo.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+Docs\dork_generator.md L51   | - Templates are YAML files in the `Templates/` folder. DorkEye ships with `dorks_templates.yaml` and `dorks_templates_research.yaml`.
+            | + Templates are YAML files in the `Templates/` folder. MappingExpo ships with `dorks_templates.yaml` and `dorks_templates_research.yaml`.
+Docs\dork_generator.md L119  | - DorkEye caps combinations per template at `--dg-max` (default `800`). When the theoretical total exceeds the cap, it samples randomly without replacem
+            | + MappingExpo caps combinations per template at `--dg-max` (default `800`). When the theoretical total exceeds the cap, it samples randomly without repl
+Docs\dork_generator.md L123  | - python dorkeye.py --dg=all
+            | + python mappingexpo.py --dg=all
+Docs\dork_generator.md L126  | - python dorkeye.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+            | + python mappingexpo.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+Docs\dork_generator.md L135  | - python dorkeye.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+Docs\dork_generator.md L138  | - python dorkeye.py --dg=all --analyze --analyze-fetch -o results.json
+            | + python mappingexpo.py --dg=all --analyze --analyze-fetch -o results.json
+Docs\dork_generator.md L141  | - python dorkeye.py --dg=sqli --crawl --crawl-rounds 5 -o crawl.json
+            | + python mappingexpo.py --dg=sqli --crawl --crawl-rounds 5 -o crawl.json
+Docs\dork_generator.md L144  | - python dorkeye.py --dg=sqli --mode=aggressive --dg-max 5000 \
+            | + python mappingexpo.py --dg=sqli --mode=aggressive --dg-max 5000 \
+Docs\dork_generator.md L151  | - python dorkeye.py --dg=backups --templates=dorks_templates_research.yaml -o results.json
+            | + python mappingexpo.py --dg=backups --templates=dorks_templates_research.yaml -o results.json
+Docs\dork_generator.md L154  | - python dorkeye.py --dg=all --templates=all -o results.json
+            | + python mappingexpo.py --dg=all --templates=all -o results.json
+Docs\file_categories.md L3    | - # File Categories — DorkEye Project
+            | + # File Categories — MappingExpo Project
+Docs\file_categories.md L5    | - DorkEye automatically categorizes every URL it finds by examining the file extension. Categories drive filtering in the HTML report, export scopes, an
+            | + MappingExpo automatically categorizes every URL it finds by examining the file extension. Categories drive filtering in the HTML report, export scopes
+Docs\file_categories.md L31   | - python dorkeye.py -d "site:example.com" --whitelist .php .asp .aspx .jsp -o scripts.json
+            | + python mappingexpo.py -d "site:example.com" --whitelist .php .asp .aspx .jsp -o scripts.json
+Docs\file_categories.md L34   | - python dorkeye.py -d "site:example.com" --whitelist .pdf .doc .docx .xls .xlsx -o docs.json
+            | + python mappingexpo.py -d "site:example.com" --whitelist .pdf .doc .docx .xls .xlsx -o docs.json
+Docs\file_categories.md L37   | - python dorkeye.py -d "site:example.com" --whitelist .env .git .htpasswd .yaml .conf -o sensitive.json
+            | + python mappingexpo.py -d "site:example.com" --whitelist .env .git .htpasswd .yaml .conf -o sensitive.json
+Docs\file_categories.md L44   | - python dorkeye.py -d "site:example.com" --blacklist .jpg .jpeg .png .gif .svg .mp4 .mp3
+            | + python mappingexpo.py -d "site:example.com" --blacklist .jpg .jpeg .png .gif .svg .mp4 .mp3
+Docs\file_categories.md L47   | - python dorkeye.py -d "site:example.com" --blacklist .zip .rar .tar .gz .7z
+            | + python mappingexpo.py -d "site:example.com" --blacklist .zip .rar .tar .gz .7z
+Docs\file_categories.md L54   | - python dorkeye.py -d "site:example.com" --whitelist .php --blacklist .svg .css .js -o php_only.json
+            | + python mappingexpo.py -d "site:example.com" --whitelist .php --blacklist .svg .css .js -o php_only.json
+Docs\file_categories.md L77   | - Edit `dorkeye_config.yaml` to add or remove extensions from any category:
+            | + Edit `mappingexpo_config.yaml` to add or remove extensions from any category:
+Docs\file_categories.md L135  | - python dorkeye.py -d "site:example.com" --config dorkeye_config.yaml -o results.html
+            | + python mappingexpo.py -d "site:example.com" --config mappingexpo_config.yaml -o results.html
+Docs\file_categories.md L141  | - python dorkeye.py --create-config
+            | + python mappingexpo.py --create-config
+Docs\fingerprinting.md L3    | - # HTTP Fingerprinting — DorkEye Project
+            | + # HTTP Fingerprinting — MappingExpo Project
+Docs\fingerprinting.md L5    | - HTTP fingerprinting makes DorkEye's requests look like real browser traffic instead of a Python script. Each request is built from a complete browser 
+            | + HTTP fingerprinting makes MappingExpo's requests look like real browser traffic instead of a Python script. Each request is built from a complete brow
+Docs\fingerprinting.md L11   | - Every HTTP request sent by DorkEye (dork search, file analysis, SQLi testing, page fetch) uses a randomly selected fingerprint that sets:
+            | + Every HTTP request sent by MappingExpo (dork search, file analysis, SQLi testing, page fetch) uses a randomly selected fingerprint that sets:
+Docs\fingerprinting.md L48   | - python dorkeye.py -d dorks.txt --no-fingerprint -o results.html
+            | + python mappingexpo.py -d dorks.txt --no-fingerprint -o results.html
+Docs\fingerprinting.md L51   | - python dorkeye.py -d dorks.txt -o results.html
+            | + python mappingexpo.py -d dorks.txt -o results.html
+Docs\fingerprinting.md L93   | - python dorkeye.py -d dorks.txt --stealth --sqli -o results.json
+            | + python mappingexpo.py -d dorks.txt --stealth --sqli -o results.json
+Docs\http_fingerprints.md L3    | - # DorkEye — HTTP Fingerprints
+            | + # MappingExpo — HTTP Fingerprints
+Docs\http_fingerprints.md L7    | - > **Used by:** `HTTPFingerprintRotator` class in `dorkeye.py`
+            | + > **Used by:** `HTTPFingerprintRotator` class in `mappingexpo.py`
+Docs\http_fingerprints.md L9    | - The fingerprint system makes DorkEye's HTTP requests look like those of real browsers from real users around the world. Instead of sending a generic `
+            | + The fingerprint system makes MappingExpo's HTTP requests look like those of real browsers from real users around the world. Instead of sending a gener
+Docs\http_fingerprints.md L22   | - 8. [How DorkEye Loads and Uses the File](#how-dorkeye-loads-and-uses-the-file)
+            | + 8. [How MappingExpo Loads and Uses the File](#how-mappingexpo-loads-and-uses-the-file)
+Docs\http_fingerprints.md L38   | - A complete HTTP fingerprint makes DorkEye's requests indistinguishable from legitimate browser traffic at the header level.
+            | + A complete HTTP fingerprint makes MappingExpo's requests indistinguishable from legitimate browser traffic at the header level.
+Docs\http_fingerprints.md L63   | -   "name":             "DorkEye Advanced HTTP Fingerprints",
+            | +   "name":             "MappingExpo Advanced HTTP Fingerprints",
+Docs\http_fingerprints.md L247  | - When a header value starts with `@`, DorkEye resolves it by looking up the remainder as a key in `common_headers`. This is handled by `resolve_referen
+            | + When a header value starts with `@`, MappingExpo resolves it by looking up the remainder as a key in `common_headers`. This is handled by `resolve_ref
+Docs\http_fingerprints.md L272  | - ## How DorkEye Loads and Uses the File
+            | + ## How MappingExpo Loads and Uses the File
+Docs\http_fingerprints.md L281  | - `load_http_fingerprints()` reads the JSON file from the same directory as `dorkeye.py`. It detects two modes:
+            | + `load_http_fingerprints()` reads the JSON file from the same directory as `mappingexpo.py`. It detects two modes:
+Docs\http_fingerprints.md L298  | - DorkEye uses `get_random()` in the `SQLiDetector._get()` method so each HTTP request gets a randomly selected fingerprint.
+            | + MappingExpo uses `get_random()` in the `SQLiDetector._get()` method so each HTTP request gets a randomly selected fingerprint.
+Docs\http_fingerprints.md L368  | - The most important header for browser identification. It encodes browser engine, version, OS, and architecture. DorkEye uses only real, currently acti
+            | + The most important header for browser identification. It encodes browser engine, version, OS, and architecture. MappingExpo uses only real, currently 
+Docs\http_fingerprints.md L411  | - What the request is for: `document` = main HTML page, `image`, `script`, `fetch`, etc. DorkEye always uses `document` since it is performing page-leve
+            | + What the request is for: `document` = main HTML page, `image`, `script`, `fetch`, etc. MappingExpo always uses `document` since it is performing page-
+Docs\http_fingerprints.md L415  | - How the request was initiated: `navigate` = user navigation, `cors`, `no-cors`, `same-origin`. DorkEye always uses `navigate`.
+            | + How the request was initiated: `navigate` = user navigation, `cors`, `no-cors`, `same-origin`. MappingExpo always uses `navigate`.
+Docs\http_fingerprints.md L428  | - DorkEye uses both `none` and `cross-site` to simulate both direct navigation and link-following behavior.
+            | + MappingExpo uses both `none` and `cross-site` to simulate both direct navigation and link-following behavior.
+Docs\http_fingerprints.md L492  | - python dorkeye.py -d "your dork" --no-fingerprint
+            | + python mappingexpo.py -d "your dork" --no-fingerprint
+Docs\http_fingerprints.md L497  | - # dorkeye_config.yaml
+            | + # mappingexpo_config.yaml
+Docs\http_fingerprints.md L501  | - **Missing file:** if `http_fingerprints.json` is not found or is invalid, DorkEye logs a warning and falls back to a minimal generic header set (`User
+            | + **Missing file:** if `http_fingerprints.json` is not found or is invalid, MappingExpo logs a warning and falls back to a minimal generic header set (`
+Docs\http_fingerprints.md L503  | - When fingerprinting is disabled, standard User-Agent rotation via `UserAgentRotator` is still active (if `user_agent_rotation: true` in config), provi
+            | + When fingerprinting is disabled, standard User-Agent rotation via `UserAgentRotator` is still active (if `user_agent_rotation: true` in config), provi
+Docs\http_fingerprints.md L507  | - *DorkEye Project — For authorized security research only.*
+            | + *MappingExpo Project — For authorized security research only.*
+Docs\output_formats.md L3    | - # Output Formats — DorkEye Project
+            | + # Output Formats — MappingExpo Project
+Docs\output_formats.md L5    | - All result files are saved to the `Dump/` folder, created automatically in the same directory as `dorkeye.py`.
+            | + All result files are saved to the `Dump/` folder, created automatically in the same directory as `mappingexpo.py`.
+Docs\output_formats.md L12   | - python dorkeye.py -d "site:example.com" -o results.html   # HTML report
+            | + python mappingexpo.py -d "site:example.com" -o results.html   # HTML report
+Docs\output_formats.md L13   | - python dorkeye.py -d "site:example.com" -o results.json   # JSON + analysis prompt
+            | + python mappingexpo.py -d "site:example.com" -o results.json   # JSON + analysis prompt
+Docs\output_formats.md L14   | - python dorkeye.py -d "site:example.com" -o results.csv    # CSV spreadsheet
+            | + python mappingexpo.py -d "site:example.com" -o results.csv    # CSV spreadsheet
+Docs\output_formats.md L15   | - python dorkeye.py -d "site:example.com" -o results.txt    # Plain text
+            | + python mappingexpo.py -d "site:example.com" -o results.txt    # Plain text
+Docs\output_formats.md L18   | - If `-o` is omitted, DorkEye generates: `report_YYYYMMDD_HHMMSS.html`
+            | + If `-o` is omitted, MappingExpo generates: `report_YYYYMMDD_HHMMSS.html`
+Docs\output_formats.md L74   | - python dorkeye.py -d "site:example.com" -o results.json
+            | + python mappingexpo.py -d "site:example.com" -o results.json
+Docs\output_formats.md L77   | - When the output is `.json`, DorkEye prompts after the search:
+            | + When the output is `.json`, MappingExpo prompts after the search:
+Docs\output_formats.md L133  | -   "meta":       { "generated_at": "...", "target": "...", "engine": "DorkEye v4.8 + Agents v3.0" },
+            | +   "meta":       { "generated_at": "...", "target": "...", "engine": "MappingExpo v4.8 + Agents v3.0" },
+Docs\output_formats.md L149  | - python dorkeye.py -d "site:example.com" -o results.csv
+            | + python mappingexpo.py -d "site:example.com" -o results.csv
+Docs\output_formats.md L176  | - python dorkeye.py -d "site:example.com" -o results.txt
+            | + python mappingexpo.py -d "site:example.com" -o results.txt
+Docs\sqli.md L3    | - # SQL Injection | DorkEye Project
+            | + # SQL Injection | MappingExpo Project
+Docs\sqli.md L5    | - DorkEye includes a built-in multi-method SQL injection engine that works on any URL with query parameters — no external tools required.
+            | + MappingExpo includes a built-in multi-method SQL injection engine that works on any URL with query parameters — no external tools required.
+Docs\sqli.md L14   | - python dorkeye.py -d "inurl:.php?id=" --sqli -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.json
+Docs\sqli.md L15   | - python dorkeye.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+Docs\sqli.md L22   | - python dorkeye.py -u "https://example.com/page.php?id=1"
+            | + python mappingexpo.py -u "https://example.com/page.php?id=1"
+Docs\sqli.md L25   | - python dorkeye.py -u "https://example.com/page.php?id=1" --sqli --stealth -o result.json
+            | + python mappingexpo.py -u "https://example.com/page.php?id=1" --sqli --stealth -o result.json
+Docs\sqli.md L31   | - python dorkeye.py -f Dump/results.json --sqli -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --sqli -o retest.json
+Docs\sqli.md L63   | - `http_fingerprints.json` is loaded from the DorkEye root (one level above `Tools/`).
+            | + `http_fingerprints.json` is loaded from the MappingExpo root (one level above `Tools/`).
+Docs\sqli.md L153  | - `dorkeye.py` sets these inside its SIGINT handler after each Ctrl+C. Every internal loop (`_run_interruptible`, `_interruptible_sleep`, payload `for` 
+            | + `mappingexpo.py` sets these inside its SIGINT handler after each Ctrl+C. Every internal loop (`_run_interruptible`, `_interruptible_sleep`, payload `f
+Docs\sqli.md L159  | - DorkEye runs **8 complementary methods** across GET parameters, POST form fields, JSON body keys, and URL path segments.
+            | + MappingExpo runs **8 complementary methods** across GET parameters, POST form fields, JSON body keys, and URL path segments.
+Docs\sqli.md L626  | - python dorkeye.py -d dorks.txt --sqli --stealth -o results.json
+            | + python mappingexpo.py -d dorks.txt --sqli --stealth -o results.json
+Docs\sqli.md L668  | - # Optional progress callback (used by dorkeye.py for the progress bar)
+            | + # Optional progress callback (used by mappingexpo.py for the progress bar)
+Docs\termux.md L1    | - # DorkEye on Termux
+            | + # MappingExpo on Termux
+Docs\termux.md L3    | - > Run the full DorkEye pipeline directly from your Android device.
+            | + > Run the full MappingExpo pipeline directly from your Android device.
+Docs\termux.md L38   | - |`python` |Runtime for DorkEye                           |
+            | + |`python` |Runtime for MappingExpo                           |
+Docs\termux.md L49   | - ### Step 3 — Clone DorkEye
+            | + ### Step 3 — Clone MappingExpo
+Docs\termux.md L53   | - cd DorkEye
+            | + cd MappingExpo
+Docs\termux.md L81   | - python dorkeye.py -h
+            | + python mappingexpo.py -h
+Docs\termux.md L85   | - If you see it, DorkEye is ready.
+            | + If you see it, MappingExpo is ready.
+Docs\termux.md L91   | - When DorkEye detects it is running inside Termux, the banner displays:
+            | + When MappingExpo detects it is running inside Termux, the banner displays:
+Docs\termux.md L116  | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\termux.md L126  | - python dorkeye.py -d "inurl:login.php" -o results.html
+            | + python mappingexpo.py -d "inurl:login.php" -o results.html
+Docs\termux.md L136  | - python dorkeye.py -d dorks.txt -c 100 -o results.json
+            | + python mappingexpo.py -d dorks.txt -c 100 -o results.json
+Docs\termux.md L147  | - python dorkeye.py -u "https://target.com/page.php?id=1"
+            | + python mappingexpo.py -u "https://target.com/page.php?id=1"
+Docs\termux.md L160  | - python dorkeye.py -d "inurl:.php?id=" --sqli -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.json
+Docs\termux.md L166  | - python dorkeye.py -d "inurl:search.php?q=" --xss -o results.json
+            | + python mappingexpo.py -d "inurl:search.php?q=" --xss -o results.json
+Docs\termux.md L172  | - python dorkeye.py -d "inurl:.php?id=" --sqli --xss -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli --xss -o results.json
+Docs\termux.md L178  | - python dorkeye.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+Docs\termux.md L199  | - python dorkeye.py -d "inurl:config.php" -o report.html
+            | + python mappingexpo.py -d "inurl:config.php" -o report.html
+Docs\termux.md L202  | - python dorkeye.py -d "inurl:config.php" -o results.json
+            | + python mappingexpo.py -d "inurl:config.php" -o results.json
+Docs\termux.md L213  | - python dorkeye.py -f Dump/results.json --sqli -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --sqli -o retest.json
+Docs\termux.md L216  | - python dorkeye.py -f Dump/results.json --xss -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --xss -o retest.json
+Docs\termux.md L219  | - python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+            | + python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+Docs\termux.md L232  | - python dorkeye.py --dg=all --sqli -o results.json
+            | + python mappingexpo.py --dg=all --sqli -o results.json
+Docs\termux.md L235  | - python dorkeye.py --dg=sqli --mode=medium --sqli -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
+Docs\termux.md L251  | - Requires `Tools/dorkeye_agents.py`. Automatically skipped if the file is missing.
+            | + Requires `Tools/mappingexpo_agents.py`. Automatically skipped if the file is missing.
+Docs\termux.md L254  | - python dorkeye.py -d dorks.txt --analyze -o results.json
+            | + python mappingexpo.py -d dorks.txt --analyze -o results.json
+Docs\termux.md L255  | - python dorkeye.py -d dorks.txt --analyze --analyze-fetch -o results.json
+            | + python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
+Docs\termux.md L264  | - python dorkeye.py -d dorks.txt --analyze --analyze-fmt md -o results.json
+            | + python mappingexpo.py -d dorks.txt --analyze --analyze-fmt md -o results.json
+Docs\termux.md L275  | - python dorkeye.py -d dorks.txt --dbscan -o results.json
+            | + python mappingexpo.py -d dorks.txt --dbscan -o results.json
+Docs\termux.md L293  | - python dorkeye.py --ui
+            | + python mappingexpo.py --ui
+Docs\termux.md L303  | - > If port 8080 is busy, DorkEye auto-increments. Check the terminal output for the actual port.
+            | + > If port 8080 is busy, MappingExpo auto-increments. Check the terminal output for the actual port.
+Docs\termux.md L322  | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\termux.md L325  | - python dorkeye.py -d "inurl:.php?id=" --sqli -o results.html
+            | + python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.html
+Docs\termux.md L328  | - python dorkeye.py -d dorks.txt --sqli --xss --stealth -o results.json
+            | + python mappingexpo.py -d dorks.txt --sqli --xss --stealth -o results.json
+Docs\termux.md L331  | - python dorkeye.py -u "https://target.com/page.php?id=1"
+            | + python mappingexpo.py -u "https://target.com/page.php?id=1"
+Docs\termux.md L334  | - python dorkeye.py --dg=sqli --mode=medium --sqli --analyze -o results.json
+            | + python mappingexpo.py --dg=sqli --mode=medium --sqli --analyze -o results.json
+Docs\termux.md L337  | - python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+            | + python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
+Docs\webconsole.md L3    | - # Web Console — DorkEye
+            | + # Web Console — MappingExpo
+Docs\webconsole.md L5    | - > Matrix-themed local web dashboard for all DorkEye operations.
+            | + > Matrix-themed local web dashboard for all MappingExpo operations.
+Docs\webconsole.md L12   | - `dorkeye_web.py` is a Flask-based web interface that wraps the entire `dorkeye.py` pipeline
+            | + `mappingexpo_web.py` is a Flask-based web interface that wraps the entire `mappingexpo.py` pipeline
+Docs\webconsole.md L19   | - **Lives in:** `DorkEye/Tools/dorkeye_web.py`
+            | + **Lives in:** `MappingExpo/Tools/mappingexpo_web.py`
+Docs\webconsole.md L35   | - ### Via `dorkeye.py` (recommended)
+            | + ### Via `mappingexpo.py` (recommended)
+Docs\webconsole.md L39   | - python dorkeye.py --ui
+            | + python mappingexpo.py --ui
+Docs\webconsole.md L42   | - python dorkeye.py --ui --port 9090
+            | + python mappingexpo.py --ui --port 9090
+Docs\webconsole.md L48   | - python Tools/dorkeye_web.py
+            | + python Tools/mappingexpo_web.py
+Docs\webconsole.md L49   | - python Tools/dorkeye_web.py --port 9090
+            | + python Tools/mappingexpo_web.py --port 9090
+Docs\webconsole.md L50   | - python Tools/dorkeye_web.py --port 9090 --no-browser
+            | + python Tools/mappingexpo_web.py --port 9090 --no-browser
+Docs\webconsole.md L57   | - ### Via `dorkeye.py`
+            | + ### Via `mappingexpo.py`
+Docs\webconsole.md L64   | - ### Standalone (`python Tools/dorkeye_web.py`)
+            | + ### Standalone (`python Tools/mappingexpo_web.py`)
+Docs\webconsole.md L110  | - Full-featured scan form covering every `dorkeye.py` pipeline option.
+            | + Full-featured scan form covering every `mappingexpo.py` pipeline option.
+Docs\webconsole.md L147  | - Direct vulnerability test on a single target URL — maps to `dorkeye.py -u`.
+            | + Direct vulnerability test on a single target URL — maps to `mappingexpo.py -u`.
+Docs\webconsole.md L171  | - |EXPORT TXT    |Downloads the full set as `dorkeye_dorks_<ts>.txt`                              |
+            | + |EXPORT TXT    |Downloads the full set as `mappingexpo_dorks_<ts>.txt`                              |
+Docs\webconsole.md L211  | - |FILE MODE|Re-process with `dorkeye.py -f`             |
+            | + |FILE MODE|Re-process with `mappingexpo.py -f`             |
+Docs\webconsole.md L251  | - api/run POST  →  JobManager.spawn()  →  Popen(dorkeye.py ...)
+            | + api/run POST  →  JobManager.spawn()  →  Popen(mappingexpo.py ...)
+Docs\webconsole.md L292  | - from `dorkeye_web.py` looking for `dorkeye.py`:
+            | + from `mappingexpo_web.py` looking for `mappingexpo.py`:
+Docs\webconsole.md L295  | - DorkEye/
+            | + MappingExpo/
+Docs\webconsole.md L296  | -     dorkeye.py          ← root anchor
+            | +     mappingexpo.py          ← root anchor
+Docs\webconsole.md L300  | -         dorkeye_web.py  ← starts here
+            | +         mappingexpo_web.py  ← starts here
+Docs\webconsole.md L303  | - This works whether `dorkeye_web.py` is run directly from `Tools/` or from the project root.
+            | + This works whether `mappingexpo_web.py` is run directly from `Tools/` or from the project root.
+Docs\webconsole.md L314  | -   shuts down the Werkzeug server (DorkEye installs a custom SIGINT handler that would
+            | +   shuts down the Werkzeug server (MappingExpo installs a custom SIGINT handler that would
+Docs\wizard.md L3    | - # Wizard — DorkEye Project
+            | + # Wizard — MappingExpo Project
+Docs\wizard.md L12   | - python dorkeye.py --wizard
+            | + python mappingexpo.py --wizard
+Docs\wizard.md L22   | - ┌─[ DorkEye Wizard ]
+            | + ┌─[ MappingExpo Wizard ]
+Docs\wizard.md L77   | - | First time running DorkEye | Wizard |
+            | + | First time running MappingExpo | Wizard |
+Docs\xss.md L3    | - # XSS Detection — DorkEye Project
+            | + # XSS Detection — MappingExpo Project
+Docs\xss.md L5    | - DorkEye includes a built-in multi-method XSS detection engine supporting reflected, stored, DOM-based, and header-based injection — no browser or exte
+            | + MappingExpo includes a built-in multi-method XSS detection engine supporting reflected, stored, DOM-based, and header-based injection — no browser or 
+Docs\xss.md L14   | - python dorkeye.py -d "inurl:search.php?q=" --xss -o results.json
+            | + python mappingexpo.py -d "inurl:search.php?q=" --xss -o results.json
+Docs\xss.md L15   | - python dorkeye.py --dg=xss --mode=medium --xss --stealth -o results.json
+            | + python mappingexpo.py --dg=xss --mode=medium --xss --stealth -o results.json
+Docs\xss.md L21   | - python dorkeye.py -u "https://example.com/search.php?q=test" --xss
+            | + python mappingexpo.py -u "https://example.com/search.php?q=test" --xss
+Docs\xss.md L22   | - python dorkeye.py -u "https://example.com/search.php?q=test" --xss --stealth -o result.json
+            | + python mappingexpo.py -u "https://example.com/search.php?q=test" --xss --stealth -o result.json
+Docs\xss.md L28   | - python dorkeye.py -f Dump/results.json --xss -o retest.json
+            | + python mappingexpo.py -f Dump/results.json --xss -o retest.json
+Docs\xss.md L34   | - python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type reflected
+            | + python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type reflected
+Docs\xss.md L35   | - python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type dom
+            | + python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type dom
+Docs\xss.md L36   | - python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type all   # default
+            | + python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type all   # default
+Docs\xss.md L584  | - python dorkeye.py -u "https://example.com/?q=x" --xss --stealth
+            | + python mappingexpo.py -u "https://example.com/?q=x" --xss --stealth
+Docs\Dorks\JSON_exposure_dork.txt L3    | - # DorkEye — Advanced JSON Exposure Dork List
+            | + # MappingExpo — Advanced JSON Exposure Dork List

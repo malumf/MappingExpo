@@ -1,4 +1,5 @@
 
+<!-- ── Row 1: Identidade do projeto ── -->
 ![Python](https://img.shields.io/badge/Python-3.9%2B-3670A0?style=flat-square&logo=python&logoColor=ffdd54)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Stable-brightgreen?style=flat-square)
@@ -56,7 +57,7 @@ Este projeto é uma versão abrasileirada do [DorkEye](https://github.com/xPloit
 |**Documentação clara** | Cada módulo tem doc dedicada (`/Docs/`) |
 |**OPSEC explícito** | Avisos de uso responsável em cada etapa |
 | **Conformidade legal** | Alinhado com LGPD, Marco Civil e boas práticas |
-| **Base sólida** | Herda maturidade técnica do DorkEye original |
+| **Base sólida** | Herda maturidade técnica do MappingExpo original |
 | **MIT License** | Livre para uso, modificação e redistribuição |
 
 ---

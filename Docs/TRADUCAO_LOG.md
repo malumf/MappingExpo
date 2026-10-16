@@ -586,6 +586,23 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   - Arte: 5 linhas de blocos + 1 sombra; contagem de linhas do web inalterada (1203); charset matrix e estruturas vizinhas intactos
 - **Residual dorkeye em código após F: ZERO** (só as 8 linhas de atribuição). Restam: Docs/README/Templates/meta (camada G)
 
+## 2026-10-16 — CAMADA G: docs/meta bulk (commit fase-3g)
+- **Backups**: 30 arquivos `.20261016_142459.pre_f3_g.bak` (+ limpeza de 1 arquivo-lixão de regex mangled do PS)
+- **Regras aprovadas**: linha de atribuição (xPloits3c, t.me/DorkEye, paypal.me/DorkEyeProject, created for DorkEye) → intacta; senão `DORK EYE`→`MAPPING EXPO`, `DORKEYE`→`MAPPINGEXPO`, `Dorkeye`→`Mappingexpo`, `DorkEye`→`MappingExpo`, `dorkeye`→`mappingexpo`
+- **Diff**: 382 linhas em 30 arquivos (INSTALL 44 · USAGE 79 · cli 40 · termux 36 · webconsole 23 · agents 19 · http_fingerprints 19 · dork_generator 15 · dbscan 13 · output_formats 12 · sqli 12 · file_categories 11 · xss 11 · crawler 8 · workflow 8 · REPORT_HTML 6 · fingerprinting 6 · wizard 4 · requirements 3 · README 2 · bug_report 2 · dorks_templates 5 · restantes 1-2) — **diff completo (765 linhas) salvo em `.traducao_backup/f3_g_diff.txt` para auditoria**
+- **git mv**: `.github/workflows/claude-dorkeye.yml` → `claude-mappingexpo.yml` (conteúdo: name `🦅 MappingExpo AI Agent`, group `mappingexpo-ai-`, prompts com refs renomeadas — italiano mantido)
+- **23 linhas de atribuição preservadas** (badges "Baseado em DorkEye" do README, URLs git clone ×6, autores, created-for) · arquivos 100% atribuição intocados (example.yaml, sql.yaml, 2 dorks.txt)
+- **Correções de verificação (2 itens)**: (1) fix da ocorrência **DEXSS7x perdida da Camada C** em Docs/USAGE.md L402 (inventário inicial a listava; não fora atribuída ao lote C) → MPXSS7x; (2) padrão de atribuição estendido com `xploits3c.github.io/DorkEye` (linha L1404 de mappingexpo.py, preservada pela F) · citações bare `python3 mappingexpo_analyze.py` = convenção pré-existente do original (`python3 dorkeye_analyze.py` no backup) — fiel, não regressão
+- **Verificações** (todas PASSARAM): residual dorkeye no repo == apenas TRADUCAO_LOG (histórico) + FUNDING (attribution) + 32 linhas de atribuição em 15 arquivos — **ZERO fora de atribuição/histórico** · DEXSS7x == 0 no repo inteiro (exceto log) · arquivos 0-alteração byte-identical aos backups
+
+**STATUS: FASE 3 (RENAME) — CAMADAS A–G CONCLUÍDAS.** Verificação final pós-G executada (abaixo).
+
+### VERIFICAÇÃO FINAL DA FASE 3 (pós-G)
+- Repositório: única marca DorkEye restante = **linhas de atribuição intencional** (URLs do autor original, linhas "Author/Autor: xPloits3c", "created for DorkEye Project", badges "Baseado em") + TRADUCAO_LOG.md (registro histórico da Fase 1) + FUNDING.yml
+- py_compile ×9 exit 0 · smoke tests funcionais: `--help` dos 4 CLIs
+- Marker MPXSS7x: 83 (xss.py) + 84 (xss.md) + 1 (USAGE.md) = 168; DEXSS7x: 0
+- **Pendência (operador)**: teste visual do Console Web pós-rename — `python Tools/mappingexpo_web.py --port 7777` → conferir arte MAPPING EXPO no launcher, título, labels e coloração (colorLine verificada como não-afetada)
+
 
 
 

@@ -1,8 +1,8 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/029a10ab-3001-4e92-9414-03f49d2dc6ea" />
 
-# SQL Injection | DorkEye Project
+# SQL Injection | MappingExpo Project
 
-DorkEye includes a built-in multi-method SQL injection engine that works on any URL with query parameters — no external tools required.
+MappingExpo includes a built-in multi-method SQL injection engine that works on any URL with query parameters — no external tools required.
 
 -----
 
@@ -11,24 +11,24 @@ DorkEye includes a built-in multi-method SQL injection engine that works on any 
 ### During a dork search
 
 ```bash
-python dorkeye.py -d "inurl:.php?id=" --sqli -o results.json
-python dorkeye.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.json
+python mappingexpo.py --dg=sqli --mode=medium --sqli --stealth -o results.json
 ```
 
 ### Direct test on a single URL
 
 ```bash
 # SQLi auto-enabled — no --sqli flag needed
-python dorkeye.py -u "https://example.com/page.php?id=1"
+python mappingexpo.py -u "https://example.com/page.php?id=1"
 
 # With stealth and output
-python dorkeye.py -u "https://example.com/page.php?id=1" --sqli --stealth -o result.json
+python mappingexpo.py -u "https://example.com/page.php?id=1" --sqli --stealth -o result.json
 ```
 
 ### Re-test a saved results file
 
 ```bash
-python dorkeye.py -f Dump/results.json --sqli -o retest.json
+python mappingexpo.py -f Dump/results.json --sqli -o retest.json
 ```
 
 -----
@@ -60,7 +60,7 @@ Every outgoing request automatically rotates its browser profile to blend in wit
 |`legacy`  |Flat dict of fingerprint objects            |Each entry is a self-contained profile                                    |
 |`advanced`|Shared header references + language profiles|Common headers via `@reference` tokens, Accept-Language via named profiles|
 
-`http_fingerprints.json` is loaded from the DorkEye root (one level above `Tools/`).  
+`http_fingerprints.json` is loaded from the MappingExpo root (one level above `Tools/`).  
 If the file is missing or malformed, fingerprinting is disabled and a minimal fallback UA is used.
 
 ```python
@@ -150,13 +150,13 @@ _exit_requested: bool = False   # Ctrl+C → abort everything
 _skip_current:   bool = False   # second Ctrl+C → skip current URL only
 ```
 
-`dorkeye.py` sets these inside its SIGINT handler after each Ctrl+C. Every internal loop (`_run_interruptible`, `_interruptible_sleep`, payload `for` loops) checks them at each iteration.
+`mappingexpo.py` sets these inside its SIGINT handler after each Ctrl+C. Every internal loop (`_run_interruptible`, `_interruptible_sleep`, payload `for` loops) checks them at each iteration.
 
 -----
 
 ## Detection Methods
 
-DorkEye runs **8 complementary methods** across GET parameters, POST form fields, JSON body keys, and URL path segments.
+MappingExpo runs **8 complementary methods** across GET parameters, POST form fields, JSON body keys, and URL path segments.
 
 ### GET Parameters (methods 1–5)
 
@@ -623,7 +623,7 @@ Vulnerable URLs are shown with:
 ## Stealth Mode
 
 ```bash
-python dorkeye.py -d dorks.txt --sqli --stealth -o results.json
+python mappingexpo.py -d dorks.txt --sqli --stealth -o results.json
 ```
 
 With `--stealth`:
@@ -665,7 +665,7 @@ result = detector.test_json_sqli(
 # Path segment
 result = detector.test_path_based_sqli("https://example.com/products/42")
 
-# Optional progress callback (used by dorkeye.py for the progress bar)
+# Optional progress callback (used by mappingexpo.py for the progress bar)
 detector._status_cb = lambda phase: print(f"[sqli] {phase}")
 
 # Reset circuit breaker between independent scans

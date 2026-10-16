@@ -1,10 +1,10 @@
 # ============================================================
-#  DorkEye | Default Dork Templates
+#  MappingExpo | Default Dork Templates
 #  Author: I.C.W.T xPloits3c | https://github.com/xPloits3c/DorkEye
 #
 #  This file was created for DorkEye Project.
 #  Is the base template, containing the various categories
-#   required for the DorkEye tool to operate.
+#   required for the MappingExpo tool to operate.
 #  It serves as a starting point for building
 #   custom dorking queries, organized by intensity level
 #   (soft / medium / aggressive).
@@ -28,9 +28,9 @@
 #        except "sensitive", which uses flat mode (mode: aggressive)
 #
 #  Usage:
-#    python dorkeye.py --dg=sqli --mode=soft
-#    python dorkeye.py --dg=cctv --mode=aggressive --stealth
-#    python dorkeye.py --dg=all  --mode=aggressive --stealth
+#    python mappingexpo.py --dg=sqli --mode=soft
+#    python mappingexpo.py --dg=cctv --mode=aggressive --stealth
+#    python mappingexpo.py --dg=all  --mode=aggressive --stealth
 # ============================================================
 
 variables:

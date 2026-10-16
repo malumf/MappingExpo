@@ -1,12 +1,12 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/21b9be47-690b-429b-93f9-44c658ce6ceb" />
 
-# DorkEye — HTTP Fingerprints
+# MappingExpo — HTTP Fingerprints
 
 > **File:** `http_fingerprints.json`
 > **Version:** 2.0
-> **Used by:** `HTTPFingerprintRotator` class in `dorkeye.py`
+> **Used by:** `HTTPFingerprintRotator` class in `mappingexpo.py`
 
-The fingerprint system makes DorkEye's HTTP requests look like those of real browsers from real users around the world. Instead of sending a generic `User-Agent: python-requests/2.x` header that is trivially blocked or logged, each request is crafted with a full, coherent set of headers that matches what a specific browser on a specific OS would actually send.
+The fingerprint system makes MappingExpo's HTTP requests look like those of real browsers from real users around the world. Instead of sending a generic `User-Agent: python-requests/2.x` header that is trivially blocked or logged, each request is crafted with a full, coherent set of headers that matches what a specific browser on a specific OS would actually send.
 
 ---
 
@@ -19,7 +19,7 @@ The fingerprint system makes DorkEye's HTTP requests look like those of real bro
 5. [language_profiles Block](#language_profiles-block)
 6. [fingerprints Block](#fingerprints-block)
 7. [Reference Resolution (@syntax)](#reference-resolution-syntax)
-8. [How DorkEye Loads and Uses the File](#how-dorkeye-loads-and-uses-the-file)
+8. [How MappingExpo Loads and Uses the File](#how-mappingexpo-loads-and-uses-the-file)
 9. [Fingerprint Inventory](#fingerprint-inventory)
 10. [Headers Explained](#headers-explained)
 11. [Adding Custom Fingerprints](#adding-custom-fingerprints)
@@ -35,7 +35,7 @@ When a crawler sends requests to web servers, the server logs every detail: User
 - Return different content or block the request entirely
 - Log the activity as automated/tool traffic
 
-A complete HTTP fingerprint makes DorkEye's requests indistinguishable from legitimate browser traffic at the header level.
+A complete HTTP fingerprint makes MappingExpo's requests indistinguishable from legitimate browser traffic at the header level.
 
 ---
 
@@ -60,7 +60,7 @@ Informational only — not used at runtime. Documents the file's identity and ve
 
 ```json
 "_meta": {
-  "name":             "DorkEye Advanced HTTP Fingerprints",
+  "name":             "MappingExpo Advanced HTTP Fingerprints",
   "version":          "2.0",
   "description":      "...",
   "generated_at":     "2026-03-14",
@@ -244,7 +244,7 @@ Using both values realistically across fingerprints prevents pattern detection b
 
 ## Reference Resolution (`@` syntax)
 
-When a header value starts with `@`, DorkEye resolves it by looking up the remainder as a key in `common_headers`. This is handled by `resolve_reference()` in `dorkeye.py`.
+When a header value starts with `@`, MappingExpo resolves it by looking up the remainder as a key in `common_headers`. This is handled by `resolve_reference()` in `mappingexpo.py`.
 
 ```python
 def resolve_reference(value: str, common_headers: Dict) -> str:
@@ -269,7 +269,7 @@ This means every request randomly selects one of the listed language profiles fo
 
 ---
 
-## How DorkEye Loads and Uses the File
+## How MappingExpo Loads and Uses the File
 
 ### Loading
 
@@ -278,7 +278,7 @@ This means every request randomly selects one of the listed language profiles fo
 fingerprints_data = load_http_fingerprints()
 ```
 
-`load_http_fingerprints()` reads the JSON file from the same directory as `dorkeye.py`. It detects two modes:
+`load_http_fingerprints()` reads the JSON file from the same directory as `mappingexpo.py`. It detects two modes:
 
 | Mode | Detection | Behavior |
 |------|-----------|----------|
@@ -295,7 +295,7 @@ The `HTTPFingerprintRotator` class manages a list of pre-built `HTTPFingerprint`
 | `get_random()` | Picks a uniformly random fingerprint for each request |
 | `get_next()` | Round-robins through the list sequentially |
 
-DorkEye uses `get_random()` in the `SQLiDetector._get()` method so each HTTP request gets a randomly selected fingerprint.
+MappingExpo uses `get_random()` in the `SQLiDetector._get()` method so each HTTP request gets a randomly selected fingerprint.
 
 ### Final header set built per request
 
@@ -365,7 +365,7 @@ Referer           → optional, passed at call time
 
 ### User-Agent
 
-The most important header for browser identification. It encodes browser engine, version, OS, and architecture. DorkEye uses only real, currently active UA strings — no synthetic or outdated ones.
+The most important header for browser identification. It encodes browser engine, version, OS, and architecture. MappingExpo uses only real, currently active UA strings — no synthetic or outdated ones.
 
 **Structure example (Chrome):**
 ```
@@ -408,11 +408,11 @@ The `q` value is the quality factor (preference weight, 0.0–1.0).
 
 ### Sec-Fetch-Dest
 
-What the request is for: `document` = main HTML page, `image`, `script`, `fetch`, etc. DorkEye always uses `document` since it is performing page-level requests.
+What the request is for: `document` = main HTML page, `image`, `script`, `fetch`, etc. MappingExpo always uses `document` since it is performing page-level requests.
 
 ### Sec-Fetch-Mode
 
-How the request was initiated: `navigate` = user navigation, `cors`, `no-cors`, `same-origin`. DorkEye always uses `navigate`.
+How the request was initiated: `navigate` = user navigation, `cors`, `no-cors`, `same-origin`. MappingExpo always uses `navigate`.
 
 ### Sec-Fetch-Site
 
@@ -425,7 +425,7 @@ Relationship between the request origin and destination:
 | `same-origin` | Same domain |
 | `same-site` | Same site, different subdomain |
 
-DorkEye uses both `none` and `cross-site` to simulate both direct navigation and link-following behavior.
+MappingExpo uses both `none` and `cross-site` to simulate both direct navigation and link-following behavior.
 
 ### Pragma
 
@@ -489,19 +489,19 @@ HTTP fingerprinting can be disabled in three ways:
 
 **CLI flag:**
 ```bash
-python dorkeye.py -d "your dork" --no-fingerprint
+python mappingexpo.py -d "your dork" --no-fingerprint
 ```
 
 **Config file:**
 ```yaml
-# dorkeye_config.yaml
+# mappingexpo_config.yaml
 http_fingerprinting: false
 ```
 
-**Missing file:** if `http_fingerprints.json` is not found or is invalid, DorkEye logs a warning and falls back to a minimal generic header set (`User-Agent: Mozilla/5.0`, `Accept: */*`, `Connection: keep-alive`).
+**Missing file:** if `http_fingerprints.json` is not found or is invalid, MappingExpo logs a warning and falls back to a minimal generic header set (`User-Agent: Mozilla/5.0`, `Accept: */*`, `Connection: keep-alive`).
 
-When fingerprinting is disabled, standard User-Agent rotation via `UserAgentRotator` is still active (if `user_agent_rotation: true` in config), providing basic rotation using the `USER_AGENTS` dict defined in `dorkeye.py`.
+When fingerprinting is disabled, standard User-Agent rotation via `UserAgentRotator` is still active (if `user_agent_rotation: true` in config), providing basic rotation using the `USER_AGENTS` dict defined in `mappingexpo.py`.
 
 ---
 
-*DorkEye Project — For authorized security research only.*
+*MappingExpo Project — For authorized security research only.*

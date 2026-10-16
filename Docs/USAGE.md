@@ -1,15 +1,15 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/33f47b3f-55c9-4661-be19-8b107e315d13" />
 
-# DorkEye — Complete Usage Reference
+# MappingExpo — Complete Usage Reference
 
 Every flag, every mode, every combination — explained.
 
 ```
  ___
-__H__       xploits3c.github.io/DorkEye
+__H__       xploits3c.github.io/MappingExpo
  [d]
  [e]
- [;]    DorkEye Project
+ [;]    MappingExpo Project
  |_|
   V
 ```
@@ -35,10 +35,10 @@ __H__       xploits3c.github.io/DorkEye
 ## 📌 Basic Syntax
 
 ```bash
-python3 dorkeye.py [OPTIONS]
+python3 mappingexpo.py [OPTIONS]
 ```
 
-DorkEye operates in **five distinct modes**, each triggered by different flags:
+MappingExpo operates in **five distinct modes**, each triggered by different flags:
 
 | Mode | Trigger | Description |
 |---|---|---|
@@ -61,7 +61,7 @@ Minimal required: at least one of `-d`, `--dg`, `-u`, or `-f`. Output `-o` is au
 Launches a fully guided session with numbered menus. Covers dork search, dork generation, analysis, and crawl — no flags needed.
 
 ```bash
-python3 dorkeye.py --wizard
+python3 mappingexpo.py --wizard
 ```
 
 The wizard will prompt for:
@@ -82,10 +82,10 @@ Defines the search query. Accepts a single dork string or a `.txt` file (one dor
 
 ```bash
 # Single dork
-python3 dorkeye.py -d "inurl:admin filetype:php" -o output.html
+python3 mappingexpo.py -d "inurl:admin filetype:php" -o output.html
 
 # File with multiple dorks
-python3 dorkeye.py -d dorks.txt -c 100 -o output.json
+python3 mappingexpo.py -d dorks.txt -c 100 -o output.json
 ```
 
 💡 For automation and large-scale scans, always use files.
@@ -99,13 +99,13 @@ Automatically enables `--sqli` if neither `--sqli` nor `--xss` is specified.
 
 ```bash
 # SQLi test only
-python3 dorkeye.py -u "https://example.com/page.php?id=1" --sqli
+python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli
 
 # XSS test only
-python3 dorkeye.py -u "https://target.com/search?q=test" --xss
+python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
 
 # Both SQLi and XSS, with stealth and output
-python3 dorkeye.py -u "https://example.com/page.php?id=1" --sqli --xss --stealth -o result.json
+python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli --xss --stealth -o result.json
 ```
 
 **Output includes:**
@@ -125,21 +125,21 @@ Combine with `--sqli`, `--xss`, `--analyze`, or `--crawl` to run additional anal
 
 ```bash
 # Re-run SQLi on saved results
-python3 dorkeye.py -f Dump/results.json --sqli -o retest.json
+python3 mappingexpo.py -f Dump/results.json --sqli -o retest.json
 
 # Re-run XSS on saved results
-python3 dorkeye.py -f Dump/results.json --xss --xss-type=reflected -o xss_retest.json
+python3 mappingexpo.py -f Dump/results.json --xss --xss-type=reflected -o xss_retest.json
 
 # Run analysis pipeline on saved results
-python3 dorkeye.py -f Dump/results.json --analyze -o reanalyzed.json
+python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
 
 # Full re-processing: SQLi + XSS + analysis + crawl
-python3 dorkeye.py -f Dump/results.json --sqli --xss --analyze --crawl -o full_retest.json
+python3 mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full_retest.json
 ```
 
 **Supported formats:**
 
-- `.json` — DorkEye JSON output (supports both `{"results": [...]}` and raw `[...]`)
+- `.json` — MappingExpo JSON output (supports both `{"results": [...]}` and raw `[...]`)
 - `.txt` — One URL per line (lines starting with `http`)
 
 The file is searched in the current directory first, then in `Dump/`.
@@ -152,10 +152,10 @@ Specifies the output filename. The file is saved inside the `Dump/` folder.
 Format is inferred from the extension.
 
 ```bash
-python3 dorkeye.py -d dorks.txt -o results.json
-python3 dorkeye.py -d dorks.txt -o report.html
-python3 dorkeye.py -d dorks.txt -o export.csv
-python3 dorkeye.py -d dorks.txt -o links.txt
+python3 mappingexpo.py -d dorks.txt -o results.json
+python3 mappingexpo.py -d dorks.txt -o report.html
+python3 mappingexpo.py -d dorks.txt -o export.csv
+python3 mappingexpo.py -d dorks.txt -o links.txt
 ```
 
 | Extension | Format | Features |
@@ -165,7 +165,7 @@ python3 dorkeye.py -d dorks.txt -o links.txt
 | `.csv` | Spreadsheet-ready | All columns including SQLi status, XSS status, types, WAF, confidence |
 | `.txt` | Plain text | Numbered list with per-result details including SQLi and XSS status |
 
-If `-o` is omitted, DorkEye auto-generates `report_YYYYMMDD_HHMMSS.html`.
+If `-o` is omitted, MappingExpo auto-generates `report_YYYYMMDD_HHMMSS.html`.
 
 💡 Using `.json` output automatically prompts for post-search analysis.
 
@@ -176,14 +176,14 @@ If `-o` is omitted, DorkEye auto-generates `report_YYYYMMDD_HHMMSS.html`.
 Limits the maximum number of results fetched per dork query. Default: **50**.
 
 ```bash
-python3 dorkeye.py -d dorks.txt -c 200 -o output.html
+python3 mappingexpo.py -d dorks.txt -c 200 -o output.html
 ```
 
 **Notes:**
 
 - Higher values = slower scans and higher risk of rate-limiting
 - Use `--stealth` when `-c > 100`
-- DorkEye automatically applies extended delays every 100 results (configurable)
+- MappingExpo automatically applies extended delays every 100 results (configurable)
 
 ---
 
@@ -192,7 +192,7 @@ python3 dorkeye.py -d dorks.txt -c 200 -o output.html
 Loads a YAML or JSON configuration file that overrides the defaults.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --config custom_config.yaml -o scan.json
+python3 mappingexpo.py -d dorks.txt --config custom_config.yaml -o scan.json
 ```
 
 Configurable settings include: extensions map, blacklist/whitelist, timeouts, retry count, stealth mode, fingerprinting, SQLi detection, XSS detection, XSS type, and the extended delay threshold.
@@ -203,10 +203,10 @@ See `--create-config` to generate a starter template.
 
 ### 🔹 `--create-config` — Generate Default Config
 
-Writes a sample `dorkeye_config.yaml` to disk.
+Writes a sample `mappingexpo_config.yaml` to disk.
 
 ```bash
-python3 dorkeye.py --create-config
+python3 mappingexpo.py --create-config
 ```
 
 ---
@@ -220,7 +220,7 @@ python3 dorkeye.py --create-config
 Reduces detection and rate-limiting risks by increasing delays and randomization.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --stealth -o stealth_scan.html
+python3 mappingexpo.py -d dorks.txt --stealth -o stealth_scan.html
 ```
 
 **What it activates:**
@@ -239,10 +239,10 @@ python3 dorkeye.py -d dorks.txt --stealth -o stealth_scan.html
 Disables the browser fingerprint rotation system. Falls back to basic User-Agent rotation.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --no-fingerprint -o output.html
+python3 mappingexpo.py -d dorks.txt --no-fingerprint -o output.html
 ```
 
-By default, DorkEye loads `http_fingerprints.json` and rotates full browser profiles (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fetch-*, Cache-Control) to mimic real browser traffic.
+By default, MappingExpo loads `http_fingerprints.json` and rotates full browser profiles (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fetch-*, Cache-Control) to mimic real browser traffic.
 
 ---
 
@@ -251,7 +251,7 @@ By default, DorkEye loads `http_fingerprints.json` and rotates full browser prof
 Skips HEAD-request file analysis for faster scans. No size, content-type, or accessibility checks.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --no-analyze -o fast_scan.txt
+python3 mappingexpo.py -d dorks.txt --no-analyze -o fast_scan.txt
 ```
 
 | Mode | Speed | Metadata |
@@ -266,7 +266,7 @@ python3 dorkeye.py -d dorks.txt --no-analyze -o fast_scan.txt
 Excludes specific file types from results.
 
 ```bash
-python3 dorkeye.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.html
+python3 mappingexpo.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.html
 ```
 
 ---
@@ -276,7 +276,7 @@ python3 dorkeye.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.
 Only includes specific file types. All other extensions are ignored.
 
 ```bash
-python3 dorkeye.py -d "site:target.com" --whitelist .pdf .xls .docx -o documents.html
+python3 mappingexpo.py -d "site:target.com" --whitelist .pdf .xls .docx -o documents.html
 ```
 
 ---
@@ -291,16 +291,16 @@ Enables the multi-method XSS detection engine on all discovered URLs. Works alon
 
 ```bash
 # XSS on a dork search
-python3 dorkeye.py -d "inurl:search?q=" --xss -o xss_scan.html
+python3 mappingexpo.py -d "inurl:search?q=" --xss -o xss_scan.html
 
 # XSS + SQLi combined
-python3 dorkeye.py -d dorks.txt --sqli --xss -o full_scan.json
+python3 mappingexpo.py -d dorks.txt --sqli --xss -o full_scan.json
 
 # XSS on a direct URL
-python3 dorkeye.py -u "https://target.com/search?q=test" --xss
+python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
 
 # XSS on saved results
-python3 dorkeye.py -f Dump/results.json --xss -o xss_retest.json
+python3 mappingexpo.py -f Dump/results.json --xss -o xss_retest.json
 ```
 
 ---
@@ -310,10 +310,10 @@ python3 dorkeye.py -f Dump/results.json --xss -o xss_retest.json
 Limits XSS testing to a specific method. Default: `all`.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --xss --xss-type=reflected -o reflected.json
-python3 dorkeye.py -d dorks.txt --xss --xss-type=stored    -o stored.json
-python3 dorkeye.py -d dorks.txt --xss --xss-type=dom       -o dom.json
-python3 dorkeye.py -d dorks.txt --xss --xss-type=all       -o full_xss.json
+python3 mappingexpo.py -d dorks.txt --xss --xss-type=reflected -o reflected.json
+python3 mappingexpo.py -d dorks.txt --xss --xss-type=stored    -o stored.json
+python3 mappingexpo.py -d dorks.txt --xss --xss-type=dom       -o dom.json
+python3 mappingexpo.py -d dorks.txt --xss --xss-type=all       -o full_xss.json
 ```
 
 ---
@@ -399,7 +399,7 @@ Individual method confidence is aggregated into an overall score:
 
 ```
 [!] Potential XSS found (high) [reflected]: https://target.com/search?q=test
-    ↳ type: reflected [payload: "><script>alert("DEXSS7x")</script>]
+    ↳ type: reflected [payload: "><script>alert("MPXSS7x")</script>]
       evidence: Unescaped reflection in param [q]: ...
 ```
 
@@ -427,7 +427,7 @@ XSS results are persisted across all output formats:
 Enables the multi-method SQLi detection engine on all discovered URLs.
 
 ```bash
-python3 dorkeye.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
+python3 mappingexpo.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
 ```
 
 ---
@@ -489,23 +489,23 @@ Generates structured Google dorks from YAML template files. Replaces manual dork
 
 ```bash
 # All categories, soft mode (default)
-python3 dorkeye.py --dg
+python3 mappingexpo.py --dg
 
 # Specific category
-python3 dorkeye.py --dg=sqli
-python3 dorkeye.py --dg=backups
-python3 dorkeye.py --dg=sensitive
-python3 dorkeye.py --dg=admin
+python3 mappingexpo.py --dg=sqli
+python3 mappingexpo.py --dg=backups
+python3 mappingexpo.py --dg=sensitive
+python3 mappingexpo.py --dg=admin
 
 # All categories, explicit
-python3 dorkeye.py --dg=all
+python3 mappingexpo.py --dg=all
 ```
 
 **Architecture note:** `--dg` controls *dork generation*. `--sqli` and `--xss` control *vulnerability detection*. They are fully independent.
 
 ```bash
 # Generate SQLi dorks AND test them for SQLi AND XSS
-python3 dorkeye.py --dg=sqli --sqli --xss --mode=aggressive -o report.html
+python3 mappingexpo.py --dg=sqli --sqli --xss --mode=aggressive -o report.html
 ```
 
 ---
@@ -521,7 +521,7 @@ Controls dork generation intensity. Default: `soft`.
 | `aggressive` | Maximum coverage. All variable expansions. |
 
 ```bash
-python3 dorkeye.py --dg=all --mode=aggressive -o results.json
+python3 mappingexpo.py --dg=all --mode=aggressive -o results.json
 ```
 
 ---
@@ -532,13 +532,13 @@ Specifies which template YAML file to use from the `Templates/` directory. Use `
 
 ```bash
 # Default template
-python3 dorkeye.py --dg=sqli --templates=dorks_templates.yaml
+python3 mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
 
 # All YAML files in Templates/
-python3 dorkeye.py --dg=all --templates=all
+python3 mappingexpo.py --dg=all --templates=all
 
 # Specific research template
-python3 dorkeye.py --dg=backups --templates=dorks_templates_research.yaml
+python3 mappingexpo.py --dg=backups --templates=dorks_templates_research.yaml
 ```
 
 ---
@@ -548,7 +548,7 @@ python3 dorkeye.py --dg=backups --templates=dorks_templates_research.yaml
 Limits the maximum number of dork combinations generated per template. Default: **800**.
 
 ```bash
-python3 dorkeye.py --dg=all --dg-max=10000 -o big_scan.json
+python3 mappingexpo.py --dg=all --dg-max=10000 -o big_scan.json
 ```
 
 ---
@@ -557,7 +557,7 @@ python3 dorkeye.py --dg=all --dg-max=10000 -o big_scan.json
 ## POST-SEARCH ANALYSIS PIPELINE
 ## ══════════════════════════════════════════
 
-The analysis pipeline is powered by `dorkeye_agents.py` and runs autonomous post-search analysis: triage, page fetching, secrets detection, and report generation — no external AI needed.
+The analysis pipeline is powered by `mappingexpo_agents.py` and runs autonomous post-search analysis: triage, page fetching, secrets detection, and report generation — no external AI needed.
 
 ### 🔹 `--analyze` — Enable Analysis Pipeline
 
@@ -565,10 +565,10 @@ Runs the full analysis pipeline after the search completes. Automatically prompt
 
 ```bash
 # Explicit activation
-python3 dorkeye.py -d dorks.txt -o results.json --analyze
+python3 mappingexpo.py -d dorks.txt -o results.json --analyze
 
 # Also works with file mode
-python3 dorkeye.py -f Dump/results.json --analyze -o reanalyzed.json
+python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
 ```
 
 **Pipeline stages:**
@@ -585,7 +585,7 @@ python3 dorkeye.py -f Dump/results.json --analyze -o reanalyzed.json
 Downloads actual page content for HIGH/CRITICAL priority results, enabling deeper secrets detection.
 
 ```bash
-python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fetch
+python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fetch
 ```
 
 ---
@@ -595,7 +595,7 @@ python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fetch
 Limits the number of pages downloaded during analysis. Default: **20**.
 
 ```bash
-python3 dorkeye.py --dg=sqli -o results.json --analyze --analyze-fetch --analyze-fetch-max=5000
+python3 mappingexpo.py --dg=sqli -o results.json --analyze --analyze-fetch --analyze-fetch-max=5000
 ```
 
 ---
@@ -612,7 +612,7 @@ Sets the output format for the analysis report. Default: `html`.
 | `txt` | Plain text |
 
 ```bash
-python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
+python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
 ```
 
 ---
@@ -622,7 +622,7 @@ python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
 Custom path for the analysis report. Default: auto-generated next to the `-o` file.
 
 ```bash
-python3 dorkeye.py -d dorks.txt -o results.json --analyze --analyze-out=custom_report.html
+python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-out=custom_report.html
 ```
 
 ---
@@ -638,7 +638,7 @@ The crawler (`DorkCrawlerAgent`) performs automatic multi-round refinement: it a
 Activates the adaptive crawl after the initial search.
 
 ```bash
-python3 dorkeye.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+python3 mappingexpo.py -d "site:example.com inurl:admin" --crawl -o crawl.json
 ```
 
 New results from the crawl are merged with the initial results and saved together.
@@ -648,7 +648,7 @@ New results from the crawl are merged with the initial results and saved togethe
 ### 🔹 `--crawl-rounds` — Maximum Crawl Rounds
 
 ```bash
-python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
+python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
 ```
 
 ---
@@ -656,7 +656,7 @@ python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
 ### 🔹 `--crawl-max` — Maximum Total Crawl Results
 
 ```bash
-python3 dorkeye.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
+python3 mappingexpo.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
 ```
 
 ---
@@ -664,7 +664,7 @@ python3 dorkeye.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
 ### 🔹 `--crawl-per-dork` — Results per Crawl Dork
 
 ```bash
-python3 dorkeye.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
+python3 mappingexpo.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
 ```
 
 ---
@@ -674,7 +674,7 @@ python3 dorkeye.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
 Applies longer delays during crawl rounds.
 
 ```bash
-python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
+python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
 ```
 
 ---
@@ -682,7 +682,7 @@ python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
 ### 🔹 `--crawl-report` — Generate Crawl Report
 
 ```bash
-python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.json
+python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.json
 ```
 
 ---
@@ -690,7 +690,7 @@ python3 dorkeye.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.js
 ### 🔹 `--crawl-out` — Crawl Report Path
 
 ```bash
-python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report.html -o crawl.json
+python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report.html -o crawl.json
 ```
 
 ---
@@ -699,7 +699,7 @@ python3 dorkeye.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report
 ## INTERRUPT CONTROL
 ## ══════════════════════════════════════════
 
-DorkEye supports graceful interrupt handling throughout all operations:
+MappingExpo supports graceful interrupt handling throughout all operations:
 
 | Action | Effect |
 |---|---|
@@ -714,7 +714,7 @@ This works during: searches, file analysis, SQLi testing, XSS testing, delays, a
 ## TERMUX / ANDROID
 ## ══════════════════════════════════════════
 
-DorkEye auto-detects Termux on Android and activates battery-saver mode:
+MappingExpo auto-detects Termux on Android and activates battery-saver mode:
 
 - Reduced baseline samples for SQLi latency
 - Lower probe and boolean sample counts
@@ -732,37 +732,37 @@ No flags needed — detection is automatic.
 ### Professional Stealth — SQLi + XSS + Analysis
 
 ```bash
-python3 dorkeye.py -d dorks.txt --stealth --sqli --xss -c 150 -o pro_scan.json --analyze --analyze-fetch
+python3 mappingexpo.py -d dorks.txt --stealth --sqli --xss -c 150 -o pro_scan.json --analyze --analyze-fetch
 ```
 
 ### XSS Only — Reflected Type, Stealth
 
 ```bash
-python3 dorkeye.py -d "inurl:search?q=" --xss --xss-type=reflected --stealth -o xss_reflected.html
+python3 mappingexpo.py -d "inurl:search?q=" --xss --xss-type=reflected --stealth -o xss_reflected.html
 ```
 
 ### Full Vulnerability Scan — Generator + SQLi + XSS
 
 ```bash
-python3 dorkeye.py --dg=all --mode=aggressive --sqli --xss -c 80 -o full_scan.json
+python3 mappingexpo.py --dg=all --mode=aggressive --sqli --xss -c 80 -o full_scan.json
 ```
 
 ### Fast Recon (No Analysis)
 
 ```bash
-python3 dorkeye.py -d dorks.txt --no-analyze -c 200 -o recon.txt
+python3 mappingexpo.py -d dorks.txt --no-analyze -c 200 -o recon.txt
 ```
 
 ### Document Harvesting
 
 ```bash
-python3 dorkeye.py -d "site:.gov" --whitelist .pdf .docx .xlsx -o docs.html
+python3 mappingexpo.py -d "site:.gov" --whitelist .pdf .docx .xlsx -o docs.html
 ```
 
 ### Full Pipeline — Generate + Search + SQLi + XSS + Analyze + Crawl
 
 ```bash
-python3 dorkeye.py \
+python3 mappingexpo.py \
   --dg=sqli \
   --mode=aggressive \
   --sqli \
@@ -780,19 +780,19 @@ python3 dorkeye.py \
 ### Re-test Saved Results — SQLi + XSS
 
 ```bash
-python3 dorkeye.py -f Dump/old_results.json --sqli --xss --analyze --crawl -o retested.json
+python3 mappingexpo.py -f Dump/old_results.json --sqli --xss --analyze --crawl -o retested.json
 ```
 
 ### Direct URL — SQLi + XSS Test
 
 ```bash
-python3 dorkeye.py -u "https://target.com/item.php?id=42" --sqli --xss --stealth -o direct_test.json
+python3 mappingexpo.py -u "https://target.com/item.php?id=42" --sqli --xss --stealth -o direct_test.json
 ```
 
 ### Standalone Analysis on Saved File
 
 ```bash
-python3 dorkeye_analyze.py Dump/results.json --fetch --fmt=html
+python3 mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
 ```
 
 ---
@@ -810,7 +810,7 @@ python3 dorkeye_analyze.py Dump/results.json --fetch --fmt=html
 | `-o` / `--output` | string | auto | Output filename (saved in `Dump/`) |
 | `-c` / `--count` | int | 50 | Results per dork |
 | `--config` | string | — | Custom YAML/JSON config file |
-| `--create-config` | flag | — | Generate sample `dorkeye_config.yaml` |
+| `--create-config` | flag | — | Generate sample `mappingexpo_config.yaml` |
 | `--sqli` | flag | off | Enable SQL injection detection |
 | `--xss` | flag | off | Enable XSS detection (reflected, stored, DOM, header) |
 | `--xss-type` | string | `all` | XSS scope: `reflected` / `stored` / `dom` / `header` / `all` |

@@ -1,9 +1,9 @@
-# DorkEye Requirements
+# MappingExpo Requirements
 # Install with: pip install -r requirements.txt
 
 # Core HTTP requests management
 # urllib3 is also listed explicitly because it is imported
-# in dorkeye.py and Tools/dorkeye_analyze.py (not only as a dependency of requests)
+# in mappingexpo.py and Tools/mappingexpo_analyze.py (not only as a dependency of requests)
 requests>=2.32.3,<3.0.0
 urllib3>=2.2.0,<3.0.0
 
@@ -25,5 +25,5 @@ rich>=13.7.0,<14.0.0
 ddgs>=6.0.0
 
 # Local web dashboard (--ui)
-# Required only if you use: python dorkeye.py --ui
+# Required only if you use: python mappingexpo.py --ui
 flask>=3.0.0,<4.0.0

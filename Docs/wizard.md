@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/e99120da-b52b-44b5-ad50-c2b7d9d1c46a" />
 
-# Wizard — DorkEye Project
+# Wizard — MappingExpo Project
 
 The wizard is an interactive guided session that walks through every option without requiring any CLI knowledge. Recommended for first use or exploratory sessions.
 
@@ -9,7 +9,7 @@ The wizard is an interactive guided session that walks through every option with
 ## Launch
 
 ```bash
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 ```
 
 No other flags are needed — the wizard ignores them all.
@@ -19,7 +19,7 @@ No other flags are needed — the wizard ignores them all.
 ## Main Menu
 
 ```
-┌─[ DorkEye Wizard ]
+┌─[ MappingExpo Wizard ]
 │  1) Dork Search         — search with a dork or dork file
 │  2) Dork Generator      — generate dorks from YAML templates
 │  0) Exit
@@ -74,7 +74,7 @@ These work at any point during the search — mid-delay, mid-dork, or during SQL
 
 | Situation | Use |
 |-----------|-----|
-| First time running DorkEye | Wizard |
+| First time running MappingExpo | Wizard |
 | Exploring options interactively | Wizard |
 | Repeatable / scriptable tasks | CLI flags |
 | CI/CD or automation | CLI flags |

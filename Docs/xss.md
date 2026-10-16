@@ -1,8 +1,8 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/4c45212e-a457-43fe-ac6e-11ebe3757188" />
 
-# XSS Detection — DorkEye Project
+# XSS Detection — MappingExpo Project
 
-DorkEye includes a built-in multi-method XSS detection engine supporting reflected, stored, DOM-based, and header-based injection — no browser or external tool required.
+MappingExpo includes a built-in multi-method XSS detection engine supporting reflected, stored, DOM-based, and header-based injection — no browser or external tool required.
 
 -----
 
@@ -11,29 +11,29 @@ DorkEye includes a built-in multi-method XSS detection engine supporting reflect
 ### During a dork search
 
 ```bash
-python dorkeye.py -d "inurl:search.php?q=" --xss -o results.json
-python dorkeye.py --dg=xss --mode=medium --xss --stealth -o results.json
+python mappingexpo.py -d "inurl:search.php?q=" --xss -o results.json
+python mappingexpo.py --dg=xss --mode=medium --xss --stealth -o results.json
 ```
 
 ### Direct test on a single URL
 
 ```bash
-python dorkeye.py -u "https://example.com/search.php?q=test" --xss
-python dorkeye.py -u "https://example.com/search.php?q=test" --xss --stealth -o result.json
+python mappingexpo.py -u "https://example.com/search.php?q=test" --xss
+python mappingexpo.py -u "https://example.com/search.php?q=test" --xss --stealth -o result.json
 ```
 
 ### Re-test a saved results file
 
 ```bash
-python dorkeye.py -f Dump/results.json --xss -o retest.json
+python mappingexpo.py -f Dump/results.json --xss -o retest.json
 ```
 
 ### Select XSS type
 
 ```bash
-python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type reflected
-python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type dom
-python dorkeye.py -u "https://example.com/?q=x" --xss --xss-type all   # default
+python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type reflected
+python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type dom
+python mappingexpo.py -u "https://example.com/?q=x" --xss --xss-type all   # default
 ```
 
 -----
@@ -581,7 +581,7 @@ The sum of ranks across all vulnerable tests determines `overall_confidence`:
 ## Stealth Mode
 
 ```bash
-python dorkeye.py -u "https://example.com/?q=x" --xss --stealth
+python mappingexpo.py -u "https://example.com/?q=x" --xss --stealth
 ```
 
 With `--stealth`:

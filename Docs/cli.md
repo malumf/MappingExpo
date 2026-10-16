@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/72f403df-8e85-4fb0-9985-8e4e2c6d9716" />
 
-# CLI Reference — DorkEye Project
+# CLI Reference — MappingExpo Project
 
 > All flags, all accepted values, all combinations.
 > Single-page cheat sheet — keep it open while you hunt.
@@ -14,9 +14,9 @@
 |`--wizard`         |bool|Launch the interactive guided session (menus for everything)                      |
 |`-d DORK`, `--dork`|str |Single dork string **or** path to a `.txt` file (one dork per line, `#` = comment)|
 |`-u URL`, `--url`  |str |Single URL — direct vulnerability test (SQLi + XSS), no search performed          |
-|`-f FILE`, `--file`|str |Load saved DorkEye results (`.json` or `.txt`) for re-processing                  |
+|`-f FILE`, `--file`|str |Load saved MappingExpo results (`.json` or `.txt`) for re-processing                  |
 |`--dg[=CATEGORY]`  |str |Activate Dork Generator; value = category name or `all` (default if omitted)      |
-|`--create-config`  |bool|Write sample `dorkeye_config.yaml` to disk and exit                               |
+|`--create-config`  |bool|Write sample `mappingexpo_config.yaml` to disk and exit                               |
 |`--ui`             |bool|Launch the Web Console (Flask dashboard) — see **Web Console** section            |
 
 -----
@@ -37,7 +37,7 @@ All output files are saved inside the `Dump/` folder (auto-created).
 |Flag             |Description                                                    |
 |-----------------|---------------------------------------------------------------|
 |`--config FILE`  |Load a custom YAML or JSON configuration (merged with defaults)|
-|`--create-config`|Generate sample `dorkeye_config.yaml` and exit                 |
+|`--create-config`|Generate sample `mappingexpo_config.yaml` and exit                 |
 
 -----
 
@@ -139,7 +139,7 @@ FortiWeb · AWS WAF · DenyAll · Reblaze · generic (403/406/419/429 with short
 |`--analyze-fmt FORMAT` |`html` |Analysis report format: `html` / `md` / `json` / `txt`    |
 |`--analyze-out FILE`   |auto   |Custom path for the analysis report                       |
 
-Requires `dorkeye_agents.py` in `Tools/`. If missing, `--analyze` and `--crawl` are silently disabled.
+Requires `mappingexpo_agents.py` in `Tools/`. If missing, `--analyze` and `--crawl` are silently disabled.
 
 -----
 
@@ -165,7 +165,7 @@ refined dorks, searches again, and repeats until diminishing returns.
 Requires `Tools/db_portscan.py`. Activated via `--dbscan` in the main pipeline,
 or run standalone as `python Tools/db_portscan.py`.
 
-### Integrated flags (via `dorkeye.py`)
+### Integrated flags (via `mappingexpo.py`)
 
 |Flag                  |Default|Description                                                        |
 |----------------------|-------|-------------------------------------------------------------------|
@@ -178,7 +178,7 @@ or run standalone as `python Tools/db_portscan.py`.
 
 |Flag          |Default     |Description                                           |
 |--------------|------------|------------------------------------------------------|
-|`results_file`|*(required)*|DorkEye `.json` results file                          |
+|`results_file`|*(required)*|MappingExpo `.json` results file                          |
 |`--timeout`   |`2.5`       |TCP connect timeout in seconds                        |
 |`--threads`   |`60`        |Worker threads per host                               |
 |`--ports N…`  |all DB ports|Space-separated port list to scan                     |
@@ -223,16 +223,16 @@ prioritise relevant ports (e.g. a result containing “phpmyadmin” will scan p
 ## Web Console
 
 Requires Flask (`pip install flask`). Launches a local Matrix-themed dashboard
-that wraps the full `dorkeye.py` pipeline in a browser UI.
+that wraps the full `mappingexpo.py` pipeline in a browser UI.
 
-### Flags (via `dorkeye.py`)
+### Flags (via `mappingexpo.py`)
 
 |Flag      |Default|Description                                                     |
 |----------|-------|----------------------------------------------------------------|
 |`--ui`    |off    |Start the Web Console and open the browser                      |
 |`--port N`|`8080` |Preferred port; auto-increments up to +100 if the port is in use|
 
-### Standalone (`python Tools/dorkeye_web.py`)
+### Standalone (`python Tools/mappingexpo_web.py`)
 
 |Flag          |Default|Description                             |
 |--------------|-------|----------------------------------------|
@@ -319,7 +319,7 @@ Only one input source per invocation.
 
 - `--analyze-fetch-max` only takes effect when `--analyze-fetch` is also set
 - `--analyze-out` requires `--analyze` to be active (or `.json` output)
-- Requires `dorkeye_agents.py` in `Tools/` — otherwise silently skipped
+- Requires `mappingexpo_agents.py` in `Tools/` — otherwise silently skipped
 
 ### `--ui` constraints
 
@@ -330,7 +330,7 @@ Only one input source per invocation.
 
 ### `.json` output special behaviour
 
-When `-o` ends in `.json` and `--analyze` is **not** explicitly set, DorkEye displays an interactive prompt:
+When `-o` ends in `.json` and `--analyze` is **not** explicitly set, MappingExpo displays an interactive prompt:
 
 ```
 Run analysis on results? [y/N]:
@@ -376,56 +376,56 @@ Auto-detected — no flags needed. When running inside Termux:
 
 ```bash
 # ── WIZARD ───────────────────────────────────────────────────────────────
-python dorkeye.py --wizard
+python mappingexpo.py --wizard
 
 # ── WEB CONSOLE ──────────────────────────────────────────────────────────
-python dorkeye.py --ui
-python dorkeye.py --ui --port 9090
-python Tools/dorkeye_web.py --port 9090 --no-browser
+python mappingexpo.py --ui
+python mappingexpo.py --ui --port 9090
+python Tools/mappingexpo_web.py --port 9090 --no-browser
 
 # ── DORK SEARCH ──────────────────────────────────────────────────────────
-python dorkeye.py -d "site:example.com filetype:pdf" -o results.html
-python dorkeye.py -d dorks.txt -c 100 -o results.json
-python dorkeye.py -d "inurl:.php?id=" --sqli --stealth -o results.json
-python dorkeye.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
-python dorkeye.py -d dorks.txt --analyze --analyze-fetch -o results.json
-python dorkeye.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # full pipeline
+python mappingexpo.py -d "site:example.com filetype:pdf" -o results.html
+python mappingexpo.py -d dorks.txt -c 100 -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli --stealth -o results.json
+python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
+python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
+python mappingexpo.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # full pipeline
 
 # ── DORK GENERATOR ───────────────────────────────────────────────────────
-python dorkeye.py --dg=all
-python dorkeye.py --dg=sqli --mode=medium --sqli -o results.json
-python dorkeye.py --dg=all --mode=aggressive --dg-max=10000 -o results.json
-python dorkeye.py --dg=sqli --sqli --xss --analyze --analyze-fetch -o results.json
+python mappingexpo.py --dg=all
+python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
+python mappingexpo.py --dg=all --mode=aggressive --dg-max=10000 -o results.json
+python mappingexpo.py --dg=sqli --sqli --xss --analyze --analyze-fetch -o results.json
 
 # ── DIRECT URL TEST ──────────────────────────────────────────────────────
-python dorkeye.py -u "https://target.com/page.php?id=1"
-python dorkeye.py -u "https://target.com/page.php?id=1" --sqli --xss --stealth -o out.json
-python dorkeye.py -u "https://target.com/page.php?id=1" --xss --xss-type reflected -o out.json
+python mappingexpo.py -u "https://target.com/page.php?id=1"
+python mappingexpo.py -u "https://target.com/page.php?id=1" --sqli --xss --stealth -o out.json
+python mappingexpo.py -u "https://target.com/page.php?id=1" --xss --xss-type reflected -o out.json
 
 # ── FILE RE-PROCESSING ────────────────────────────────────────────────────
-python dorkeye.py -f Dump/results.json --sqli -o retest.json
-python dorkeye.py -f Dump/results.json --sqli --xss -o retest.json
-python dorkeye.py -f Dump/results.json --analyze --analyze-fetch -o reanalysis.json
-python dorkeye.py -f Dump/results.json --sqli --xss --analyze --crawl -o full.json
-python dorkeye.py -f Dump/results.json --dbscan --dbscan-timeout 3 -o dbscan.json
+python mappingexpo.py -f Dump/results.json --sqli -o retest.json
+python mappingexpo.py -f Dump/results.json --sqli --xss -o retest.json
+python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o reanalysis.json
+python mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full.json
+python mappingexpo.py -f Dump/results.json --dbscan --dbscan-timeout 3 -o dbscan.json
 
 # ── DB PORT SCAN ─────────────────────────────────────────────────────────
-python dorkeye.py -d dorks.txt --dbscan -o results.json
-python dorkeye.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+python mappingexpo.py -d dorks.txt --dbscan -o results.json
+python mappingexpo.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
 python Tools/db_portscan.py Dump/results.json
 python Tools/db_portscan.py Dump/results.json --timeout 3 --threads 80
 python Tools/db_portscan.py Dump/results.json --ports 3306 5432 27017 6379
 python Tools/db_portscan.py Dump/results.json --stealth --max-hosts 50
 
 # ── XSS-ONLY SCAN ────────────────────────────────────────────────────────
-python dorkeye.py -d dorks.txt --xss --xss-type reflected -o results.json
-python dorkeye.py -d dorks.txt --xss --xss-type dom -o results.json
+python mappingexpo.py -d dorks.txt --xss --xss-type reflected -o results.json
+python mappingexpo.py -d dorks.txt --xss --xss-type dom -o results.json
 
 # ── STANDALONE AGENTS ────────────────────────────────────────────────────
-python dorkeye_analyze.py Dump/results.json --fetch --fmt=html
+python mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
 
 # ── FULL PIPELINE (generate + search + sqli + xss + analyze + crawl + dbscan) ──
-python dorkeye.py \
+python mappingexpo.py \
   --dg=sqli \
   --mode=aggressive \
   --sqli \

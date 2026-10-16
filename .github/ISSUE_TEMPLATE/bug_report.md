@@ -1,6 +1,6 @@
 ---
 name: 🐞 Bug Report
-about: Create a report to help us improve DorkEye
+about: Create a report to help us improve MappingExpo
 title: '[BUG] '
 labels: bug
 assignees: ''
@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. Kali Linux, Windows, macOS]
  - Python Version: [e.g. 3.10]
- - DorkEye Version: [e.g. 1.0.2]
+ - MappingExpo Version: [e.g. 1.0.2]
 
 **Additional context**
 Add any other context about the problem here.

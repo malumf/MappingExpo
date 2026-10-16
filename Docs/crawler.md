@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/da43ca6a-d3bd-4df6-b9dd-5f35b9d97316" />
 
-# Adaptive Recursive Crawler — DorkEye Project
+# Adaptive Recursive Crawler — MappingExpo Project
 
 The crawler runs additional rounds of DuckDuckGo searches after the initial result set, automatically refining its dorks based on what it found in each round. No AI — everything is driven by pattern matching and template logic.
 
@@ -10,13 +10,13 @@ The crawler runs additional rounds of DuckDuckGo searches after the initial resu
 
 ```bash
 # Append --crawl to any search command
-python dorkeye.py -d "site:example.com inurl:admin" --crawl -o crawl.json
+python mappingexpo.py -d "site:example.com inurl:admin" --crawl -o crawl.json
 
 # With the Dork Generator
-python dorkeye.py --dg=sqli --crawl -o crawl.json
+python mappingexpo.py --dg=sqli --crawl -o crawl.json
 
 # On a saved result file (v4.8)
-python dorkeye.py -f Dump/results.json --crawl -o crawl.json
+python mappingexpo.py -f Dump/results.json --crawl -o crawl.json
 ```
 
 ---
@@ -31,7 +31,7 @@ python dorkeye.py -f Dump/results.json --crawl -o crawl.json
 | `--crawl-per-dork N` | `20` | DuckDuckGo results per dork per round |
 | `--crawl-stealth` | off | Longer delays between round searches |
 | `--crawl-report` | off | Generate a dedicated HTML crawl report |
-| `--crawl-out FILE` | auto | Path for the crawl report (default: `dorkeye_crawl_TIMESTAMP.html`) |
+| `--crawl-out FILE` | auto | Path for the crawl report (default: `mappingexpo_crawl_TIMESTAMP.html`) |
 
 ---
 
@@ -113,16 +113,16 @@ The stop reason is shown in the terminal summary and in the crawl report.
 
 ```bash
 # Crawl + SQLi on found URLs
-python dorkeye.py -d "site:target.com" --sqli --crawl -o results.json
+python mappingexpo.py -d "site:target.com" --sqli --crawl -o results.json
 
 # Crawl + analysis pipeline
-python dorkeye.py -d "site:target.com" \
+python mappingexpo.py -d "site:target.com" \
   --analyze --analyze-fetch \
   --crawl --crawl-rounds 5 --crawl-report \
   -o results.json
 
 # Maximum configuration
-python dorkeye.py --dg=all --mode=aggressive \
+python mappingexpo.py --dg=all --mode=aggressive \
   --sqli --stealth \
   --analyze --analyze-fetch --analyze-fetch-max 50 \
   --crawl --crawl-rounds 6 --crawl-max 500 \

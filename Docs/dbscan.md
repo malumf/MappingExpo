@@ -1,6 +1,6 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/3925ab33-92a0-41da-a181-06274796b5f4" />
 
-# DB Port Scanner — DorkEye
+# DB Port Scanner — MappingExpo
 
 > Scans exposed database ports on hosts extracted from dork results.
 > Detects open services, grabs banners, and confirms unauthenticated access via protocol-level probes.
@@ -9,7 +9,7 @@
 
 ## Overview
 
-`db_portscan.py` is a multi-threaded database port scanner integrated into the DorkEye pipeline.
+`db_portscan.py` is a multi-threaded database port scanner integrated into the MappingExpo pipeline.
 It extracts unique hostnames from result sets, scans them for exposed database services,
 and classifies each finding by severity based on whether authentication is required.
 
@@ -17,26 +17,26 @@ The scanner uses **protocol-aware probes** — not just TCP connect checks — s
 distinguish between a port that is open-but-authenticated and one that is directly accessible
 with no credentials.
 
-**Lives in:** `DorkEye/Tools/db_portscan.py`
+**Lives in:** `MappingExpo/Tools/db_portscan.py`
 
 -----
 
 ## Usage
 
-### Integrated (via `dorkeye.py`)
+### Integrated (via `mappingexpo.py`)
 
 ```bash
 # Enable DB scan on results from a dork search
-python dorkeye.py -d dorks.txt --dbscan -o results.json
+python mappingexpo.py -d dorks.txt --dbscan -o results.json
 
 # With custom timeout and thread count
-python dorkeye.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
+python mappingexpo.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
 
 # Re-process an existing results file
-python dorkeye.py -f Dump/results.json --dbscan -o retest.json
+python mappingexpo.py -f Dump/results.json --dbscan -o retest.json
 
 # Full pipeline with DB scan
-python dorkeye.py \
+python mappingexpo.py \
   --dg=sqli \
   --mode=aggressive \
   --sqli \
@@ -61,7 +61,7 @@ python Tools/db_portscan.py results.json --out Dump/custom_report
 
 ## Flags
 
-### Integrated flags (via `dorkeye.py`)
+### Integrated flags (via `mappingexpo.py`)
 
 |Flag                  |Default|Description                                            |
 |----------------------|-------|-------------------------------------------------------|
@@ -74,7 +74,7 @@ python Tools/db_portscan.py results.json --out Dump/custom_report
 
 |Flag          |Default     |Description                                                       |
 |--------------|------------|------------------------------------------------------------------|
-|`results_file`|*(required)*|DorkEye `.json` results file                                      |
+|`results_file`|*(required)*|MappingExpo `.json` results file                                      |
 |`--timeout`   |`2.5`       |TCP connect timeout in seconds                                    |
 |`--threads`   |`60`        |Worker threads per host                                           |
 |`--ports N…`  |all DB ports|Space-separated custom port list to scan                          |
@@ -198,7 +198,7 @@ The hard cap of 200 threads per host prevents resource exhaustion on large port 
 
 ## Interrupt Handling
 
-The scanner respects DorkEye’s global interrupt flags:
+The scanner respects MappingExpo’s global interrupt flags:
 
 |Action                         |Effect                                       |
 |-------------------------------|---------------------------------------------|
@@ -259,7 +259,7 @@ Structured JSON with full per-host findings:
 Human-readable report usable as a reference for follow-up tooling:
 
 ```
-# DorkEye DB Port Scan Report
+# MappingExpo DB Port Scan Report
 # Generated : 2025-05-01 14:32:10
 # Hosts     : 12
 # Open ports: 4
@@ -311,7 +311,7 @@ pip install requests rich
 
 ## Integration Notes
 
-- The DBScan agent is instantiated by `dorkeye.py` after the main search/analysis pipeline
+- The DBScan agent is instantiated by `mappingexpo.py` after the main search/analysis pipeline
   completes, so it always has a full result set to work from.
 - `DBPortScanAgent.run()` accepts the same result list format as the rest of the pipeline
   (`{"url": ..., "title": ..., "snippet": ..., "dork": ...}`).

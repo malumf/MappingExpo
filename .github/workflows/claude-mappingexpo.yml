@@ -1,8 +1,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# 🦅 DorkEye — Claude Code Agent
+# 🦅 MappingExpo — Claude Code Agent
 # ─────────────────────────────────────────────────────────────────────────────
 
-name: 🦅 DorkEye AI Agent
+name: 🦅 MappingExpo AI Agent
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: dorkeye-ai-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: mappingexpo-ai-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -43,10 +43,10 @@ jobs:
           claude_args: |
             --max-turns 10
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Read,GlobTool"
-            --append-system-prompt "Sei il Senior Security Auditor di DorkEye. Focus: XSS nei report, SQLi logic, e compatibilità Python 3.8. DDGS DEVE rimanere v4.x. Sii brutale sui bug ma conciso."
+            --append-system-prompt "Sei il Senior Security Auditor di MappingExpo. Focus: XSS nei report, SQLi logic, e compatibilità Python 3.8. DDGS DEVE rimanere v4.x. Sii brutale sui bug ma conciso."
           prompt: |
             Analizza PR #${{ github.event.pull_request.number }} nel repository ${{ github.repository }}.
-            Verifica la sicurezza di dorkeye.py e Tools/dorkeye_analyze.py. 
+            Verifica la sicurezza di mappingexpo.py e Tools/mappingexpo_analyze.py. 
             Posta una tabella riepilogativa con la severity dei finding.
 
   # JOB 2: Assistente (Semplificato)
@@ -100,10 +100,10 @@ jobs:
           claude_args: |
             --max-turns 25
             --allowedTools "Read,GlobTool,GrepTool,Bash(gh issue create:*),Bash(gh issue list:*)"
-            --append-system-prompt "Esegui l'audit di DorkEye. Hai a disposizione bandit_summary.json e pip_summary.json per i dati grezzi. Crea una issue solo se trovi nuovi problemi reali. Mantieni ddgs < 5.0.0."
+            --append-system-prompt "Esegui l'audit di MappingExpo. Hai a disposizione bandit_summary.json e pip_summary.json per i dati grezzi. Crea una issue solo se trovi nuovi problemi reali. Mantieni ddgs < 5.0.0."
           prompt: |
             Analizza l'intero repository. 
-            1. Controlla gap di confidenza in dorkeye_analyze.py.
-            2. Verifica sanitizzazione XSS in dorkeye_report.py.
+            1. Controlla gap di confidenza in mappingexpo_analyze.py.
+            2. Verifica sanitizzazione XSS in mappingexpo_report.py.
             3. Esamina bandit_summary.json e pip_summary.json.
             Crea un report dettagliato come GitHub Issue.

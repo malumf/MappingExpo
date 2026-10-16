@@ -1,6 +1,6 @@
 # ============================================================
 # Use permitted only on assets you own or with explicit authorization.
-# DorkEye — Advanced JSON Exposure Dork List
+# MappingExpo — Advanced JSON Exposure Dork List
 # Category: json_exposure
 # Author: xPloits3c
 # ============================================================

@@ -1,14 +1,14 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/c0c1fd19-e570-4185-8529-56f138a067e7" />
 
-# HTTP Fingerprinting — DorkEye Project
+# HTTP Fingerprinting — MappingExpo Project
 
-HTTP fingerprinting makes DorkEye's requests look like real browser traffic instead of a Python script. Each request is built from a complete browser profile — not just a user-agent string.
+HTTP fingerprinting makes MappingExpo's requests look like real browser traffic instead of a Python script. Each request is built from a complete browser profile — not just a user-agent string.
 
 ---
 
 ## What Gets Rotated
 
-Every HTTP request sent by DorkEye (dork search, file analysis, SQLi testing, page fetch) uses a randomly selected fingerprint that sets:
+Every HTTP request sent by MappingExpo (dork search, file analysis, SQLi testing, page fetch) uses a randomly selected fingerprint that sets:
 
 | Header | Example |
 |--------|---------|
@@ -45,10 +45,10 @@ Fingerprinting is **on by default**.
 
 ```bash
 # Disable fingerprinting (uses plain UA rotation only)
-python dorkeye.py -d dorks.txt --no-fingerprint -o results.html
+python mappingexpo.py -d dorks.txt --no-fingerprint -o results.html
 
 # Fingerprinting is always active unless disabled
-python dorkeye.py -d dorks.txt -o results.html
+python mappingexpo.py -d dorks.txt -o results.html
 ```
 
 In the configuration file:
@@ -90,7 +90,7 @@ Each fetch attempt (including retries) picks a random profile from this pool.
 | Baseline latency measurement | 2 samples | 2 samples |
 
 ```bash
-python dorkeye.py -d dorks.txt --stealth --sqli -o results.json
+python mappingexpo.py -d dorks.txt --stealth --sqli -o results.json
 ```
 
 ---

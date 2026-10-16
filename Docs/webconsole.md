@@ -1,22 +1,22 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/286d4893-e1e6-4dc4-b112-03f0c19287c6" />
 
-# Web Console — DorkEye
+# Web Console — MappingExpo
 
-> Matrix-themed local web dashboard for all DorkEye operations.
+> Matrix-themed local web dashboard for all MappingExpo operations.
 > Run scans, preview dorks, stream live output, and browse results — all from the browser.
 
 -----
 
 ## Overview
 
-`dorkeye_web.py` is a Flask-based web interface that wraps the entire `dorkeye.py` pipeline
+`mappingexpo_web.py` is a Flask-based web interface that wraps the entire `mappingexpo.py` pipeline
 in a browser UI. It launches a local server (bound to `127.0.0.1` only), spawns scans as
 background jobs, and streams their output in real time via **Server-Sent Events (SSE)**.
 
 No data leaves the machine. The dashboard is a local tool — it is not designed to be
 exposed on a network interface.
 
-**Lives in:** `DorkEye/Tools/dorkeye_web.py`
+**Lives in:** `MappingExpo/Tools/mappingexpo_web.py`
 
 -----
 
@@ -32,36 +32,36 @@ pip install flask
 
 ## Usage
 
-### Via `dorkeye.py` (recommended)
+### Via `mappingexpo.py` (recommended)
 
 ```bash
 # Start on default port 8080
-python dorkeye.py --ui
+python mappingexpo.py --ui
 
 # Start on a custom port
-python dorkeye.py --ui --port 9090
+python mappingexpo.py --ui --port 9090
 ```
 
 ### Standalone
 
 ```bash
-python Tools/dorkeye_web.py
-python Tools/dorkeye_web.py --port 9090
-python Tools/dorkeye_web.py --port 9090 --no-browser
+python Tools/mappingexpo_web.py
+python Tools/mappingexpo_web.py --port 9090
+python Tools/mappingexpo_web.py --port 9090 --no-browser
 ```
 
 -----
 
 ## Flags
 
-### Via `dorkeye.py`
+### Via `mappingexpo.py`
 
 |Flag      |Default|Description                                                      |
 |----------|-------|-----------------------------------------------------------------|
 |`--ui`    |off    |Launch the Web Console and open the browser automatically        |
 |`--port N`|`8080` |Preferred port — auto-increments up to +100 if the port is in use|
 
-### Standalone (`python Tools/dorkeye_web.py`)
+### Standalone (`python Tools/mappingexpo_web.py`)
 
 |Flag          |Default|Description                             |
 |--------------|-------|----------------------------------------|
@@ -107,7 +107,7 @@ to attach the terminal to any of them.
 
 ### ◉ New Scan
 
-Full-featured scan form covering every `dorkeye.py` pipeline option.
+Full-featured scan form covering every `mappingexpo.py` pipeline option.
 
 **Target**
 
@@ -144,7 +144,7 @@ XSS type selector (`--xss-type`): `all` / `reflected` / `stored` / `dom`.
 
 ### ◎ URL Tester
 
-Direct vulnerability test on a single target URL — maps to `dorkeye.py -u`.
+Direct vulnerability test on a single target URL — maps to `mappingexpo.py -u`.
 
 |Field     |Flag mapped |
 |----------|------------|
@@ -168,7 +168,7 @@ Preview and export dork combinations without launching a scan.
 |Mode          |`soft` / `medium` / `aggressive`                                                |
 |Max combos    |Cap on generated combinations (10–10,000)                                       |
 |PREVIEW button|Fetches up to 200 dorks inline for review                                       |
-|EXPORT TXT    |Downloads the full set as `dorkeye_dorks_<ts>.txt`                              |
+|EXPORT TXT    |Downloads the full set as `mappingexpo_dorks_<ts>.txt`                              |
 
 Template resolution order:
 
@@ -208,7 +208,7 @@ File browser for the `Dump/` directory. Shows all `.html`, `.json`, `.txt`, `.cs
 |Name     |File name — click to open `.html` in browser|
 |Size     |Human-readable file size                    |
 |Modified |Last modified timestamp                     |
-|FILE MODE|Re-process with `dorkeye.py -f`             |
+|FILE MODE|Re-process with `mappingexpo.py -f`             |
 |↓ DL     |Download the file                           |
 |OPEN     |Open `.html` reports in a new tab           |
 
@@ -248,7 +248,7 @@ does not block — multiple jobs can run concurrently.
 **Job lifecycle:**
 
 ```
-api/run POST  →  JobManager.spawn()  →  Popen(dorkeye.py ...)
+api/run POST  →  JobManager.spawn()  →  Popen(mappingexpo.py ...)
                                         ↓
                                   stdout/stderr merged
                                         ↓
@@ -289,18 +289,18 @@ api/run POST  →  JobManager.spawn()  →  Popen(dorkeye.py ...)
 ## Path Resolution
 
 The web module resolves the project root at startup by walking up the directory tree
-from `dorkeye_web.py` looking for `dorkeye.py`:
+from `mappingexpo_web.py` looking for `mappingexpo.py`:
 
 ```
-DorkEye/
-    dorkeye.py          ← root anchor
+MappingExpo/
+    mappingexpo.py          ← root anchor
     Dump/               ← output directory
     Templates/          ← dork templates
     Tools/
-        dorkeye_web.py  ← starts here
+        mappingexpo_web.py  ← starts here
 ```
 
-This works whether `dorkeye_web.py` is run directly from `Tools/` or from the project root.
+This works whether `mappingexpo_web.py` is run directly from `Tools/` or from the project root.
 
 -----
 
@@ -311,7 +311,7 @@ This works whether `dorkeye_web.py` is run directly from `Tools/` or from the pr
 - Template path resolution includes a **directory traversal guard**: any path that resolves
   outside `Templates/` is rejected and falls back to the default template.
 - SIGINT is restored to the default handler before starting Flask so that Ctrl+C correctly
-  shuts down the Werkzeug server (DorkEye installs a custom SIGINT handler that would
+  shuts down the Werkzeug server (MappingExpo installs a custom SIGINT handler that would
   otherwise intercept the signal and prevent clean shutdown).
 
 -----

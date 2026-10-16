@@ -1,8 +1,8 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/5771d0bb-5341-48d7-a3e1-9d75a98872da" />
 
-# Dork Generator — DorkEye Project
+# Dork Generator — MappingExpo Project
 
-The Dork Generator produces structured Google dorks automatically from YAML template files. Instead of writing dorks manually, you define variables and templates once and let DorkEye generate every combination.
+The Dork Generator produces structured Google dorks automatically from YAML template files. Instead of writing dorks manually, you define variables and templates once and let MappingExpo generate every combination.
 
 ---
 
@@ -10,13 +10,13 @@ The Dork Generator produces structured Google dorks automatically from YAML temp
 
 ```bash
 # All categories, soft mode
-python dorkeye.py --dg=all -o results.html
+python mappingexpo.py --dg=all -o results.html
 
 # Specific category, medium mode
-python dorkeye.py --dg=sqli --mode=medium -o results.json
+python mappingexpo.py --dg=sqli --mode=medium -o results.json
 
 # Aggressive mode, high combination limit
-python dorkeye.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+python mappingexpo.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
 ```
 
 ---
@@ -48,7 +48,7 @@ Each mode is a superset of the previous: `aggressive` includes everything in `me
 
 ## Template Structure
 
-Templates are YAML files in the `Templates/` folder. DorkEye ships with `dorks_templates.yaml` and `dorks_templates_research.yaml`.
+Templates are YAML files in the `Templates/` folder. MappingExpo ships with `dorks_templates.yaml` and `dorks_templates_research.yaml`.
 
 ### Basic structure
 
@@ -116,14 +116,14 @@ Run `--wizard` → option 2 to see the exact categories available in each templa
 
 ## Combination Limit
 
-DorkEye caps combinations per template at `--dg-max` (default `800`). When the theoretical total exceeds the cap, it samples randomly without replacement, so you always get a representative spread rather than just the first N combinations.
+MappingExpo caps combinations per template at `--dg-max` (default `800`). When the theoretical total exceeds the cap, it samples randomly without replacement, so you always get a representative spread rather than just the first N combinations.
 
 ```bash
 # Default cap
-python dorkeye.py --dg=all
+python mappingexpo.py --dg=all
 
 # Raise the cap for exhaustive runs
-python dorkeye.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
+python mappingexpo.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
 ```
 
 ---
@@ -132,24 +132,24 @@ python dorkeye.py --dg=all --mode=aggressive --dg-max 10000 -o big.json
 
 ```bash
 # Generator + SQLi testing
-python dorkeye.py --dg=sqli --mode=medium --sqli --stealth -o results.json
+python mappingexpo.py --dg=sqli --mode=medium --sqli --stealth -o results.json
 
 # Generator + analysis pipeline
-python dorkeye.py --dg=all --analyze --analyze-fetch -o results.json
+python mappingexpo.py --dg=all --analyze --analyze-fetch -o results.json
 
 # Generator + adaptive crawl
-python dorkeye.py --dg=sqli --crawl --crawl-rounds 5 -o crawl.json
+python mappingexpo.py --dg=sqli --crawl --crawl-rounds 5 -o crawl.json
 
 # Full pipeline
-python dorkeye.py --dg=sqli --mode=aggressive --dg-max 5000 \
+python mappingexpo.py --dg=sqli --mode=aggressive --dg-max 5000 \
   --sqli --stealth \
   --analyze --analyze-fetch --analyze-fetch-max 50 \
   --crawl --crawl-rounds 6 --crawl-stealth \
   -o results.json
 
 # Custom template
-python dorkeye.py --dg=backups --templates=dorks_templates_research.yaml -o results.json
+python mappingexpo.py --dg=backups --templates=dorks_templates_research.yaml -o results.json
 
 # All template files
-python dorkeye.py --dg=all --templates=all -o results.json
+python mappingexpo.py --dg=all --templates=all -o results.json
 ```

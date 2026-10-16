@@ -1,21 +1,21 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/3f4cdecf-78ac-4fe6-aefe-2d6d85118378" />
 
-# Output Formats — DorkEye Project
+# Output Formats — MappingExpo Project
 
-All result files are saved to the `Dump/` folder, created automatically in the same directory as `dorkeye.py`.
+All result files are saved to the `Dump/` folder, created automatically in the same directory as `mappingexpo.py`.
 
 ---
 
 ## Specify Output
 
 ```bash
-python dorkeye.py -d "site:example.com" -o results.html   # HTML report
-python dorkeye.py -d "site:example.com" -o results.json   # JSON + analysis prompt
-python dorkeye.py -d "site:example.com" -o results.csv    # CSV spreadsheet
-python dorkeye.py -d "site:example.com" -o results.txt    # Plain text
+python mappingexpo.py -d "site:example.com" -o results.html   # HTML report
+python mappingexpo.py -d "site:example.com" -o results.json   # JSON + analysis prompt
+python mappingexpo.py -d "site:example.com" -o results.csv    # CSV spreadsheet
+python mappingexpo.py -d "site:example.com" -o results.txt    # Plain text
 ```
 
-If `-o` is omitted, DorkEye generates: `report_YYYYMMDD_HHMMSS.html`
+If `-o` is omitted, MappingExpo generates: `report_YYYYMMDD_HHMMSS.html`
 
 ---
 
@@ -71,10 +71,10 @@ The popup closes on ✕ click or click-outside. Positioning is viewport-aware.
 ## JSON
 
 ```bash
-python dorkeye.py -d "site:example.com" -o results.json
+python mappingexpo.py -d "site:example.com" -o results.json
 ```
 
-When the output is `.json`, DorkEye prompts after the search:
+When the output is `.json`, MappingExpo prompts after the search:
 > *"Vuoi analizzare i risultati? [y/N]"*
 
 Use `--analyze` to skip the prompt and force yes.
@@ -130,7 +130,7 @@ Use `--analyze` to skip the prompt and force yes.
 
 ```json
 {
-  "meta":       { "generated_at": "...", "target": "...", "engine": "DorkEye v4.8 + Agents v3.0" },
+  "meta":       { "generated_at": "...", "target": "...", "engine": "MappingExpo v4.8 + Agents v3.0" },
   "metrics":    { "total": 42, "by_label": { "CRITICAL": 3, "HIGH": 8, "..." }, "secrets": 5, "pii": 2, "emails": 7, "subdomains": 4 },
   "secrets":    [{ "type": "AWS_KEY", "severity": "CRITICAL", "value": "AKIA…", "..." }],
   "pii":        [{ "type": "CF_IT", "value": "RSM***", "..." }],
@@ -146,7 +146,7 @@ Use `--analyze` to skip the prompt and force yes.
 ## CSV
 
 ```bash
-python dorkeye.py -d "site:example.com" -o results.csv
+python mappingexpo.py -d "site:example.com" -o results.csv
 ```
 
 Columns:
@@ -173,7 +173,7 @@ Columns:
 ## TXT
 
 ```bash
-python dorkeye.py -d "site:example.com" -o results.txt
+python mappingexpo.py -d "site:example.com" -o results.txt
 ```
 
 Plain numbered list with per-result details:
