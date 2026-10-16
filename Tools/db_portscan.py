@@ -352,7 +352,7 @@ def _probe_http(
                 timeout=timeout,
                 verify=False,
                 allow_redirects=True,
-                headers={"User-Agent": "Mozilla/5.0 DorkEye DBScan/1.0"},
+                headers={"User-Agent": "Mozilla/5.0 MappingExpo DBScan/1.0"},
             )
             body = r.text[:1000]
             # Verifica indicadores de no-auth
