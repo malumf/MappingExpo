@@ -520,6 +520,28 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   4. **Fase 0 (saneamento ético)**: payloads WAF-bypass, "Cubra seus rastros."/"Permaneça fantasma." (reframe), referências a Sqlmap (db_portscan L773), _SecurityPatternDB (condição documentada acima)
 - **Nada commitado** (regra em vigor)
 
+---
+
+# FASE 3 — RENAME (dorkeye → mappingexpo)
+
+## Plano aprovado (decisões do mantenedor, 2026-10-16)
+- **Ordem das fases**: Fase 3 (rename) → Fase 2 (regionalização BR) → Fase 0 (saneamento ético)
+- **dork_generator.py**: MANTER (dork = termo da técnica, não a marca; classe DorkGenerator, rotas /api/dorkgen e label DorkGen mantidos)
+- **Marker XSS**: DEXSS7x → **MEXSS7x** (7 chars — preserva exatamente o comprimento de todos os payloads; leitura: MappingExpo XSS)
+- **Identificadores internos c/ marca**: RENOMEAR (DORKEYE_PY→MAPPINGEXPO_PY, var instância dorkeye→mappingexpo, logger dorkeye_web→mappingexpo_web)
+- **Linhas de autor** ("Author: xPloits3c … | DorkEye Project", "script by xPloits3c / DorkEye", "created for DorkEyeProject"): MANTER (atribuição de origem)
+- **Docs**: bulk programático + arquivo de diff completo p/ auditoria
+- **Commits**: um por camada (A–G)
+- **Camadas**: A (1+2 atômica: renames físicos + imports) · B (3: classe/identificadores) · C (4: marker MEXSS7x) · D (5: UA) · E (6: paths de saída) · F (7: marca visível + arte MAPPING EXPO) · G (docs/meta bulk)
+- **NÃO tocados**: TRADUCAO_LOG.md (histórico) · FUNDING.yml (attribution paypal) · URLs github/t.me (attribution) · LICENSE (zero ocorrências) · nomes sqli.py/xss.py/db_portscan.py (sem prefixo de marca) · termos "dork"/"dorking"/"DorkGen"/"DorkGenerator" (termo da técnica)
+
+## 2026-10-16 — CAMADA A: renames físicos + imports (commit fase-3a)
+- **Renames** (git mv): dorkeye.py→mappingexpo.py · Tools/dorkeye_{agents,analyze,web,patterns}.py→Tools/mappingexpo_*.py
+- **Diff aprovado**: 52 linhas (mappingexpo.py 7 · agents 20 · analyze 14 · web 8 · patterns 2 · sqli 1) — imports, refs de módulo em docstrings/exemplos/mensagens de erro, `python dorkeye.py`→`python mappingexpo.py` em exemplos, `MAPPINGEXPO_PY` (def+3 usos), logger `mappingexpo_web`, `mappingexpo_llm_plugin` (plugin opcional), fix extra aprovado: `analisi.json`→`analise.json` (resíduo italiano da Fase 1)
+- Linhas c/ marca+módulo na mesma linha (mappingexpo.py L2607, patterns L4) transformadas integralmente aqui (antecipação parcial da camada F)
+- **Verificações** (todas PASSARAM): py_compile ×9 (SyntaxWarning preexistente `\s` xss.py L1270 — conhecida da Fase 1) · resolução estática de imports: todos os módulos locais resolvem em disco (llm_plugin permitido ausente) · zero imports dorkeye* restantes · residual dorkeye no código = 169 refs (aguardam E/F/G)
+- **Pendências da camada A**: Docs/README ainda referenciam nomes antigos (corrigidos na camada G)
+
 
 
 

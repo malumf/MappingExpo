@@ -1,10 +1,10 @@
 """
 DorkEye Patterns
 ======================
-dorkeye_patterns.py — Shared pattern library for DorkEye Project
+mappingexpo_patterns.py — Shared pattern library for MappingExpo Project
 ===============================================================
 Centraliza padrões, constantes e auxiliares que estavam duplicados entre
-dorkeye_agents.py e dorkeye_analyze.py:
+mappingexpo_agents.py e mappingexpo_analyze.py:
 
   - TRIAGE_RULES       — pontuação por regex para classificação de prioridade OSINT
   - SECRET_RULES       — padrões de detecção de credenciais/segredos (+ hashes)

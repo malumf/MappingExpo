@@ -41,7 +41,7 @@ from urllib3.util.retry import Retry
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ── Flags de interrupção — espelhadas do signal handler do dorkeye.py ────────────────
+# ── Flags de interrupção — espelhadas do signal handler do mappingexpo.py ────────────────
 _exit_requested: bool = False
 _skip_current:   bool = False
 

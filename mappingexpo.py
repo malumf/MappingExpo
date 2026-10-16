@@ -51,7 +51,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ── Agents ────────────────────────────────────────────────────────────────────
 try:
-    from dorkeye_agents import (
+    from mappingexpo_agents import (
         run_analysis_pipeline as _run_agents_pipeline,
         add_crawler_args,
         run_crawl,
@@ -2598,13 +2598,13 @@ def main():
     # ── Interface Web ────────────────────────────────────────────────────────────────
     # Verificado antes do argparse para não consumir --port / --no-browser
     if "--ui" in sys.argv:
-        # dorkeye_web.py está localizado em Tools/, que já está no sys.path
+        # mappingexpo_web.py está localizado em Tools/, que já está no sys.path
         try:
-            from dorkeye_web import launch_web
+            from mappingexpo_web import launch_web
         except ImportError:
             console.print(
-                "[red][!] dorkeye_web.py não encontrado em Tools/.[/red]\n"
-                "[dim]    Certifique-se de que o arquivo existe em DorkEye/Tools/dorkeye_web.py[/dim]\n"
+                "[red][!] mappingexpo_web.py não encontrado em Tools/.[/red]\n"
+                "[dim]    Certifique-se de que o arquivo existe em MappingExpo/Tools/mappingexpo_web.py[/dim]\n"
                 "[dim]    e de que o Flask está instalado:  pip install flask[/dim]"
             )
             sys.exit(1)
@@ -2753,7 +2753,7 @@ def main():
         else:
             console.print("[bold cyan]└─>[/bold cyan] [dim]Análise pulada.[/dim]\n")
     elif args.analyze and not _ANALYZE_AVAILABLE:
-        console.print("[yellow][!] dorkeye_agents.py não encontrado — análise indisponível.[/yellow]")
+        console.print("[yellow][!] mappingexpo_agents.py não encontrado — análise indisponível.[/yellow]")
         _do_analyze = False
 
     dorkeye = DorkEyeEnhanced(config, output_file)
@@ -3011,7 +3011,7 @@ def main():
 
     if getattr(args, "crawl", False):
         if not _ANALYZE_AVAILABLE:
-            console.print("[yellow][!] dorkeye_agents.py não encontrado — crawl indisponível.[/yellow]")
+            console.print("[yellow][!] mappingexpo_agents.py não encontrado — crawl indisponível.[/yellow]")
         else:
             try:
                 crawl_out = run_crawl(seed_dorks=dorks, args=args, target="")

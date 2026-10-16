@@ -19,7 +19,7 @@ Pipeline (ativado com --analyze):
 10. ReportAgent            — relatório HTML/MD/JSON com todas as seções novas (incl. segurança)
 11. DorkCrawlerAgent       — crawl recursivo adaptativo (alimentado por TechFP + SubHarvest)
 12. DBScan                 — scan de portas de banco de dados do agente (portas abertas)
-13. Análise LLM            — Todos os resultados triados | dict `analysis` opcional — requer dorkeye_llm_plugin.py
+13. Análise LLM            — Todos os resultados triados | dict `analysis` opcional — requer mappingexpo_llm_plugin.py
 
 O SecurityAgent opera como middleware — faz hook em AMBOS:
 
@@ -27,15 +27,15 @@ O SecurityAgent opera como middleware — faz hook em AMBOS:
 - O fluxo --analyze (sob demanda, como etapa 3 do pipeline)
 
 Uso via CLI:
-python dorkeye.py --dg=all --analyze -o results.json
-python dorkeye.py -d dorks.txt --analyze --analyze-fetch --analyze-fmt=html
+python mappingexpo.py --dg=all --analyze -o results.json
+python mappingexpo.py -d dorks.txt --analyze --analyze-fetch --analyze-fmt=html
 
 # Flags específicos de segurança:
-python dorkeye.py --dg=all --analyze --security-mode=active --security-quarantine
-python dorkeye.py --dg=all --analyze --no-security   # disable agent
+python mappingexpo.py --dg=all --analyze --security-mode=active --security-quarantine
+python mappingexpo.py --dg=all --analyze --no-security   # disable agent
 
 Uso standalone (a partir de arquivo de resultados):
-python dorkeye_agents.py results.json --analyze-fmt=html --analyze-out=report.html
+python mappingexpo_agents.py results.json --analyze-fmt=html --analyze-out=report.html
 
 Autor: xPloits3c | DorkEye Project
 """
@@ -91,10 +91,10 @@ except ImportError:
         print(f"\n[{title}]\n{body}")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# BIBLIOTECA DE PADRÕES — importada de dorkeye_patterns.py
+# BIBLIOTECA DE PADRÕES — importada de mappingexpo_patterns.py
 # ══════════════════════════════════════════════════════════════════════════════
 
-from dorkeye_patterns import (
+from mappingexpo_patterns import (
     TRIAGE_RULES       as _TRIAGE_PATTERNS,
     SECRET_RULES       as _SECRET_PATTERNS,
     SECRET_SEVERITY    as _SECRET_SEVERITY,
@@ -1089,7 +1089,7 @@ class SecurityAgent(BaseAgent):
       Adiciona 'security_verdict' (dict) a cada resultado processado.
 
     Integração no fluxo de scan (hook standalone):
-      from dorkeye_agents import security_scan_hook
+      from mappingexpo_agents import security_scan_hook
       verdict = security_scan_hook(url, content, headers)
       if verdict.blocked:
           continue  # skip result
@@ -1393,7 +1393,7 @@ def get_security_agent(**kwargs) -> SecurityAgent:
     Chamável de qualquer módulo do DorkEye.
 
     Uso:
-        from dorkeye_agents import get_security_agent
+        from mappingexpo_agents import get_security_agent
         agent = get_security_agent(mode="active")
         verdict = agent.scan_single(url, content)
     """
@@ -1417,7 +1417,7 @@ def security_scan_hook(
     Hook rápido para integração inline no fluxo de scan.
 
     Uso no dorkeye.py (loop de scan):
-        from dorkeye_agents import security_scan_hook
+        from mappingexpo_agents import security_scan_hook
         verdict = security_scan_hook(result_url, response_text, resp_headers)
         if verdict.blocked:
             continue  # skip malicious result
@@ -2945,7 +2945,7 @@ def run_crawl(
     target:  str = "",
     plugin       = None,
 ) -> dict:
-    """Entry point para o dorkeye.py — inicia o DorkCrawlerAgent."""
+    """Entry point para o mappingexpo.py — inicia o DorkCrawlerAgent."""
     crawler = DorkCrawlerAgent(
         plugin           = plugin,
         max_rounds       = getattr(args, "crawl_rounds",   4),
@@ -3274,14 +3274,14 @@ if __name__ == "__main__":
         epilog=(
             "Exemplos:\n"
             "  # Análise standalone (sem exigência de LLM)\n"
-            "  python dorkeye_agents.py results.json\n"
-            "  python dorkeye_agents.py results.json --analyze-fetch --analyze-fmt=html\n\n"
+            "  python mappingexpo_agents.py results.json\n"
+            "  python mappingexpo_agents.py results.json --analyze-fetch --analyze-fmt=html\n\n"
             "  # Com security agent em modo active + quarentena\n"
-            "  python dorkeye_agents.py results.json --security-mode=active --security-quarantine\n\n"
+            "  python mappingexpo_agents.py results.json --security-mode=active --security-quarantine\n\n"
             "  # Desativa o security agent\n"
-            "  python dorkeye_agents.py results.json --no-security\n\n"
+            "  python mappingexpo_agents.py results.json --no-security\n\n"
             "  # Com LLM Ollama (opcional — adiciona resumo e análise contextual)\n"
-            "  python dorkeye_agents.py results.json --llm --analyze-fetch\n"
+            "  python mappingexpo_agents.py results.json --llm --analyze-fetch\n"
         ),
     )
     parser.add_argument(
@@ -3319,12 +3319,12 @@ if __name__ == "__main__":
 
     _llm_available = False
     try:
-        from dorkeye_llm_plugin import add_llm_args, init_llm_plugin
+        from mappingexpo_llm_plugin import add_llm_args, init_llm_plugin
         add_llm_args(parser)
         _llm_available = True
     except ImportError:
         parser.add_argument("--llm", action="store_true",
-                            help="(indisponível: dorkeye_llm_plugin.py não encontrado)")
+                            help="(indisponível: mappingexpo_llm_plugin.py não encontrado)")
 
     args     = parser.parse_args()
     args.llm = getattr(args, "llm", False)
@@ -3352,7 +3352,7 @@ if __name__ == "__main__":
         if not llm:
             print("[!] LLM não inicializado — continuando em modo autônomo.", file=sys.stderr)
     elif args.llm and not _llm_available:
-        print("[!] dorkeye_llm_plugin.py não encontrado — modo autônomo.", file=sys.stderr)
+        print("[!] mappingexpo_llm_plugin.py não encontrado — modo autônomo.", file=sys.stderr)
 
     print(f"\n[*] Analisando {len(results)} resultados de '{p.name}'")
     print(f"[*] Mode: {'LLM + regex' if llm else 'autonomous (regex)'}")

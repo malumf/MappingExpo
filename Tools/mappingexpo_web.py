@@ -18,7 +18,7 @@ except ImportError:
     _FLASK = False
 
 # ── Logger (somente servidor — nunca encaminhado a clientes HTTP) ───────────────
-_LOG = logging.getLogger('dorkeye_web')
+_LOG = logging.getLogger('mappingexpo_web')
 if not _LOG.handlers:
     _h = logging.StreamHandler()
     _h.setFormatter(logging.Formatter('[%(levelname)s] %(name)s: %(message)s'))
@@ -41,14 +41,14 @@ def _safe_err(e: Exception, context: str = '') -> str:
 def _find_project_root() -> Path:
     here = Path(__file__).resolve().parent
     for candidate in [here, here.parent, here.parent.parent]:
-        if (candidate / "dorkeye.py").exists():
+        if (candidate / "mappingexpo.py").exists():
             return candidate
     return here
 
 ROOT          = _find_project_root()
 DUMP_DIR      = ROOT / "Dump"
 TEMPLATES_DIR = ROOT / "Templates"
-DORKEYE_PY    = ROOT / "dorkeye.py"
+MAPPINGEXPO_PY = ROOT / "mappingexpo.py"
 PYTHON_EXE    = sys.executable
 
 _ANSI_RE = re.compile(
@@ -135,9 +135,9 @@ def _normalize_output(out: str, default_prefix: str) -> tuple:
     """
     Retorna (cmd_arg, ui_filename).
 
-    cmd_arg     — passado ao dorkeye.py como -o.
+    cmd_arg     — passado ao mappingexpo.py como -o.
                   Apenas o nome do arquivo (sem o prefixo Dump/):
-                  o dorkeye.py adiciona Dump/ internamente.
+                  o mappingexpo.py adiciona Dump/ internamente.
     ui_filename — relativo a DUMP_DIR; usado pela rota /dump/<ui_filename> e
                   exibido na seção Results.
     """
@@ -160,7 +160,7 @@ def _normalize_output(out: str, default_prefix: str) -> tuple:
 
 
 def build_scan_cmd(d: dict) -> tuple:
-    cmd = [PYTHON_EXE, str(DORKEYE_PY)]
+    cmd = [PYTHON_EXE, str(MAPPINGEXPO_PY)]
 
     if d.get('dork'):
         dork_val = d['dork'].strip()
@@ -239,7 +239,7 @@ def build_scan_cmd(d: dict) -> tuple:
 
 
 def build_urltest_cmd(d: dict) -> tuple:
-    cmd = [PYTHON_EXE, str(DORKEYE_PY), '-u', d['url']]
+    cmd = [PYTHON_EXE, str(MAPPINGEXPO_PY), '-u', d['url']]
     if d.get('sqli'): cmd.append('--sqli')
     if d.get('xss'):
         cmd.append('--xss')
@@ -254,7 +254,7 @@ def build_urltest_cmd(d: dict) -> tuple:
 
 def build_file_cmd(d: dict) -> tuple:
     fpath = d.get('file','')
-    cmd   = [PYTHON_EXE, str(DORKEYE_PY), '-f', fpath]
+    cmd   = [PYTHON_EXE, str(MAPPINGEXPO_PY), '-f', fpath]
     if d.get('sqli'): cmd.append('--sqli')
     if d.get('xss'):  cmd.append('--xss')
     if d.get('dbscan'):

@@ -13,13 +13,13 @@ Lê resultados salvos pelo DorkEye (-o results.json) e produz:
   4. Report    — HTML com tema escuro / Markdown / JSON / texto
 
 Ex.:
-    python dorkeye_analyze.py Dump/results.json
-    python dorkeye_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
-    python dorkeye_analyze.py Dump/results.json --fetch --fetch-max=30 --fmt=md
+    python mappingexpo_analyze.py Dump/results.json
+    python mappingexpo_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
+    python mappingexpo_analyze.py Dump/results.json --fetch --fetch-max=30 --fmt=md
 
-Integrado ao dorkeye.py via --analyze-local:
-    python dorkeye.py --dg=all -o results.html --analyze-local
-    python dorkeye.py -d dorks.txt --analyze-local --analyze-local-fetch --analyze-local-fmt=html
+Integrado ao mappingexpo.py via --analyze-local:
+    python mappingexpo.py --dg=all -o results.html --analyze-local
+    python mappingexpo.py -d dorks.txt --analyze-local --analyze-local-fetch --analyze-local-fmt=html
 
 Autor: @xPloits3c
 """
@@ -72,9 +72,9 @@ except ImportError:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  BIBLIOTECA DE PADRÕES — importada de dorkeye_patterns.py
+#  BIBLIOTECA DE PADRÕES — importada de mappingexpo_patterns.py
 # ══════════════════════════════════════════════════════════════════════════════
-from dorkeye_patterns import (
+from mappingexpo_patterns import (
     TRIAGE_RULES,
     SECRET_RULES,
     SecretRule,
@@ -792,19 +792,19 @@ def main() -> None:
         epilog="""Exemplos:
 
   # Análise básica (triage + regex de segredos)
-    python dorkeye_analyze.py Dump/results.json
+    python mappingexpo_analyze.py Dump/results.json
 
   # Com download de páginas + relatório HTML
-    python dorkeye_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
+    python mappingexpo_analyze.py Dump/results.json --fetch --fmt=html --out=report.html
 
   # Relatório Markdown com contexto do alvo
-    python dorkeye_analyze.py results.json --target "gov.it admin panels" --fmt=md
+    python mappingexpo_analyze.py results.json --target "gov.it admin panels" --fmt=md
 
   # Baixa até 40 páginas (mais preciso para segredos)
-    python dorkeye_analyze.py results.json --fetch --fetch-max=40 --fmt=html
+    python mappingexpo_analyze.py results.json --fetch --fetch-max=40 --fmt=html
 
   # Saída JSON legível por máquina
-    python dorkeye_analyze.py results.json --fmt=json --out=analisi.json
+    python mappingexpo_analyze.py results.json --fmt=json --out=analise.json
 """,
     )
 
