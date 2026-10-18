@@ -635,6 +635,27 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   - Falsos positivos PREEXISTENTES confirmados (não regressão): TAX_ID_AS `[0-9A-Z]{9,10}` re.I casa "sequencia"/"protocolo"; NID_AS `\d{6}[\-]?\d{7}` casa +5511999998888 — regras originais idênticas ao backup; ficam como nota p/ Fase 6 (melhorias reais)
 - **Glossário**: descriptions PT-BR; categorias/validadores em inglês (consistente com PHONE_US, luhn_check)
 
+## 2026-10-16 — F2.2: categorias BR no DorkGen (commit f2b)
+- **Backup**: `.traducao_backup/dorks_templates.yaml.20261018_191717.pre_f2b.bak`
+- **Diff** (append-only, 2 pontos de inserção, categorias/variáveis existentes byte-identical):
+  - Nova variável `br_doc` (8 termos: contracheque, holerite, "nota fiscal", boleto, edital, "licitação", portaria, "folha de pagamento") com comentário ⚠ LGPD
+  - 7 categorias novas no final de `templates:` — schema aninhado soft/medium/aggressive idêntico ao existente:
+    - `gov_br` — portais governamentais (.gov.br federal/estaduais, 4/5/6 dorks)
+    - `edu_br` — universidades/IFs (.edu.br, 4/4/4)
+    - `br_domains` — .org.br/.com.br (4/4/4)
+    - `pix_br` — chaves/comprovantes/QR Pix (3/3/4) — **⚠ aviso LGPD no próprio YAML**
+    - `whatsapp_br` — links wa.me/api.whatsapp.com expostos (3/3/3)
+    - `lgpd_br` — políticas de privacidade/avisos/DPO (3/3/4) — verificação de conformidade (defensivo)
+    - `documentos_br` — documentos corporativos BR via {br_doc} (3/3/4) — **⚠ aviso LGPD no próprio YAML**
+  - Descriptions em INGLÊS (convenção do arquivo: descriptions existentes são dados EN preservados na Fase 1); docs PT-BR ficam em Docs/dorks_br.md (F2.3)
+- **Zero mudança em código**: `DorkGenerator.get_available_categories()` é dinâmico → as 7 categorias aparecem automaticamente em CLI (`--dg=gov_br`), Web UI (dropdowns) e wizard
+- **Verificações** (suíte 38/38 PASSOU, 1 falso positivo de teste corrigido — predicate retornava str e o helper comparava igualdade):
+  - `yaml.safe_load` OK · chaves top-level preservadas · variáveis existentes intactas + exatamente br_doc nova (8 termos)
+  - Templates existentes intactos (deep-compare) + exatamente 7 categorias novas
+  - Schema: description + soft/medium/aggressive não-vazios nas 7 × 3 modos
+  - DorkGenerator: 7 categorias em `get_available_categories()` · categorias antigas preservadas (15+) · generate() nos 3 modos × 7 categorias sem warnings de placeholder · placeholders {..} 100% resolvidos (dorks gerados sem `{`)
+  - **Sem testes contra alvos reais** — validação de sintaxe/schema/composição apenas (regra crítica)
+
 
 
 

@@ -329,6 +329,25 @@ variables:
     - "Microsoft OLE DB Provider for SQL Server"
 
 
+  # ──────────────────────────────────────────────
+  #  BR — F2.2 (regionalização BR)
+  #  Brazilian administrative/corporate document terms.
+  #  ⚠ LGPD: dorks that use {br_doc} can surface real personal data
+  #  (payroll sheets, invoices containing CPF numbers). Use only on
+  #  assets you own or with explicit written authorization, and
+  #  preferably in soft mode.
+  # ──────────────────────────────────────────────
+  br_doc:
+    - contracheque
+    - holerite
+    - "nota fiscal"
+    - boleto
+    - edital
+    - "licitação"
+    - portaria
+    - "folha de pagamento"
+
+
 templates:
 
   # ──────────────────────────────────────────────
@@ -864,3 +883,168 @@ templates:
       - 'site:{domain} intext:{sense} filetype:{extension}'
       - 'site:{domain} intext:{sense} ext:txt'
       - 'site:{domain} intext:{sense} inurl:{param}'
+
+  # ════════════════════════════════════════════════
+  #  BR CATEGORIES — F2.2 (regionalização BR)
+  #  Brazilian-focused dorks for .gov.br / .edu.br /
+  #  .org.br / .com.br targets, Pix, WhatsApp, LGPD
+  #  documents and BR corporate documents.
+  #  Discoverable via --dg=<category>, Web UI and
+  #  wizard (dynamic category listing).
+  # ════════════════════════════════════════════════
+
+  # ──────────────────────────────────────────────
+  #  GOVERNMENT PORTALS (federal + state)
+  # ──────────────────────────────────────────────
+  gov_br:
+    description: "Brazilian government portals and services (.gov.br, federal and state)"
+    dorks:
+      soft:
+        - 'site:gov.br inurl:login'
+        - 'site:gov.br intitle:"login"'
+        - 'site:gov.br inurl:{param}'
+        - 'site:gov.br filetype:{extension}'
+      medium:
+        - 'site:gov.br inurl:{param} intext:{sense}'
+        - 'site:gov.br filetype:{extension} intitle:"index of"'
+        - 'site:gov.br inurl:admin intitle:{sense}'
+        - 'site:*.gov.br inurl:login'
+        - 'site:gov.br inurl:{param} filetype:pdf'
+      aggressive:
+        - 'site:gov.br filetype:{extension} "{br_doc}"'
+        - 'site:gov.br intitle:"index of" "{sense}"'
+        - 'site:*.gov.br filetype:{extension} intext:{sense}'
+        - 'site:gov.br inurl:{param} intext:{sense} filetype:{extension}'
+        - 'site:gov.br inurl:{param} intext:"error"'
+        - 'site:gov.br filetype:{extension} inurl:{param} "{sense}"'
+
+  # ──────────────────────────────────────────────
+  #  EDUCATIONAL INSTITUTIONS
+  # ──────────────────────────────────────────────
+  edu_br:
+    description: "Brazilian universities, federal institutes and schools (.edu.br)"
+    dorks:
+      soft:
+        - 'site:edu.br inurl:login'
+        - 'site:edu.br intitle:"index of"'
+        - 'site:edu.br filetype:{extension}'
+        - 'site:edu.br inurl:{param}'
+      medium:
+        - 'site:edu.br filetype:{extension} intitle:"index of"'
+        - 'site:edu.br inurl:{param} intext:{sense}'
+        - 'site:edu.br filetype:pdf "{br_doc}"'
+        - 'site:*.edu.br inurl:admin'
+      aggressive:
+        - 'site:edu.br filetype:{extension} "{br_doc}"'
+        - 'site:edu.br intitle:"index of" ext:{extension}'
+        - 'site:edu.br inurl:{param} filetype:{extension} intext:{sense}'
+        - 'site:*.edu.br filetype:{extension} intext:{sense}'
+
+  # ──────────────────────────────────────────────
+  #  BR ORGANIZATIONS AND COMPANIES
+  # ──────────────────────────────────────────────
+  br_domains:
+    description: "Brazilian organizations and companies (.org.br / .com.br)"
+    dorks:
+      soft:
+        - 'site:org.br inurl:login'
+        - 'site:com.br intitle:"login"'
+        - 'site:com.br inurl:{param}'
+        - 'site:org.br filetype:{extension}'
+      medium:
+        - 'site:com.br inurl:{param} intext:{sense}'
+        - 'site:org.br filetype:{extension} intitle:"index of"'
+        - 'site:com.br filetype:pdf "{br_doc}"'
+        - 'site:*.com.br inurl:admin'
+      aggressive:
+        - 'site:com.br filetype:{extension} "{br_doc}"'
+        - 'site:org.br intitle:"index of" filetype:{extension}'
+        - 'site:com.br inurl:{param} filetype:{extension} intext:{sense}'
+        - 'site:*.com.br intext:{sense} filetype:{extension}'
+
+  # ──────────────────────────────────────────────
+  #  PIX  ⚠ LGPD WARNING
+  #  Dorks below can surface documents containing real
+  #  Pix keys (CPF, phone, e-mail) and payment receipts
+  #  with personal data. Restrict to your own domains
+  #  whenever possible; treat results as sensitive data.
+  # ──────────────────────────────────────────────
+  pix_br:
+    description: "Exposed Pix keys, receipts and QR codes (LGPD-sensitive — see Docs/dorks_br.md)"
+    dorks:
+      soft:
+        - 'site:{domain} "chave pix"'
+        - 'site:{domain} comprovante pix filetype:pdf'
+        - 'site:{domain} "qr code pix"'
+      medium:
+        - 'site:{domain} "pix" filetype:{extension}'
+        - 'site:{domain} intitle:"comprovante pix"'
+        - 'site:com.br "chave pix" filetype:pdf'
+      aggressive:
+        - 'site:com.br "chave pix" filetype:{extension}'
+        - 'site:com.br intext:"comprovante" intext:"pix"'
+        - 'site:gov.br "chave pix" filetype:pdf'
+        - 'site:org.br "chave pix" filetype:pdf'
+
+  # ──────────────────────────────────────────────
+  #  WHATSAPP
+  # ──────────────────────────────────────────────
+  whatsapp_br:
+    description: "Exposed WhatsApp links, groups and API integrations"
+    dorks:
+      soft:
+        - 'site:{domain} wa.me'
+        - 'site:{domain} api.whatsapp.com'
+        - 'site:{domain} "link whatsapp"'
+      medium:
+        - 'site:{domain} wa.me filetype:pdf'
+        - 'site:com.br api.whatsapp.com inurl:send'
+        - 'site:com.br intext:wa.me filetype:{extension}'
+      aggressive:
+        - 'site:com.br wa.me filetype:{extension}'
+        - 'site:com.br intitle:"whatsapp" inurl:{param}'
+        - 'site:com.br intext:"api.whatsapp.com/send"'
+
+  # ──────────────────────────────────────────────
+  #  LGPD COMPLIANCE DOCUMENTS
+  # ──────────────────────────────────────────────
+  lgpd_br:
+    description: "LGPD privacy policies, privacy notices and DPO contact pages"
+    dorks:
+      soft:
+        - 'site:{domain} "política de privacidade"'
+        - 'site:{domain} "aviso de privacidade"'
+        - 'site:{domain} intitle:"dpo"'
+      medium:
+        - 'site:com.br "política de privacidade" filetype:pdf'
+        - 'site:gov.br "aviso de privacidade"'
+        - 'site:{domain} "encarregado de dados"'
+      aggressive:
+        - 'site:gov.br "política de privacidade" filetype:{extension}'
+        - 'site:com.br "tratamento de dados pessoais" filetype:pdf'
+        - 'site:edu.br "aviso de privacidade"'
+        - 'site:org.br "política de privacidade"'
+
+  # ──────────────────────────────────────────────
+  #  BR CORPORATE DOCUMENTS  ⚠ LGPD WARNING
+  #  {br_doc} dorks can surface real personal data
+  #  (payroll sheets with salaries/CPF, invoices).
+  #  Use only on assets you own or with explicit
+  #  written authorization, preferably in soft mode.
+  # ──────────────────────────────────────────────
+  documentos_br:
+    description: "Exposed Brazilian corporate/administrative documents (payroll, invoices, bids — LGPD-sensitive)"
+    dorks:
+      soft:
+        - 'site:{domain} filetype:pdf "{br_doc}"'
+        - 'site:{domain} intitle:"{br_doc}"'
+        - 'site:{domain} filetype:{extension} "{br_doc}"'
+      medium:
+        - 'site:com.br filetype:pdf "{br_doc}"'
+        - 'site:gov.br filetype:pdf "{br_doc}"'
+        - 'site:{domain} filetype:{extension} "{br_doc}" "{sense}"'
+      aggressive:
+        - 'site:gov.br filetype:{extension} "{br_doc}"'
+        - 'site:com.br filetype:{extension} "{br_doc}"'
+        - 'site:edu.br filetype:pdf "{br_doc}"'
+        - 'site:org.br intitle:"{br_doc}" filetype:{extension}'
