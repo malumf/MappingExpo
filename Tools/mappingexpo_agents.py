@@ -13,7 +13,7 @@ Pipeline (ativado com --analyze):
 4. HeaderIntelAgent        — analisa headers de resposta: vazamentos de info, security headers ausentes
 5. TechFingerprintAgent    — detecta CMS, frameworks, versões de JS/servidor a partir do conteúdo
 6. SecretsAgent            — scan regex por segredos/credenciais + detecção de hash + severidade
-7. PiiDetectorAgent        — detecta PII: e-mail, telefone, IBAN, CF, CC, SSN, DOB
+7. PiiDetectorAgent        — detecta PII: e-mail, telefone, IBAN, CPF/CNPJ/CEP/PIX BR, CC, SSN, DOB
 8. EmailHarvesterAgent     — coleta e categoriza e-mails de todos os resultados
 9. SubdomainHarvesterAgent — extrai subdomínios e gera dorks para o DorkCrawler
 10. ReportAgent            — relatório HTML/MD/JSON com todas as seções novas (incl. segurança)
@@ -100,6 +100,7 @@ from mappingexpo_patterns import (
     SECRET_RULES       as _SECRET_PATTERNS,
     SECRET_SEVERITY    as _SECRET_SEVERITY,
     PII_RULES          as _PII_PATTERNS,
+    PII_VALIDATORS     as _PII_VALIDATORS,
     SCORE_TO_LABEL     as _LABEL_FROM_SCORE,
     FETCH_UA           as _FETCH_UA_SHARED,
     FETCH_UA_POOL      as _FETCH_UA_POOL,
@@ -2265,9 +2266,9 @@ class PiiDetectorAgent(BaseAgent):
     """
     Detecta dados pessoais (PII) em snippet + page_content.
 
-    Tipos detectados: e-mail, telefone (IT/EU/US), IBAN, código fiscal italiano,
-    cartão de crédito (validação Luhn), SSN dos EUA, data de nascimento, passaporte,
-    IPs públicos.
+    Tipos detectados: e-mail, telefone (US/EU/ME/AS/BR), IBAN, cartão de crédito
+    (validação Luhn), CPF/CNPJ (validação Módulo 11), CEP e chave Pix (Brasil),
+    SSN dos EUA, data de nascimento, passaporte, IPs públicos.
 
     Adiciona 'pii_found' (List[dict]) a cada resultado com achados.
     Separado do SecretsAgent — PII ≠ credenciais técnicas.
@@ -2323,6 +2324,11 @@ class PiiDetectorAgent(BaseAgent):
                     continue
 
                 if category == "CREDIT_CARD" and not _luhn_check(raw_value):
+                    continue
+
+                # PII brasileira: validação de dígito verificador (Módulo 11)
+                _br_validator = _PII_VALIDATORS.get(category)
+                if _br_validator and not _br_validator(raw_value):
                     continue
 
                 norm = re.sub(r"\s", "", raw_value.lower())
@@ -2994,7 +3000,7 @@ def run_analysis_pipeline(
         4.  HeaderIntelAgent        — analisa headers de resposta
         5.  TechFingerprintAgent    — detecta CMS/frameworks/versões
         6.  SecretsAgent            — scan de segredos + hash + severidade
-        7.  PiiDetectorAgent        — detecta PII (CC, IBAN, CF, SSN etc.)
+        7.  PiiDetectorAgent        — detecta PII (CC, IBAN, CPF/CNPJ/CEP/PIX BR, SSN etc.)
         8.  EmailHarvesterAgent     — coleta e categoriza e-mails
         9.  SubdomainHarvesterAgent — extrai subdomínios, gera dorks de follow-up
         10. ReportAgent             — gera relatório HTML/MD/JSON completo (incl. segurança)

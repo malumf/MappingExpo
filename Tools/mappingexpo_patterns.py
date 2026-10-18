@@ -26,14 +26,23 @@ mappingexpo_agents.py e mappingexpo_analyze.py:
                             · NID_AS          (números de identidade nacional da Ásia)
                            · PASSPORT        (global)
                            · DOB             (global)
-                           · PUBLIC_IP       (global)
+                            · PUBLIC_IP       (global)
+                            · CPF_BR          (Brasil — validação Módulo 11)
+                            · CNPJ_BR         (Brasil — validação Módulo 11)
+                            · CEP_BR          (Brasil)
+                            · PHONE_BR        (Brasil, +55)
+                            · PIX_BR          (Brasil — chave Pix)
    - SCORE_TO_LABEL     — limiares de pontuação → label (CRITICAL/HIGH/MEDIUM/LOW/SKIP)
    - FETCH_UA           — User-Agent compartilhado para fetch de páginas
    - FETCH_UA_POOL      — pool de UAs para rotação
    - SKIP_EXTENSIONS    — extensões binárias a pular durante o fetch
    - label_from_score() — função de conversão pontuação → label
    - censor()           — mascaramento parcial de valores sensíveis
-   - luhn_check()       — validação de número de cartão de crédito (algoritmo de Luhn)
+    - luhn_check()       — validação de número de cartão de crédito (algoritmo de Luhn)
+    - cpf_is_valid()     — validação de CPF pelo algoritmo oficial (Módulo 11)
+    - cnpj_is_valid()    — validação de CNPJ pelo algoritmo oficial (Módulo 11)
+    - phone_br_is_valid()— validação de telefone BR (DDD 11–99, 8/9 dígitos)
+    - PII_VALIDATORS     — mapa categoria BR → validador pós-match
 
 Changelog v2.0
 --------------
@@ -43,6 +52,10 @@ Changelog v2.0
   - TAX_ID adicionado para as quatro áreas geográficas
   - NIN/NID (números de identidade nacional) adicionados para EU, ME, AS
   - Sem alvos diretos; todos os padrões são de nível OSINT genérico
+
+  Fase 2 (regionalização BR):
+  - CPF/CNPJ/CEP/telefone +55/chave Pix + validadores de dígito
+    verificador (Módulo 11) — PII brasileira com validação obrigatória
 """
 
 from __future__ import annotations
@@ -421,7 +434,71 @@ PII_RULES: List[PiiRule] = [
          r")"
          r"([0-9]{9,15})\b",
          re.I),
-     "Tax ID — Oriente Médio (SA/AE/EG/TR/IR)", True),
+      "Tax ID — Oriente Médio (SA/AE/EG/TR/IR)", True),
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #  BRASIL — CPF (Cadastro de Pessoas Físicas)
+    #  Formato: XXX.XXX.XXX-XX · bare 11 dígitos (ancorado por palavra-chave)
+    #  Validação pós-match OBRIGATÓRIA: cpf_is_valid() — Módulo 11 (Receita
+    #  Federal). Regex puro casa datas/protocolos/IDs de 11 dígitos.
+    #  Posicionado ANTES das regras AS: números de 11 dígitos com keyword
+    #  "cpf" devem ser reivindicados por CPF_BR, não por TAX_ID_AS (dedup).
+    # ════════════════════════════════════════════════════════════════════════════
+    ("CPF_BR",
+     re.compile(r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b"),
+     "CPF — Brasil (XXX.XXX.XXX-XX, validação Módulo 11)", False),
+
+    ("CPF_BR",
+     re.compile(r"\bcpf\b(?:\s+n[ºo°]\.?)?\s*[=:\"'-]?\s*(\d{11})\b", re.I),
+     "CPF — Brasil (11 dígitos, ancorado por palavra-chave)", True),
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #  BRASIL — CNPJ (Cadastro Nacional da Pessoa Jurídica)
+    #  Formato: XX.XXX.XXX/XXXX-XX · bare 14 dígitos (ancorado por palavra-chave)
+    #  Validação pós-match OBRIGATÓRIA: cnpj_is_valid() — Módulo 11.
+    # ════════════════════════════════════════════════════════════════════════════
+    ("CNPJ_BR",
+     re.compile(r"\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b"),
+     "CNPJ — Brasil (XX.XXX.XXX/XXXX-XX, validação Módulo 11)", False),
+
+    ("CNPJ_BR",
+     re.compile(r"\bcnpj\b(?:\s+n[ºo°]\.?)?\s*[=:\"'-]?\s*(\d{14})\b", re.I),
+     "CNPJ — Brasil (14 dígitos, ancorado por palavra-chave)", True),
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #  BRASIL — CEP (Código de Endereçamento Postal)
+    #  Formato: XXXXX-XXX · bare 8 dígitos (ancorado por palavra-chave)
+    #  CEP não tem dígito verificador — o formato É a validação (sem validador).
+    # ════════════════════════════════════════════════════════════════════════════
+    ("CEP_BR",
+     re.compile(r"\b\d{5}-\d{3}\b"),
+     "CEP — Brasil (XXXXX-XXX)", False),
+
+    ("CEP_BR",
+     re.compile(r"\bcep\b(?:\s+n[ºo°]\.?)?\s*[=:\"'-]?\s*(\d{8})\b", re.I),
+     "CEP — Brasil (8 dígitos, ancorado por palavra-chave)", True),
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #  BRASIL — Telefone (+55)
+    #  Móvel: (11) 9XXXX-XXXX · +55 11 9XXXX-XXXX · 11 9XXXX-XXXX · bare 11 dígitos
+    #  Fixo:   (11) 2XXX-XXXX a (11) 5XXX-XXXX (com parênteses — forma canônica)
+    #  Validação pós-match: phone_br_is_valid() — DDD 11–99 + 8/9 dígitos.
+    # ════════════════════════════════════════════════════════════════════════════
+    ("PHONE_BR",
+     re.compile(r"\b(?:\+55[\s\-.]?)?\(?\d{2}\)?[\s\-.]?9\d{4}[\s\-.]?\d{4}\b"),
+     "Telefone móvel — Brasil (+55)", False),
+
+    ("PHONE_BR",
+     re.compile(r"\b(?:\+55[\s\-.]?)?\(\d{2}\)[\s\-.]?[2-5]\d{3}[\s\-.]?\d{4}\b"),
+     "Telefone fixo — Brasil (+55)", False),
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #  BRASIL — Chave Pix (ancorada por palavra-chave; sem validador — a chave
+    #  pode ser e-mail, telefone (+55...), CPF, CNPJ ou aleatória (UUID-like))
+    # ════════════════════════════════════════════════════════════════════════════
+    ("PIX_BR",
+     re.compile(r"\bchave[\s_\-]?pix\b\s*[=:\"'-]?\s*([A-Za-z0-9@._+\-]{4,64})", re.I),
+     "Chave Pix — Brasil (e-mail, telefone, CPF, CNPJ ou aleatória)", True),
 
     # ══════════════════════════════════════════════════════════════════════════
     #  TAX ID — Ásia-Pacífico
@@ -577,3 +654,78 @@ def luhn_check(number: str) -> bool:
                 d -= 9
         total += d
     return total % 10 == 0
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  VALIDADORES DE PII BRASILEIRA — Fase 2 (regionalização BR)
+#  Pós-match: filtram falsos positivos que o regex puro não consegue eliminar
+#  (datas, protocolos, IDs internos com a mesma contagem de dígitos).
+# ══════════════════════════════════════════════════════════════════════════════
+
+def cpf_is_valid(value: str) -> bool:
+    """Valida CPF pelo algoritmo oficial (Módulo 11, Receita Federal).
+
+    Formatação (pontos/hífen) é ignorada — só os 11 dígitos importam.
+    Rejeita sequências com todos os dígitos iguais (111.111.111-11 etc.),
+    que satisfazem o Módulo 11 matematicamente mas não existem como CPF.
+
+    Algoritmo: 2 dígitos verificadores calculados sobre os 9 anteriores
+    com pesos decrescentes (10..2 e 11..2); resto < 2 → DV = 0.
+    """
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 11 or len(set(digits)) == 1:
+        return False
+    for n in (9, 10):
+        s = sum(int(digits[i]) * (n + 1 - i) for i in range(n))
+        r = s % 11
+        if (0 if r < 2 else 11 - r) != int(digits[n]):
+            return False
+    return True
+
+
+def cnpj_is_valid(value: str) -> bool:
+    """Valida CNPJ pelo algoritmo oficial (Módulo 11, Receita Federal).
+
+    Formatação é ignorada — só os 14 dígitos importam. Pesos oficiais:
+    5,4,3,2,9,8,7,6,5,4,3,2 (DV1) e 6,5,4,3,2,9,8,7,6,5,4,3,2 (DV2);
+    resto < 2 → DV = 0.
+    """
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 14 or len(set(digits)) == 1:
+        return False
+    for n, weights in ((12, (5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2)),
+                       (13, (6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2))):
+        s = sum(int(digits[i]) * weights[i] for i in range(n))
+        r = s % 11
+        if (0 if r < 2 else 11 - r) != int(digits[n]):
+            return False
+    return True
+
+
+def phone_br_is_valid(value: str) -> bool:
+    """Valida telefone brasileiro: DDD 11–99 + 8 dígitos (fixo) ou 9 (móvel).
+
+    Remove o prefixo +55 somente quando o total de dígitos indica país
+    (12/13) — preserva DDDs reais que começam com 55 (Rio Grande do Sul).
+    Números móveis de 11 dígitos exigem o nono dígito '9'.
+    """
+    digits = re.sub(r"\D", "", value)
+    if len(digits) in (12, 13) and digits.startswith("55"):
+        digits = digits[2:]
+    if len(digits) not in (10, 11):
+        return False
+    if not (11 <= int(digits[:2]) <= 99):
+        return False
+    if len(digits) == 11 and digits[2] != "9":
+        return False
+    return True
+
+
+# Mapa categoria BR → validador pós-match (consumido pelo PiiDetectorAgent,
+# mesmo padrão do CREDIT_CARD → luhn_check). CEP_BR não tem entrada — o
+# formato é a validação; PIX_BR não tem entrada — chave é multi-tipo.
+PII_VALIDATORS: dict = {
+    "CPF_BR":     cpf_is_valid,
+    "CNPJ_BR":    cnpj_is_valid,
+    "PHONE_BR":   phone_br_is_valid,
+}

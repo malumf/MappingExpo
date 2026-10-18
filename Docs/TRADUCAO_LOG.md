@@ -609,6 +609,32 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Fix 2 (este, Tools/mappingexpo_web.py L107-109)**: `Popen(..., text=True, encoding='utf-8', errors='replace')` — decodificação UTF-8 com fallback na leitura de stdout/stderr; única leitura de subprocess do repo (audit: 1 ocorrência de `subprocess.Popen` em todo o código)
 - **Backup**: `Tools/mappingexpo_web.py.pre_utf8_fix2.bak` (ignorado pelo .gitignore `*.bak`) · py_compile OK · teste manual de scan via UI confirmado pelo operador (sem crash; saída legível no terminal web)
 
+---
+
+# FASE 2 — REGIONALIZAÇÃO BR
+
+## Plano aprovado (decisão do mantenedor, 2026-10-16)
+- **Ordem**: F2.1 validadores BR (patterns+agents) → F2.2 categorias BR (dorks_templates.yaml) → F2.3 docs BR. Commit por sublote (f2a, f2b, f2c)
+- **F2.4 REJEITADO pelo mantenedor**: NÃO criar CPFDetectorAgent/CNPJDetectorAgent/PixDetectorAgent separados — CPF/CNPJ/Pix integram como categorias dentro do PiiDetectorAgent existente (um único scan pass, reuso de dedup/censor/contexto; agentes separados duplicariam o loop)
+- **phone_br_is_valid**: mantido como obrigatório (não opcional) — decisã do mantenedor
+- Regras críticas em vigor: sem testes contra alvos reais · payloads sqli/xss intocados · regex de detecção existentes intocadas · chaves de config intocadas · validação de dígito verificador OBRIGATÓRIA para CPF/CNPJ · glossário: técnicos em inglês, visíveis em PT-BR
+
+## 2026-10-16 — F2.1: validadores BR + regras de PII brasileira (commit f2a)
+- **Backups**: `.traducao_backup/mappingexpo_patterns.py.20261016_174456.pre_f2a.bak`, `mappingexpo_agents.py.20261016_174456.pre_f2a.bak`
+- **Diff aprovado** (padrão LNNNN | -/+): patterns 158 linhas líquidas (5 blocos) + agents 8 linhas líquidas (5 pontos) — 166 insertions / 8 deletions em 2 arquivos
+- **patterns.py**:
+  - Docstring: 5 linhas na lista PII_RULES (CPF_BR/CNPJ_BR/CEP_BR/PHONE_BR/PIX_BR) · 4 na lista de funções · nota "Fase 2 (regionalização BR)" no Changelog
+  - `PII_RULES`: +9 regras BR (CPF formatado/bare keyword-anchored · CNPJ formatado/bare · CEP formatado/bare · PHONE móvel/fixo · PIX keyword-anchored) — **DESVIO APROVADO VIA EXECUÇÃO: bloco inserido ANTES da seção TAX_ID_AS (não no fim da lista)** — Motivo: o dedup global do `_scan` (norm por ordem de iteração) deixava a regra bare do CPF morta: TAX_ID_AS (`\d{11}` AU ABN, preexistente) reivindicava qualquer 11 dígitos antes. Com o bloco BR antes, "cpf: <11 dígitos>" é reivindicado por CPF_BR (categoria correta); 11 dígitos sem keyword seguem para TAX_ID_AS (comportamento preservado). Nenhuma linha existente tocada — fluxo geográfico vira US→EU→ME→**BR**→AS
+  - Novos validadores (fim do arquivo): `cpf_is_valid()` (Módulo 11, pesos 10..2 e 11..2, rejeita all-same-digits) · `cnpj_is_valid()` (Módulo 11, pesos oficiais 5,4,3,2,9..2 e 6,5,4,3,2,9..2) · `phone_br_is_valid()` (DDD 11–99; strip de +55 só com 12/13 dígitos totais — preserva DDD 55/RS; 11 dígitos exigem nono dígito 9) · `PII_VALIDATORS: dict` {CPF_BR, CNPJ_BR, PHONE_BR} — CEP_BR sem entrada (formato é a validação), PIX_BR sem entrada (chave multi-tipo)
+- **agents.py** (integração cirúrgica): import `PII_VALIDATORS as _PII_VALIDATORS` · hook pós-match após o precedente CREDIT_CARD→luhn: `_br_validator = _PII_VALIDATORS.get(category); if _br_validator and not _br_validator(raw_value): continue` · 3 docstrings atualizadas (L16 pipeline, PiiDetectorAgent "Tipos detectados" — remove resíduo desatualizado "código fiscal italiano"/"IT" morto desde a v2.0, L2997 pipeline list)
+- **Verificações** (suíte 45/45 PASSOU, após 3 falsos-positivos do próprio teste corrigidos: expectativa de sorted(), loader de .bak, comparação contra valor censurado `_censor(visible=3)` em vez de cru):
+  - py_compile ×2 exit 0
+  - 22 vetores de validadores: CPF Receita 529.982.247-25 ✓ · bare ✓ · **111.111.111-11 rejeitado** (all-same) · 000.000.000-00 rejeitado · DV1/DV2 errados rejeitados · data-like 20240115000 rejeitada · CNPJ 11.222.333/0001-81 ✓/bare ✓ · DV1/DV2 errados rejeitados · all-same rejeitado · fone +55/(DD)/bare/DDD 55 com e sem +55 ✓ · DDD 10 rejeitado · 11 dígitos sem 9 rejeitado
+  - Integridade vs backup: TRIAGE/SECRET/PII_RULES existentes idênticas (regex+flags+desc+has_group, ordem preservada; PII_RULES atual menos as 9 _BR == backup) · +9 exatamente · SECRET_SEVERITY/SCORE_TO_LABEL/luhn_check/FETCH_UA/POOL/SKIP intactos
+  - Integração `_scan`: conteúdo sintético → CPF_BR ×2 (formatado+bare) · CNPJ_BR ×1 (DV errado NÃO reportado) · CEP_BR ×2 · PHONE_BR ×2 (DDD 10 NÃO reportado) · PIX_BR ×1 (capturou +5511999998888) · 111.111.111-11 NÃO reportado · Luhn-fail NÃO reportado · PHONE_US preexistente ainda detecta +1 555... · bare CPF reivindicado por CPF_BR (não TAX_ID_AS)
+  - Falsos positivos PREEXISTENTES confirmados (não regressão): TAX_ID_AS `[0-9A-Z]{9,10}` re.I casa "sequencia"/"protocolo"; NID_AS `\d{6}[\-]?\d{7}` casa +5511999998888 — regras originais idênticas ao backup; ficam como nota p/ Fase 6 (melhorias reais)
+- **Glossário**: descriptions PT-BR; categorias/validadores em inglês (consistente com PHONE_US, luhn_check)
+
 
 
 
