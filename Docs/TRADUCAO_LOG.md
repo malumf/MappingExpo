@@ -656,6 +656,14 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
   - DorkGenerator: 7 categorias em `get_available_categories()` · categorias antigas preservadas (15+) · generate() nos 3 modos × 7 categorias sem warnings de placeholder · placeholders {..} 100% resolvidos (dorks gerados sem `{`)
   - **Sem testes contra alvos reais** — validação de sintaxe/schema/composição apenas (regra crítica)
 
+## 2026-10-16 — F2.3: documentação BR (commit f2c)
+- **Backup**: `README.md.20261018_193018.pre_f2c.bak` (Docs novos não precisam backup)
+- **Docs/dorks_br.md** (165 linhas, novo): guia das 7 categorias BR — tabela-resumo com sensibilidade LGPD, seção por categoria com exemplos de dorks reais do YAML, variável `br_doc` documentada (8 termos com contexto de exposição), semântica dos modos, integração com agents; regra crítica reiterada (sem testes contra alvos reais)
+- **Docs/validators_br.md** (193 linhas, novo): motivação regex-vs-validador · algoritmos CPF/CNPJ (Módulo 11 com pseudocódigo e pesos) · rejeição de all-same-digits · CEP sem DV (formato é a validação) · telefone (regra do strip de +55 preservando DDD 55) · Pix multi-tipo · tabelas de vetores de teste (as mesmas da suíte 45/45 do F2.1) · **taxas esperadas de falso positivo** (exigência do mantenedor): CPF/CNPJ ~0,8% (p≈(1/11)²), PHONE_BR bare ~9%, CEP moderado sem DV — com conclusão prática de interpretação · dedup/ordem de reivindicação (CPF_BR vs TAX_ID_AS) · uso programático
+- **README.md** (+28 linhas, insert-only — verificado: 0 deletions no diff): seção dedicada "🇧🇷 LGPD — Regionalização BR e Tratamento de Dados Pessoais" entre o banner do Console Web e o banner legal — tabela dos 2 recursos BR, aviso de responsabilidade sobre resultados sensíveis (minimização art. 6º III, tratamento de relatórios com PII como ativos protegidos, categorias `pix_br`/`documentos_br` especialmente sensíveis, caminho defensivo = corrigir exposição, ponto de partida defensivo = categoria `lgpd_br`)
+- **Verificações**: diff README 100% aditivo (o único "-" era o header `--- a/README.md`) · todos os dorks citados em dorks_br.md existem no YAML (cross-check programático UTF-8 ×7, incluindo os acentuados — o "False" inicial era encoding do pipeline PS, não do arquivo) · links cruzados dorks_br↔validators_br e README→Docs
+- **Pendência p/ Fase 4 (Docs/*.md)**: `Docs/agents.md` seção PiiDetectorAgent (L326) ainda lista os tipos pré-F2.1 — atualizar para incluir CPF/CNPJ/CEP/PIX BR quando a Fase 4 abrir
+
 
 
 

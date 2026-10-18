@@ -203,7 +203,35 @@ python3 mappingexpo.py --ui
 <img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Console+Web+MappingExpo" width="1280" height="720" alt="Console Web" />
 </div>
 
+## 🇧🇷 LGPD — Regionalização BR e Tratamento de Dados Pessoais
 
+O MappingExpo inclui recursos específicos para a realidade brasileira:
+
+| Recurso | O que faz | Doc |
+|---|---|---|
+| **Validadores BR** | CPF e CNPJ validados por dígito verificador (Módulo 11), CEP, telefone +55 e chave Pix — detecção de PII brasileira com ~99% de precisão matemática, sem falso positivo em datas/protocolos | [Docs/validators_br.md](Docs/validators_br.md) |
+| **Categorias BR de dorks** | 7 categorias para .gov.br, .edu.br, .org.br/.com.br, Pix, WhatsApp, documentos LGPD e documentos corporativos | [Docs/dorks_br.md](Docs/dorks_br.md) |
+
+> ⚠️ **Responsabilidade com resultados sensíveis**
+>
+> Ao rodar o MappingExpo em ativos brasileiros, os resultados **podem conter
+> dados pessoais reais** — CPFs, CNPJs, contracheques, chaves Pix e
+> comprovantes. Sob a **LGPD (Lei 13.709/2018)**, esses dados são **dados
+> pessoais** (e alguns, **dados sensíveis**):
+>
+> - Colete apenas o mínimo necessário para a finalidade autorizada (art. 6º, III);
+> - **Não reposte**, copie ou armazene dados pessoais fora do escopo da
+>   autorização escrita;
+> - Trate relatórios contendo PII como ativos protegidos — limite o acesso;
+> - Dorks das categorias `pix_br` e `documentos_br` são **especialmente
+>   sensíveis**: prefira o modo `soft` e restrinja ao seu próprio domínio;
+> - Ao encontrar exposição de dados pessoais de terceiros em um ativo seu,
+>   o caminho defensivo correto é **corrigir a exposição** e avaliar
+>   notificação à ANPD/titulares, se aplicável — não reutilizar os dados.
+>
+> O ponto de partida defensivo é a categoria `lgpd_br`: verifique se a sua
+> própria organização publica política de privacidade, aviso de privacidade
+> e canal do encarregado (DPO) conforme exige a Lei.
 
 <!-- BANNER 5 — LEGAL — 1280x300 px -->
 <!-- Substitua abaixo se quiser um aviso legal visual -->
