@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/21b9be47-690b-429b-93f9-44c658ce6ceb" />
+
 
 # MappingExpo — HTTP Fingerprints
 
