@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/5771d0bb-5341-48d7-a3e1-9d75a98872da" />
+
 
 # Dork Generator — MappingExpo Project
 
