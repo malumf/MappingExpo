@@ -690,6 +690,17 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Verificação** (suíte 36 checks: 35 OK + 1 falso positivo do teste — "Crawl"/"Console" na lista EN, mas são termos técnicos mantidos em PT por glossário e constavam do diff aprovado)
 - **Rescan de italiano (lista ampla)** revelou 2 resíduos reais fora do f4b, corrigidos nos sublotes seguintes: crawler.md L94–107 (mock "Avvio crawl ricorsivo adattivo..."/"risultati fin qui"/"Completato" — string PT real no f4g) · output_formats.md L78 (`"Vuoi analizzare i risultati? [y/N]"` — prompt italiano → string PT real no f4h) · webconsole.md L262 referencia o prompt EN antigo (corrigir no f4d)
 
+## 2026-10-16 — f4c: USAGE.md (commit f4c)
+- **Backup**: `USAGE.md.20261018_225932.pre_f4c.bak` (852→858 linhas — +6 pela expansão da lista de pipeline de 4 para 11 estágios)
+- **Tradução integral PT-BR** (diff aprovado em 3 blocos): título, navegação (11 âncoras recalculadas para slugs PT; badge-URLs intactas), 5 modos, ~35 seções 🔹, tabelas (modos, extensões de saída, modos de análise, pipeline XSS 4 métodos, pipeline SQLi 7 métodos, contagens de payload, formatos XSS, estágios, escadas de confiança, referência completa de 32 flags), combinações recomendadas ×9, aviso legal
+- **Correções de consistência doc↔código (aprovadas)**:
+  - L9: `xploits3c.github.io/MappingExpo` → **`xploits3c.github.io/DorkEye`** (URL de atribuição real restaurada — colateral da camada G; consistente com mappingexpo.py L1412)
+  - L335: `--oob-url` (flag fantasma, não existe no CLI) → "callback blind via parâmetro `oob_url` da API (endpoint interactsh)" — OOB é parâmetro do XSSDetector (xss.py L575–615)
+  - L401–404 + L475–478: mocks de terminal EN estagnados → **strings reais do CLI PT**: "[!] XSS potencial encontrado (high) [reflected]", "↳ tipo: … evidência:" (mappingexpo.py L837–853), "[!] SQLi potencial encontrado (critical)", "↳ método: … [parâmetro: id] evidência:" (L780–799)
+  - L574–579: lista "Pipeline stages" com 4 estágios desatualizada → **11 agentes do pipeline v3.1 real** (Triage → PageFetch → Security → HeaderIntel → TechFingerprint → Secrets → PII → Email → Subdomain → Report → DBScan opt-in)
+- **Mantido fiel (reportado, sem correção)**: "51 payloads" (29+16+6) — não bate com `_REFLECTED`=44/`_BYPASS`=26 do xss.py; staleness herdado do original; **pendência de auditoria registrada para Fase 6**
+- **Verificação** (suíte 41/41): code blocks e comandos idênticos · linhas de tabela idênticas · **deltas de flags = exatamente os 2 aprovados** (`-oob-url` removida, `-dbscan` adicionada — confirmado via Counter com strip de âncoras; nota metodológica: inline `python -c` no PS 5.1 corrompe regex com backtick por ser char de escape — arquivo de suíte é a autoridade) · divisores ═══ idênticos · 11 âncoras PT · keys técnicos intactos ×13 (`xss_detection_enabled`, `best >= 6`, `report_YYYYMMDD_HHMMSS.html`, `SQLiDetector.test_post_sqli()` etc.) · vereditos SAFE/VULNERABLE e escada NONE→CRITICAL intactos · MPXSS7x intacto · zero inglês em headings
+
 
 
 

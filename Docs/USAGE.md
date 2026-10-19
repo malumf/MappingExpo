@@ -1,12 +1,12 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/33f47b3f-55c9-4661-be19-8b107e315d13" />
 
-# MappingExpo — Complete Usage Reference
+# MappingExpo — Referência Completa de Uso
 
-Every flag, every mode, every combination — explained.
+Toda flag, todo modo, toda combinação — explicados.
 
 ```
  ___
-__H__       xploits3c.github.io/MappingExpo
+__H__       xploits3c.github.io/DorkEye
  [d]
  [e]
  [;]    MappingExpo Project
@@ -16,140 +16,140 @@ __H__       xploits3c.github.io/MappingExpo
 
 ---
 
-## 🗂️ Navigation
+## 🗂️ Navegação
 
-[![Core Flags](https://img.shields.io/badge/Core_Flags-0077BB?style=flat-square)](#-core-flags)
-[![Detection & Stealth](https://img.shields.io/badge/Detection_%26_Stealth-0077BB?style=flat-square)](#-detection--stealth)
-[![XSS Detection](https://img.shields.io/badge/XSS_Detection-0077BB?style=flat-square)](#-xss-detection)
-[![SQLi Detection](https://img.shields.io/badge/SQLi_Detection-0077BB?style=flat-square)](#-sqli---sql-injection-detection)
-[![Dork Generator](https://img.shields.io/badge/Dork_Generator-0077BB?style=flat-square)](#-dork-generator)
-[![Analysis Pipeline](https://img.shields.io/badge/Analysis_Pipeline-0077BB?style=flat-square)](#-post-search-analysis-pipeline)
-[![Recursive Crawl](https://img.shields.io/badge/Recursive_Crawl-0077BB?style=flat-square)](#-adaptive-recursive-crawl)
-[![Interrupt Control](https://img.shields.io/badge/Interrupt_Control-0077BB?style=flat-square)](#-interrupt-control)
+[![Core Flags](https://img.shields.io/badge/Core_Flags-0077BB?style=flat-square)](#-flags-principais)
+[![Detection & Stealth](https://img.shields.io/badge/Detection_%26_Stealth-0077BB?style=flat-square)](#-detecção--stealth)
+[![XSS Detection](https://img.shields.io/badge/XSS_Detection-0077BB?style=flat-square)](#-detecção-xss)
+[![SQLi Detection](https://img.shields.io/badge/SQLi_Detection-0077BB?style=flat-square)](#-sqli---detecção-de-sql-injection)
+[![Dork Generator](https://img.shields.io/badge/Dork_Generator-0077BB?style=flat-square)](#-gerador-de-dorks)
+[![Analysis Pipeline](https://img.shields.io/badge/Analysis_Pipeline-0077BB?style=flat-square)](#-pipeline-de-análise-pós-busca)
+[![Recursive Crawl](https://img.shields.io/badge/Recursive_Crawl-0077BB?style=flat-square)](#-crawl-recursivo-adaptativo)
+[![Interrupt Control](https://img.shields.io/badge/Interrupt_Control-0077BB?style=flat-square)](#-controle-de-interrupção)
 [![Termux](https://img.shields.io/badge/Termux_%2F_Android-0077BB?style=flat-square)](#-termux--android)
-[![Combinations](https://img.shields.io/badge/Recommended_Combos-0077BB?style=flat-square)](#-recommended-combinations)
-[![Flag Reference](https://img.shields.io/badge/Complete_Flag_Reference-0077BB?style=flat-square)](#-complete-flag-reference)
+[![Combinations](https://img.shields.io/badge/Recommended_Combos-0077BB?style=flat-square)](#-combinações-recomendadas)
+[![Flag Reference](https://img.shields.io/badge/Complete_Flag_Reference-0077BB?style=flat-square)](#-referência-completa-de-flags)
 
 ---
 
-## 📌 Basic Syntax
+## 📌 Sintaxe Básica
 
 ```bash
 python3 mappingexpo.py [OPTIONS]
 ```
 
-MappingExpo operates in **five distinct modes**, each triggered by different flags:
+O MappingExpo opera em **cinco modos distintos**, cada um disparado por flags diferentes:
 
-| Mode | Trigger | Description |
+| Modo | Gatilho | Descrição |
 |---|---|---|
-| **Interactive Wizard** | `--wizard` | Guided menu-driven session |
-| **Dork Search** | `-d` | Search with manual or file-based dorks |
-| **Dork Generator** | `--dg` | Auto-generate dorks from YAML templates |
-| **Direct URL Test** | `-u` | Test a single URL for SQLi / XSS |
-| **File Reload** | `-f` | Re-process saved results (SQLi / XSS / analyze / crawl) |
+| **Wizard interativo** | `--wizard` | Sessão guiada por menus |
+| **Busca de dorks** | `-d` | Busca com dorks manuais ou de arquivo |
+| **Gerador de Dorks** | `--dg` | Gera dorks automaticamente a partir de templates YAML |
+| **Teste direto de URL** | `-u` | Testa uma URL única para SQLi / XSS |
+| **Recarga de arquivo** | `-f` | Reprocessa resultados salvos (SQLi / XSS / analyze / crawl) |
 
-Minimal required: at least one of `-d`, `--dg`, `-u`, or `-f`. Output `-o` is auto-generated if omitted.
+Mínimo exigido: pelo menos um de `-d`, `--dg`, `-u` ou `-f`. A saída `-o` é gerada automaticamente se omitida.
 
 ---
 
 ## ══════════════════════════════════════════
-## CORE FLAGS
+## FLAGS PRINCIPAIS
 ## ══════════════════════════════════════════
 
-### 🔹 `--wizard` — Interactive Mode
+### 🔹 `--wizard` — Modo Interativo
 
-Launches a fully guided session with numbered menus. Covers dork search, dork generation, analysis, and crawl — no flags needed.
+Abre uma sessão totalmente guiada com menus numerados. Cobre busca de dorks, geração de dorks, análise e crawl — sem precisar de flags.
 
 ```bash
 python3 mappingexpo.py --wizard
 ```
 
-The wizard will prompt for:
+O wizard vai perguntar:
 
-- Dork input (single string or file)
-- Results per dork
-- SQLi / XSS / stealth / fingerprinting toggles
-- XSS type (`all` / `reflected` / `stored` / `dom`)
-- Output filename and format
-- Post-search analysis (if output is `.json`)
-- Recursive crawl options
+- Dork de entrada (string única ou arquivo)
+- Resultados por dork
+- Toggles de SQLi / XSS / stealth / fingerprinting
+- Tipo de XSS (`all` / `reflected` / `stored` / `dom`)
+- Nome e formato do arquivo de saída
+- Análise pós-busca (se a saída for `.json`)
+- Opções de crawl recursivo
 
 ---
 
-### 🔹 `-d` / `--dork` — Dork Input
+### 🔹 `-d` / `--dork` — Entrada de Dorks
 
-Defines the search query. Accepts a single dork string or a `.txt` file (one dork per line, `#` lines ignored).
+Define a consulta de busca. Aceita uma string de dork única ou um arquivo `.txt` (um dork por linha, linhas `#` ignoradas).
 
 ```bash
-# Single dork
+# Dork único
 python3 mappingexpo.py -d "inurl:admin filetype:php" -o output.html
 
-# File with multiple dorks
+# Arquivo com vários dorks
 python3 mappingexpo.py -d dorks.txt -c 100 -o output.json
 ```
 
-💡 For automation and large-scale scans, always use files.
+💡 Para automação e scans em larga escala, use sempre arquivos.
 
 ---
 
-### 🔹 `-u` / `--url` — Direct URL Test
+### 🔹 `-u` / `--url` — Teste Direto de URL
 
-Tests a single URL directly for SQL injection and/or XSS. No search is performed.
-Automatically enables `--sqli` if neither `--sqli` nor `--xss` is specified.
+Testa uma URL única diretamente para SQL injection e/ou XSS. Nenhuma busca é feita.
+Habilita `--sqli` automaticamente se nem `--sqli` nem `--xss` forem especificados.
 
 ```bash
-# SQLi test only
+# Apenas teste SQLi
 python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli
 
-# XSS test only
+# Apenas teste XSS
 python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
 
-# Both SQLi and XSS, with stealth and output
+# SQLi e XSS juntos, com stealth e saída
 python3 mappingexpo.py -u "https://example.com/page.php?id=1" --sqli --xss --stealth -o result.json
 ```
 
-**Output includes:**
+**A saída inclui:**
 
-- Vulnerability status (SAFE / VULNERABLE)
-- Confidence level (NONE → LOW → MEDIUM → HIGH → CRITICAL)
-- Detection method, parameter, and evidence
-- XSS type(s) found (reflected / stored / dom / header)
-- WAF detection
+- Status de vulnerabilidade (SAFE / VULNERABLE)
+- Nível de confiança (NONE → LOW → MEDIUM → HIGH → CRITICAL)
+- Método de detecção, parâmetro e evidência
+- Tipo(s) de XSS encontrados (reflected / stored / dom / header)
+- Detecção de WAF
 
 ---
 
-### 🔹 `-f` / `--file` — Load Saved Results
+### 🔹 `-f` / `--file` — Carregar Resultados Salvos
 
-Loads results from a previously saved `.json` or `.txt` file and re-processes them.
-Combine with `--sqli`, `--xss`, `--analyze`, or `--crawl` to run additional analysis on existing data.
+Carrega resultados de um arquivo `.json` ou `.txt` salvo anteriormente e os reprocessa.
+Combine com `--sqli`, `--xss`, `--analyze` ou `--crawl` para rodar análises adicionais sobre dados existentes.
 
 ```bash
-# Re-run SQLi on saved results
+# Re-executar SQLi em resultados salvos
 python3 mappingexpo.py -f Dump/results.json --sqli -o retest.json
 
-# Re-run XSS on saved results
+# Re-executar XSS em resultados salvos
 python3 mappingexpo.py -f Dump/results.json --xss --xss-type=reflected -o xss_retest.json
 
-# Run analysis pipeline on saved results
+# Rodar o pipeline de análise em resultados salvos
 python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
 
-# Full re-processing: SQLi + XSS + analysis + crawl
+# Reprocessamento completo: SQLi + XSS + análise + crawl
 python3 mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full_retest.json
 ```
 
-**Supported formats:**
+**Formatos aceitos:**
 
-- `.json` — MappingExpo JSON output (supports both `{"results": [...]}` and raw `[...]`)
-- `.txt` — One URL per line (lines starting with `http`)
+- `.json` — saída JSON do MappingExpo (aceita `{"results": [...]}` e `[...]` cru)
+- `.txt` — uma URL por linha (linhas começando com `http`)
 
-The file is searched in the current directory first, then in `Dump/`.
+O arquivo é buscado primeiro no diretório atual, depois em `Dump/`.
 
 ---
 
-### 🔹 `-o` / `--output` — Output Filename
+### 🔹 `-o` / `--output` — Nome do Arquivo de Saída
 
-Specifies the output filename. The file is saved inside the `Dump/` folder.
-Format is inferred from the extension.
+Especifica o nome do arquivo de saída. O arquivo é salvo dentro da pasta `Dump/`.
+O formato é inferido da extensão.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt -o results.json
@@ -158,52 +158,52 @@ python3 mappingexpo.py -d dorks.txt -o export.csv
 python3 mappingexpo.py -d dorks.txt -o links.txt
 ```
 
-| Extension | Format | Features |
+| Extensão | Formato | Recursos |
 |---|---|---|
-| `.json` | Structured JSON | Full metadata, statistics, SQLi + XSS details. Enables `--analyze` prompt. |
-| `.html` | Interactive report | Dark matrix theme, filters, search, export panels, SQLi + XSS badges, WAF labels, file browser, XSS export section |
-| `.csv` | Spreadsheet-ready | All columns including SQLi status, XSS status, types, WAF, confidence |
-| `.txt` | Plain text | Numbered list with per-result details including SQLi and XSS status |
+| `.json` | JSON estruturado | Metadados completos, estatísticas, detalhes SQLi + XSS. Habilita o prompt de `--analyze`. |
+| `.html` | Relatório interativo | Tema escuro matrix, filtros, busca, painéis de export, badges SQLi + XSS, labels de WAF, navegador de arquivos, seção de export XSS |
+| `.csv` | Pronto para planilha | Todas as colunas, incluindo status SQLi, status XSS, tipos, WAF, confiança |
+| `.txt` | Texto puro | Lista numerada com detalhes por resultado, incluindo status SQLi e XSS |
 
-If `-o` is omitted, MappingExpo auto-generates `report_YYYYMMDD_HHMMSS.html`.
+Se `-o` for omitido, o MappingExpo gera automaticamente `report_YYYYMMDD_HHMMSS.html`.
 
-💡 Using `.json` output automatically prompts for post-search analysis.
+💡 Usar saída `.json` dispara automaticamente o prompt de análise pós-busca.
 
 ---
 
-### 🔹 `-c` / `--count` — Results per Dork
+### 🔹 `-c` / `--count` — Resultados por Dork
 
-Limits the maximum number of results fetched per dork query. Default: **50**.
+Limita o número máximo de resultados buscados por consulta de dork. Default: **50**.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt -c 200 -o output.html
 ```
 
-**Notes:**
+**Observações:**
 
-- Higher values = slower scans and higher risk of rate-limiting
-- Use `--stealth` when `-c > 100`
-- MappingExpo automatically applies extended delays every 100 results (configurable)
+- Valores altos = scans mais lentos e maior risco de rate limit
+- Use `--stealth` quando `-c > 100`
+- O MappingExpo aplica automaticamente delays estendidos a cada 100 resultados (configurável)
 
 ---
 
-### 🔹 `--config` — Custom Configuration File
+### 🔹 `--config` — Arquivo de Configuração Customizado
 
-Loads a YAML or JSON configuration file that overrides the defaults.
+Carrega um arquivo de configuração YAML ou JSON que sobrepõe os defaults.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --config custom_config.yaml -o scan.json
 ```
 
-Configurable settings include: extensions map, blacklist/whitelist, timeouts, retry count, stealth mode, fingerprinting, SQLi detection, XSS detection, XSS type, and the extended delay threshold.
+Configurações disponíveis incluem: mapa de extensões, blacklist/whitelist, timeouts, contagem de retries, modo stealth, fingerprinting, detecção SQLi, detecção XSS, tipo de XSS e o limiar de delay estendido.
 
-See `--create-config` to generate a starter template.
+Veja `--create-config` para gerar um template inicial.
 
 ---
 
-### 🔹 `--create-config` — Generate Default Config
+### 🔹 `--create-config` — Gerar Config Default
 
-Writes a sample `mappingexpo_config.yaml` to disk.
+Grava um `mappingexpo_config.yaml` de exemplo em disco.
 
 ```bash
 python3 mappingexpo.py --create-config
@@ -212,58 +212,58 @@ python3 mappingexpo.py --create-config
 ---
 
 ## ══════════════════════════════════════════
-## DETECTION & STEALTH
+## DETECÇÃO & STEALTH
 ## ══════════════════════════════════════════
 
-### 🔹 `--stealth` — Stealth Mode
+### 🔹 `--stealth` — Modo Stealth
 
-Reduces detection and rate-limiting risks by increasing delays and randomization.
+Reduz riscos de detecção e rate limit aumentando delays e randomização.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --stealth -o stealth_scan.html
 ```
 
-**What it activates:**
+**O que ativa:**
 
-- Extended randomized delays between requests (1.4×–1.8× multiplier)
-- Longer inter-dork waits
-- Extended rate-limit pauses (120–150s vs. 85–110s)
-- Additional delays during SQLi and XSS testing
+- Delays aleatórios estendidos entre requisições (multiplicador de 1,4×–1,8×)
+- Esperas mais longas entre dorks
+- Pausas estendidas de rate limit (120–150s vs. 85–110s)
+- Delays adicionais durante os testes de SQLi e XSS
 
-✅ Strongly recommended for: sensitive targets, long scans, SQLi/XSS testing, high `-c` values.
+✅ Fortemente recomendado para: alvos sensíveis, scans longos, testes SQLi/XSS, valores altos de `-c`.
 
 ---
 
-### 🔹 `--no-fingerprint` — Disable HTTP Fingerprinting
+### 🔹 `--no-fingerprint` — Desabilitar Fingerprint HTTP
 
-Disables the browser fingerprint rotation system. Falls back to basic User-Agent rotation.
+Desabilita o sistema de rotação de fingerprint de navegador. Faz fallback para rotação básica de User-Agent.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --no-fingerprint -o output.html
 ```
 
-By default, MappingExpo loads `http_fingerprints.json` and rotates full browser profiles (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fetch-*, Cache-Control) to mimic real browser traffic.
+Por default, o MappingExpo carrega `http_fingerprints.json` e rota perfis completos de navegador (User-Agent, Accept, Accept-Language, Accept-Encoding, Sec-Fetch-*, Cache-Control) para imitar tráfego real de navegador.
 
 ---
 
-### 🔹 `--no-analyze` — Disable File Analysis
+### 🔹 `--no-analyze` — Desabilitar Análise de Arquivos
 
-Skips HEAD-request file analysis for faster scans. No size, content-type, or accessibility checks.
+Pula a análise HEAD de arquivos para scans mais rápidos. Sem checagens de tamanho, content-type ou acessibilidade.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --no-analyze -o fast_scan.txt
 ```
 
-| Mode | Speed | Metadata |
+| Modo | Velocidade | Metadados |
 |---|---|---|
-| Default | Medium | File size, content-type, HTTP status |
-| `--no-analyze` | Fast | None |
+| Default | Média | Tamanho do arquivo, content-type, status HTTP |
+| `--no-analyze` | Rápida | Nenhum |
 
 ---
 
-### 🔹 `--blacklist` — Extension Blacklist
+### 🔹 `--blacklist` — Lista Negra de Extensões
 
-Excludes specific file types from results.
+Exclui tipos específicos de arquivo dos resultados.
 
 ```bash
 python3 mappingexpo.py -d "site:target.com" --blacklist .jpg .png .gif -o no_images.html
@@ -271,9 +271,9 @@ python3 mappingexpo.py -d "site:target.com" --blacklist .jpg .png .gif -o no_ima
 
 ---
 
-### 🔹 `--whitelist` — Extension Whitelist
+### 🔹 `--whitelist` — Lista Branca de Extensões
 
-Only includes specific file types. All other extensions are ignored.
+Inclui apenas tipos específicos de arquivo. Todas as outras extensões são ignoradas.
 
 ```bash
 python3 mappingexpo.py -d "site:target.com" --whitelist .pdf .xls .docx -o documents.html
@@ -282,32 +282,32 @@ python3 mappingexpo.py -d "site:target.com" --whitelist .pdf .xls .docx -o docum
 ---
 
 ## ══════════════════════════════════════════
-## XSS DETECTION
+## DETECÇÃO XSS
 ## ══════════════════════════════════════════
 
-### 🔹 `--xss` — XSS Detection
+### 🔹 `--xss` — Detecção XSS
 
-Enables the multi-method XSS detection engine on all discovered URLs. Works alongside `--sqli` or standalone.
+Habilita o engine multi-método de detecção XSS em todas as URLs descobertas. Funciona junto de `--sqli` ou sozinho.
 
 ```bash
-# XSS on a dork search
+# XSS numa busca de dorks
 python3 mappingexpo.py -d "inurl:search?q=" --xss -o xss_scan.html
 
-# XSS + SQLi combined
+# XSS + SQLi combinados
 python3 mappingexpo.py -d dorks.txt --sqli --xss -o full_scan.json
 
-# XSS on a direct URL
+# XSS numa URL direta
 python3 mappingexpo.py -u "https://target.com/search?q=test" --xss
 
-# XSS on saved results
+# XSS em resultados salvos
 python3 mappingexpo.py -f Dump/results.json --xss -o xss_retest.json
 ```
 
 ---
 
-### 🔹 `--xss-type` — XSS Detection Scope
+### 🔹 `--xss-type` — Escopo da Detecção XSS
 
-Limits XSS testing to a specific method. Default: `all`.
+Limita o teste XSS a um método específico. Default: `all`.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --xss --xss-type=reflected -o reflected.json
@@ -318,75 +318,75 @@ python3 mappingexpo.py -d dorks.txt --xss --xss-type=all       -o full_xss.json
 
 ---
 
-### 🔹 XSS Detection Pipeline (4 methods)
+### 🔹 Pipeline de Detecção XSS (4 métodos)
 
-All four methods run in sequence when `--xss-type=all`. Each is fully independent and can be selected individually.
+Os quatro métodos rodam em sequência quando `--xss-type=all`. Cada um é totalmente independente e pode ser selecionado individualmente.
 
-#### Method 1 — Reflected
+#### Método 1 — Reflected
 
-Injects payloads into GET parameters and checks the response for unescaped reflection.
+Injeta payloads em parâmetros GET e verifica reflexão sem escape na resposta.
 
-**51 total payloads** across two tiers:
+**51 payloads no total** em duas camadas:
 
-| Tier | Count | Examples |
+| Camada | Contagem | Exemplos |
 |---|---|---|
-| Standard | 29 | `<script>`, `<svg/onload>`, `<img onerror>`, autofocus events, MathML, `formaction`, attribute break-out |
-| WAF bypass | 16 | Case mixing, URL double-encoding, comment insertion (`<scr<!---->ipt>`), tab/newline in tags, data URI iframe, backtick attributes |
-| OOB | 6 | Blind callback via `--oob-url` (interactsh endpoint) |
+| Padrão | 29 | `<script>`, `<svg/onload>`, `<img onerror>`, eventos autofocus, MathML, `formaction`, quebra de atributo |
+| WAF bypass | 16 | Mistura de caixa, dupla codificação de URL, inserção de comentário (`<scr<!---->ipt>`), tab/newline em tags, iframe via data URI, atributos backtick |
+| OOB | 6 | Callback blind via parâmetro `oob_url` da API (endpoint interactsh) |
 
-**False-positive reduction:**
+**Redução de falso positivo:**
 
-- Skips responses with non-HTML `Content-Type` (JSON, XML, plain text)
-- Verifies the full tag structure survives, not just the marker word
-- Rejects reflection inside `<!-- HTML comments -->`
-- Rejects reflection where `\u003C` escaping is detected in a `<script>` block
-- Uses 60-char context window (vs 20 in previous versions)
+- Pula respostas com `Content-Type` não-HTML (JSON, XML, texto puro)
+- Verifica que a estrutura completa da tag sobrevive, não só a palavra marker
+- Rejeita reflexão dentro de `<!-- comentários HTML -->`
+- Rejeita reflexão onde escape `\u003C` é detectado num bloco `<script>`
+- Usa janela de contexto de 60 chars (vs 20 nas versões anteriores)
 
-**Confidence:**
-- `HIGH` when unescaped and no CSP
-- `MEDIUM` when unescaped but `Content-Security-Policy` (without `unsafe-inline`) is present
+**Confiança:**
+- `HIGH` quando sem escape e sem CSP
+- `MEDIUM` quando sem escape, mas com `Content-Security-Policy` presente (sem `unsafe-inline`)
 
-#### Method 2 — Stored
+#### Método 2 — Stored
 
-POSTs payloads into each parameter individually (not all at once), then refetches the page via GET and checks for persistence.
+Envia payloads via POST em cada parâmetro individualmente (não todos de uma vez), depois refaz a página via GET e verifica persistência.
 
-Two-stage detection:
+Detecção em dois estágios:
 
-| Stage | Trigger | Confidence |
+| Estágio | Gatilho | Confiança |
 |---|---|---|
-| Stage 1 | Payload echoed in immediate POST response | MEDIUM |
-| Stage 2 | Payload persists in subsequent GET request | HIGH |
+| Estágio 1 | Payload ecoado na resposta imediata do POST | MEDIUM |
+| Estágio 2 | Payload persiste na requisição GET subsequente | HIGH |
 
-Content-type gate applied on both POST response and GET refetch.
+Gate de content-type aplicado tanto na resposta do POST quanto no refetch GET.
 
-#### Method 3 — DOM
+#### Método 3 — DOM
 
-Fetches the page, extracts inline `<script>` blocks and up to 5 external `.js` files, then performs static source-to-sink analysis.
+Baixa a página, extrai blocos `<script>` inline e até 5 arquivos `.js` externos, e então realiza análise estática source-to-sink.
 
-**Sources detected:** `location.hash`, `location.search`, `location.href`, `document.URL`, `document.documentURI`, `document.referrer`, `window.name`, `history.state`
+**Sources detectados:** `location.hash`, `location.search`, `location.href`, `document.URL`, `document.documentURI`, `document.referrer`, `window.name`, `history.state`
 
-**Sinks detected:** `document.write`, `innerHTML =`, `outerHTML =`, `eval()`, `setTimeout("…")`, `location.href =`, `insertAdjacentHTML`, `.setAttribute("src"/"href"/"on*")`, `document.createElement("script")`
+**Sinks detectados:** `document.write`, `innerHTML =`, `outerHTML =`, `eval()`, `setTimeout("…")`, `location.href =`, `insertAdjacentHTML`, `.setAttribute("src"/"href"/"on*")`, `document.createElement("script")`
 
-**False-positive reduction:**
-- Source and sink must co-occur in the **same 40-line sliding block** — global page-level matching is not used
-- Lines matching analytics, static string writes, and code comments are excluded before analysis
-- Confidence is `LOW` for a single source/sink pair, `MEDIUM` for 2+ distinct pairs in the same block
+**Redução de falso positivo:**
+- Source e sink precisam coexistir no **mesmo bloco deslizante de 40 linhas** — não é usado matching global de página
+- Linhas de analytics, escritas de string estática e comentários de código são excluídas antes da análise
+- Confiança `LOW` para um único par source/sink, `MEDIUM` para 2+ pares distintos no mesmo bloco
 
-#### Method 4 — Header
+#### Método 4 — Header
 
-Injects the XSS marker into HTTP request headers that some servers reflect back in error pages, debug output, or log-replay interfaces.
+Injeta o marker XSS em headers de requisição HTTP que alguns servidores refletem de volta em páginas de erro, saída de debug ou interfaces de log-replay.
 
-**Tested headers:** `X-Forwarded-For` · `Referer` · `User-Agent` · `X-Forwarded-Host` · `X-Original-URL`
+**Headers testados:** `X-Forwarded-For` · `Referer` · `User-Agent` · `X-Forwarded-Host` · `X-Original-URL`
 
-Confidence: `HIGH` on unescaped reflection. Content-type gate applied per response.
+Confiança: `HIGH` em reflexão sem escape. Gate de content-type aplicado por resposta.
 
 ---
 
-### 🔹 XSS Confidence Scoring
+### 🔹 Pontuação de Confiança XSS
 
-Individual method confidence is aggregated into an overall score:
+A confiança de cada método individual é agregada numa pontuação geral:
 
-| Score | Overall Confidence |
+| Pontuação | Confiança geral |
 |---|---|
 | ≥ 5 | CRITICAL |
 | ≥ 3 | HIGH |
@@ -395,36 +395,35 @@ Individual method confidence is aggregated into an overall score:
 
 ---
 
-### 🔹 XSS Terminal Output
+### 🔹 Saída de Terminal XSS
 
 ```
-[!] Potential XSS found (high) [reflected]: https://target.com/search?q=test
-    ↳ type: reflected [payload: "><script>alert("MPXSS7x")</script>]
-      evidence: Unescaped reflection in param [q]: ...
+[!] XSS potencial encontrado (high) [reflected]: https://target.com/search?q=test
+    ↳ tipo: reflected [payload: "><script>alert("MPXSS7x")</script>]  evidência: Reflexão sem escape no parâmetro [q]: ...
 ```
 
 ---
 
-### 🔹 XSS Output Formats
+### 🔹 Formatos de Saída XSS
 
-XSS results are persisted across all output formats:
+Os resultados XSS são persistidos em todos os formatos de saída:
 
-| Format | XSS data included |
+| Formato | Dados XSS incluídos |
 |---|---|
-| `.json` | `xss_test` dict per result; metadata: `xss_detection_enabled`, `xss_type`, `xss_vulnerabilities_found` |
-| `.html` | XSS column in results table; XSS alert banner; XSS stats counter; XSS filter sub-menu (VULN / SAFE); XSS export section in Links panel (all tested / vuln / safe) |
-| `.csv` | `xss_vulnerable`, `xss_types`, `xss_confidence` columns |
-| `.txt` | `XSS: VULNERABLE (high) [reflected, stored]` line per result |
+| `.json` | dict `xss_test` por resultado; metadados: `xss_detection_enabled`, `xss_type`, `xss_vulnerabilities_found` |
+| `.html` | Coluna XSS na tabela de resultados; banner de alerta XSS; contador de estatísticas XSS; submenu de filtro XSS (VULN / SAFE); seção de export XSS no painel de Links (todos os testados / vuln / safe) |
+| `.csv` | Colunas `xss_vulnerable`, `xss_types`, `xss_confidence` |
+| `.txt` | Linha `XSS: VULNERABLE (high) [reflected, stored]` por resultado |
 
 ---
 
 ## ══════════════════════════════════════════
-## SQLi — SQL INJECTION DETECTION
+## SQLi — DETECÇÃO DE SQL INJECTION
 ## ══════════════════════════════════════════
 
-### 🔹 `--sqli` — SQL Injection Detection
+### 🔹 `--sqli` — Detecção de SQL Injection
 
-Enables the multi-method SQLi detection engine on all discovered URLs.
+Habilita o engine multi-método de detecção SQLi em todas as URLs descobertas.
 
 ```bash
 python3 mappingexpo.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
@@ -432,93 +431,93 @@ python3 mappingexpo.py -d "site:example.com .php?id=" --sqli -o sqli_scan.html
 
 ---
 
-### 🔹 SQLi Detection Pipeline (7 methods)
+### 🔹 Pipeline de Detecção SQLi (7 métodos)
 
-| Method | Description | Confidence |
+| Método | Descrição | Confiança |
 |---|---|---|
-| **Error-based** | Injects payloads that trigger DB-specific error signatures (MySQL, PostgreSQL, MSSQL, SQLite, Oracle) | HIGH |
-| **UNION-based** | Probes column count with `UNION SELECT NULL,…` and detects mismatch errors or response anomalies | MEDIUM–HIGH |
-| **Boolean blind** | Compares response sizes for true/false condition pairs with statistical noise filtering | MEDIUM |
-| **Time-based blind** | Measures `SLEEP()`-induced delays above baseline + margin | MEDIUM |
-| **Stacked queries** | Injects after `;` — targets PDO multi-statement, stored procedures, APIs executing multiple queries | HIGH |
-| **Heavy query time** | CPU-intensive delays without `SLEEP`/`WAITFOR` — bypasses WAFs that block those keywords | MEDIUM |
-| **Header injection** | Injects into `X-Forwarded-For`, `X-Real-IP`, `User-Agent`, `Referer`, `CF-Connecting-IP` | MEDIUM–HIGH |
+| **Error-based** | Injeta payloads que disparam assinaturas de erro específicas de banco (MySQL, PostgreSQL, MSSQL, SQLite, Oracle) | HIGH |
+| **UNION-based** | Sonda a contagem de colunas com `UNION SELECT NULL,…` e detecta erros de mismatch ou anomalias de resposta | MEDIUM–HIGH |
+| **Boolean blind** | Compara tamanhos de resposta de pares de condição true/false com filtragem estatística de ruído | MEDIUM |
+| **Time-based blind** | Mede delays induzidos por `SLEEP()` acima do baseline + margem | MEDIUM |
+| **Stacked queries** | Injeta após `;` — mira PDO multi-statement, stored procedures, APIs que executam múltiplas queries | HIGH |
+| **Heavy query time** | Delays intensivos de CPU sem `SLEEP`/`WAITFOR` — bypassa WAFs que bloqueiam essas keywords | MEDIUM |
+| **Header injection** | Injeta em `X-Forwarded-For`, `X-Real-IP`, `User-Agent`, `Referer`, `CF-Connecting-IP` | MEDIUM–HIGH |
 
-**Payload counts:**
+**Contagens de payloads:**
 
-| Method | Payloads |
+| Método | Payloads |
 |---|---|
-| Error-based | 8 (+ updatexml, BENCHMARK error, CONVERT MSSQL, cast PG, XMLType Oracle) |
-| UNION-based | 4 × 5 column depths |
-| Boolean blind | 4 true/false pairs |
-| Time-based | 6 (+ WAITFOR MSSQL, pg_sleep PG, dbms_pipe Oracle, OR SLEEP bypass) |
+| Error-based | 8 (+ updatexml, erro BENCHMARK, CONVERT MSSQL, cast PG, XMLType Oracle) |
+| UNION-based | 4 × 5 profundidades de coluna |
+| Boolean blind | 4 pares true/false |
+| Time-based | 6 (+ WAITFOR MSSQL, pg_sleep PG, dbms_pipe Oracle, bypass OR SLEEP) |
 | Stacked queries | 11 |
 | Heavy query | 12 |
 | Header injection | 5 headers × error + boolean |
 
 ---
 
-### 🔹 SQLi Additional Features
+### 🔹 Recursos Adicionais SQLi
 
-- Parameter priority sorting: high-risk (`id`, `page`, `cat`) → medium (`search`, `q`) → low
-- Adaptive noise probing before each parameter test
-- WAF detection (12 providers: Cloudflare, ModSecurity, Wordfence, Sucuri, Imperva, Akamai, F5 BigIP, Barracuda, FortiWeb, AWS WAF, DenyAll, Reblaze)
-- Circuit breaker: auto-skips unreachable hosts
-- Confidence scoring: NONE → LOW → MEDIUM → HIGH → CRITICAL (threshold `best >= 6`)
-- POST and JSON injection available via `SQLiDetector.test_post_sqli()` and `test_json_sqli()`
+- Ordenação por prioridade de parâmetro: alto risco (`id`, `page`, `cat`) → médio (`search`, `q`) → baixo
+- Probe adaptativo de ruído antes de cada teste de parâmetro
+- Detecção de WAF (12 provedores: Cloudflare, ModSecurity, Wordfence, Sucuri, Imperva, Akamai, F5 BigIP, Barracuda, FortiWeb, AWS WAF, DenyAll, Reblaze)
+- Circuit breaker: pula automaticamente hosts inalcançáveis
+- Pontuação de confiança: NONE → LOW → MEDIUM → HIGH → CRITICAL (limiar `best >= 6`)
+- Injeção POST e JSON disponível via `SQLiDetector.test_post_sqli()` e `test_json_sqli()`
 
 ---
 
-### 🔹 SQLi Terminal Output
+### 🔹 Saída de Terminal SQLi
 
 ```
-[!] Potential SQLi found (critical): https://target.com/product.php?id=7
-    ↳ method: error_based [param: id]  evidence: MYSQL error signature: extractvalue(0,...
-    ↳ method: time_based_blind         evidence: SLEEP(3) elapsed=3.4s > threshold=3.2s
+[!] SQLi potencial encontrado (critical): https://target.com/product.php?id=7
+    ↳ método: error_based [parâmetro: id]  evidência: assinatura de erro MYSQL: extractvalue(0,...
+    ↳ método: time_based_blind         evidência: SLEEP(3) decorrido=3.4s > limiar=3.2s
 ```
 
 ---
 
 ## ══════════════════════════════════════════
-## DORK GENERATOR
+## GERADOR DE DORKS
 ## ══════════════════════════════════════════
 
-### 🔹 `--dg` — Activate Dork Generator
+### 🔹 `--dg` — Ativar o Gerador de Dorks
 
-Generates structured Google dorks from YAML template files. Replaces manual dork writing with a scalable, category-based engine.
+Gera Google dorks estruturados a partir de arquivos de template YAML. Substitui a escrita manual de dorks por um engine escalável baseado em categorias.
 
 ```bash
-# All categories, soft mode (default)
+# Todas as categorias, modo soft (default)
 python3 mappingexpo.py --dg
 
-# Specific category
+# Categoria específica
 python3 mappingexpo.py --dg=sqli
 python3 mappingexpo.py --dg=backups
 python3 mappingexpo.py --dg=sensitive
 python3 mappingexpo.py --dg=admin
 
-# All categories, explicit
+# Todas as categorias, explícito
 python3 mappingexpo.py --dg=all
 ```
 
-**Architecture note:** `--dg` controls *dork generation*. `--sqli` and `--xss` control *vulnerability detection*. They are fully independent.
+**Nota de arquitetura:** `--dg` controla a *geração de dorks*. `--sqli` e `--xss` controlam a *detecção de vulnerabilidades*. São totalmente independentes.
 
 ```bash
-# Generate SQLi dorks AND test them for SQLi AND XSS
+# Gerar dorks SQLi E testá-los para SQLi E XSS
 python3 mappingexpo.py --dg=sqli --sqli --xss --mode=aggressive -o report.html
 ```
 
 ---
 
-### 🔹 `--mode` — Generation Mode
+### 🔹 `--mode` — Modo de Geração
 
-Controls dork generation intensity. Default: `soft`.
+Controla a intensidade de geração de dorks. Default: `soft`.
 
-| Mode | Behavior |
+| Modo | Comportamento |
 |---|---|
-| `soft` | Safe, minimal footprint. Fewer combinations. |
-| `medium` | Balanced coverage. |
-| `aggressive` | Maximum coverage. All variable expansions. |
+| `soft` | Seguro, pegada mínima. Menos combinações. |
+| `medium` | Cobertura equilibrada. |
+| `aggressive` | Cobertura máxima. Todas as expansões de variáveis. |
 
 ```bash
 python3 mappingexpo.py --dg=all --mode=aggressive -o results.json
@@ -526,26 +525,26 @@ python3 mappingexpo.py --dg=all --mode=aggressive -o results.json
 
 ---
 
-### 🔹 `--templates` — Template File Selection
+### 🔹 `--templates` — Seleção de Arquivo de Template
 
-Specifies which template YAML file to use from the `Templates/` directory. Use `=` syntax (no space).
+Especifica qual arquivo de template YAML usar do diretório `Templates/`. Use a sintaxe com `=` (sem espaço).
 
 ```bash
-# Default template
+# Template padrão
 python3 mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
 
-# All YAML files in Templates/
+# Todos os arquivos YAML de Templates/
 python3 mappingexpo.py --dg=all --templates=all
 
-# Specific research template
+# Template de pesquisa específico
 python3 mappingexpo.py --dg=backups --templates=dorks_templates_research.yaml
 ```
 
 ---
 
-### 🔹 `--dg-max` — Max Dork Combinations
+### 🔹 `--dg-max` — Máximo de Combinações de Dorks
 
-Limits the maximum number of dork combinations generated per template. Default: **800**.
+Limita o número máximo de combinações de dorks geradas por template. Default: **800**.
 
 ```bash
 python3 mappingexpo.py --dg=all --dg-max=10000 -o big_scan.json
@@ -554,35 +553,42 @@ python3 mappingexpo.py --dg=all --dg-max=10000 -o big_scan.json
 ---
 
 ## ══════════════════════════════════════════
-## POST-SEARCH ANALYSIS PIPELINE
+## PIPELINE DE ANÁLISE PÓS-BUSCA
 ## ══════════════════════════════════════════
 
-The analysis pipeline is powered by `mappingexpo_agents.py` and runs autonomous post-search analysis: triage, page fetching, secrets detection, and report generation — no external AI needed.
+O pipeline de análise é movido pelo `mappingexpo_agents.py` e roda análise pós-busca autônoma: triage, fetch de páginas, detecção de segredos, PII e geração de relatório — sem IA externa.
 
-### 🔹 `--analyze` — Enable Analysis Pipeline
+### 🔹 `--analyze` — Habilitar o Pipeline de Análise
 
-Runs the full analysis pipeline after the search completes. Automatically prompted when output is `.json`.
+Roda o pipeline completo de análise após a busca terminar. Prompt automático quando a saída é `.json`.
 
 ```bash
-# Explicit activation
+# Ativação explícita
 python3 mappingexpo.py -d dorks.txt -o results.json --analyze
 
-# Also works with file mode
+# Também funciona com modo arquivo
 python3 mappingexpo.py -f Dump/results.json --analyze -o reanalyzed.json
 ```
 
-**Pipeline stages:**
+**Estágios do pipeline:**
 
-1. **TriageAgent** — Prioritizes results by risk level (SQLi/XSS confirmed scores bonus points)
-2. **PageFetchAgent** — Downloads page content (if `--analyze-fetch`)
-3. **SecretsAgent** — Detects credentials, API keys, tokens, sensitive data
-4. **ReportAgent** — Generates the analysis report
+1. **TriageAgent** — Prioriza resultados por nível de risco (SQLi/XSS confirmados ganham pontos de bônus)
+2. **PageFetchAgent** — Baixa o conteúdo das páginas (se `--analyze-fetch`)
+3. **SecurityAgent** — Veredito de ameaça por resultado (phishing/malware/exploit/ofuscação)
+4. **HeaderIntelAgent** — Analisa headers de resposta (vazamentos de info, headers ausentes)
+5. **TechFingerprintAgent** — Detecta CMS/frameworks/versões e gera dorks de CVE
+6. **SecretsAgent** — Detecta credenciais, API keys, tokens, dados sensíveis
+7. **PiiDetectorAgent** — Detecta PII (CPF/CNPJ/CEP/Pix BR, cartões, SSN, DOB)
+8. **EmailHarvesterAgent** — Coleta e categoriza e-mails
+9. **SubdomainHarvesterAgent** — Extrai subdomínios e gera dorks de follow-up
+10. **ReportAgent** — Gera o relatório de análise
+11. **DBPortScanAgent** — Varredura de portas DB expostas (opt-in: `--dbscan`)
 
 ---
 
-### 🔹 `--analyze-fetch` — Enable Page Downloading
+### 🔹 `--analyze-fetch` — Habilitar Download de Páginas
 
-Downloads actual page content for HIGH/CRITICAL priority results, enabling deeper secrets detection.
+Baixa o conteúdo real das páginas dos resultados de prioridade HIGH/CRITICAL, habilitando detecção mais profunda de segredos.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fetch
@@ -590,9 +596,9 @@ python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fetch
 
 ---
 
-### 🔹 `--analyze-fetch-max` — Max Pages to Download
+### 🔹 `--analyze-fetch-max` — Máximo de Páginas a Baixar
 
-Limits the number of pages downloaded during analysis. Default: **20**.
+Limita o número de páginas baixadas durante a análise. Default: **20**.
 
 ```bash
 python3 mappingexpo.py --dg=sqli -o results.json --analyze --analyze-fetch --analyze-fetch-max=5000
@@ -600,16 +606,16 @@ python3 mappingexpo.py --dg=sqli -o results.json --analyze --analyze-fetch --ana
 
 ---
 
-### 🔹 `--analyze-fmt` — Analysis Report Format
+### 🔹 `--analyze-fmt` — Formato do Relatório de Análise
 
-Sets the output format for the analysis report. Default: `html`.
+Define o formato de saída do relatório de análise. Default: `html`.
 
-| Format | Extension |
+| Formato | Extensão |
 |---|---|
-| `html` | Interactive HTML report |
+| `html` | Relatório HTML interativo |
 | `md` | Markdown |
-| `json` | Structured JSON |
-| `txt` | Plain text |
+| `json` | JSON estruturado |
+| `txt` | Texto puro |
 
 ```bash
 python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
@@ -617,9 +623,9 @@ python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-fmt=md
 
 ---
 
-### 🔹 `--analyze-out` — Analysis Report Path
+### 🔹 `--analyze-out` — Path do Relatório de Análise
 
-Custom path for the analysis report. Default: auto-generated next to the `-o` file.
+Path customizado para o relatório de análise. Default: gerado automaticamente junto do arquivo `-o`.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-out=custom_report.html
@@ -628,24 +634,24 @@ python3 mappingexpo.py -d dorks.txt -o results.json --analyze --analyze-out=cust
 ---
 
 ## ══════════════════════════════════════════
-## ADAPTIVE RECURSIVE CRAWL
+## CRAWL RECURSIVO ADAPTATIVO
 ## ══════════════════════════════════════════
 
-The crawler (`DorkCrawlerAgent`) performs automatic multi-round refinement: it analyzes initial results, extracts patterns (domains, paths, technologies, extensions), generates new refined dorks, and searches again — iterating until diminishing returns.
+O crawler (`DorkCrawlerAgent`) faz refinamento automático de múltiplas rodadas: analisa os resultados iniciais, extrai padrões (domínios, paths, tecnologias, extensões), gera novos dorks refinados e busca de novo — iterando até retornos decrescentes.
 
-### 🔹 `--crawl` — Enable Recursive Crawl
+### 🔹 `--crawl` — Habilitar Crawl Recursivo
 
-Activates the adaptive crawl after the initial search.
+Ativa o crawl adaptativo após a busca inicial.
 
 ```bash
 python3 mappingexpo.py -d "site:example.com inurl:admin" --crawl -o crawl.json
 ```
 
-New results from the crawl are merged with the initial results and saved together.
+Novos resultados do crawl são mesclados com os resultados iniciais e salvos juntos.
 
 ---
 
-### 🔹 `--crawl-rounds` — Maximum Crawl Rounds
+### 🔹 `--crawl-rounds` — Máximo de Rodadas de Crawl
 
 ```bash
 python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
@@ -653,7 +659,7 @@ python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 -o crawl.json
 
 ---
 
-### 🔹 `--crawl-max` — Maximum Total Crawl Results
+### 🔹 `--crawl-max` — Máximo Total de Resultados do Crawl
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
@@ -661,7 +667,7 @@ python3 mappingexpo.py -d dorks.txt --crawl --crawl-max=200 -o crawl.json
 
 ---
 
-### 🔹 `--crawl-per-dork` — Results per Crawl Dork
+### 🔹 `--crawl-per-dork` — Resultados por Dork do Crawl
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
@@ -669,9 +675,9 @@ python3 mappingexpo.py -d dorks.txt --crawl --crawl-per-dork=30 -o crawl.json
 
 ---
 
-### 🔹 `--crawl-stealth` — Stealth Crawl
+### 🔹 `--crawl-stealth` — Crawl Stealth
 
-Applies longer delays during crawl rounds.
+Aplica delays mais longos durante as rodadas de crawl.
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
@@ -679,7 +685,7 @@ python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth -o crawl.json
 
 ---
 
-### 🔹 `--crawl-report` — Generate Crawl Report
+### 🔹 `--crawl-report` — Gerar Relatório de Crawl
 
 ```bash
 python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o crawl.json
@@ -687,7 +693,7 @@ python3 mappingexpo.py --dg=sqli --crawl --crawl-rounds=5 --crawl-report -o craw
 
 ---
 
-### 🔹 `--crawl-out` — Crawl Report Path
+### 🔹 `--crawl-out` — Path do Relatório de Crawl
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_report.html -o crawl.json
@@ -696,17 +702,17 @@ python3 mappingexpo.py -d dorks.txt --crawl --crawl-stealth --crawl-out=crawl_re
 ---
 
 ## ══════════════════════════════════════════
-## INTERRUPT CONTROL
+## CONTROLE DE INTERRUPÇÃO
 ## ══════════════════════════════════════════
 
-MappingExpo supports graceful interrupt handling throughout all operations:
+O MappingExpo suporta tratamento de interrupção elegante em todas as operações:
 
-| Action | Effect |
+| Ação | Efeito |
 |---|---|
-| **Single Ctrl+C** | Skips the current dork / task and moves to the next |
-| **Double Ctrl+C** (within 1.5s) | Exits immediately, saves partial results |
+| **Ctrl+C único** | Pula o dork / tarefa atual e vai para o próximo |
+| **Ctrl+C duplo** (em até 1,5s) | Sai imediatamente, salva resultados parciais |
 
-This works during: searches, file analysis, SQLi testing, XSS testing, delays, analysis, and crawl. The interrupt signal propagates automatically to `sqli.py` and `xss.py` sub-modules.
+Funciona durante: buscas, análise de arquivos, testes SQLi/XSS, delays, análise e crawl. O sinal de interrupção se propaga automaticamente para os sub-módulos `sqli.py` e `xss.py`.
 
 ---
 
@@ -714,52 +720,52 @@ This works during: searches, file analysis, SQLi testing, XSS testing, delays, a
 ## TERMUX / ANDROID
 ## ══════════════════════════════════════════
 
-MappingExpo auto-detects Termux on Android and activates battery-saver mode:
+O MappingExpo detecta o Termux no Android automaticamente e ativa o modo economia de bateria:
 
-- Reduced baseline samples for SQLi latency
-- Lower probe and boolean sample counts
-- Shorter connect timeouts
-- Fewer time-based confirmation rounds
+- Menos amostras de baseline para latência SQLi
+- Contagens menores de amostras de probe e booleanas
+- Timeouts de conexão mais curtos
+- Menos rodadas de confirmação time-based
 
-No flags needed — detection is automatic.
+Sem flags — a detecção é automática.
 
 ---
 
 ## ══════════════════════════════════════════
-## RECOMMENDED COMBINATIONS
+## COMBINAÇÕES RECOMENDADAS
 ## ══════════════════════════════════════════
 
-### Professional Stealth — SQLi + XSS + Analysis
+### Stealth Profissional — SQLi + XSS + Análise
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --stealth --sqli --xss -c 150 -o pro_scan.json --analyze --analyze-fetch
 ```
 
-### XSS Only — Reflected Type, Stealth
+### Apenas XSS — Tipo Reflected, Stealth
 
 ```bash
 python3 mappingexpo.py -d "inurl:search?q=" --xss --xss-type=reflected --stealth -o xss_reflected.html
 ```
 
-### Full Vulnerability Scan — Generator + SQLi + XSS
+### Scan Completo de Vulnerabilidades — Gerador + SQLi + XSS
 
 ```bash
 python3 mappingexpo.py --dg=all --mode=aggressive --sqli --xss -c 80 -o full_scan.json
 ```
 
-### Fast Recon (No Analysis)
+### Recon Rápido (Sem Análise)
 
 ```bash
 python3 mappingexpo.py -d dorks.txt --no-analyze -c 200 -o recon.txt
 ```
 
-### Document Harvesting
+### Colheita de Documentos
 
 ```bash
 python3 mappingexpo.py -d "site:.gov" --whitelist .pdf .docx .xlsx -o docs.html
 ```
 
-### Full Pipeline — Generate + Search + SQLi + XSS + Analyze + Crawl
+### Pipeline Completo — Gerar + Buscar + SQLi + XSS + Analisar + Crawl
 
 ```bash
 python3 mappingexpo.py \
@@ -777,19 +783,19 @@ python3 mappingexpo.py \
   --crawl-report
 ```
 
-### Re-test Saved Results — SQLi + XSS
+### Re-testar Resultados Salvos — SQLi + XSS
 
 ```bash
 python3 mappingexpo.py -f Dump/old_results.json --sqli --xss --analyze --crawl -o retested.json
 ```
 
-### Direct URL — SQLi + XSS Test
+### URL Direta — Teste SQLi + XSS
 
 ```bash
 python3 mappingexpo.py -u "https://target.com/item.php?id=42" --sqli --xss --stealth -o direct_test.json
 ```
 
-### Standalone Analysis on Saved File
+### Análise Standalone em Arquivo Salvo
 
 ```bash
 python3 mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
@@ -798,55 +804,55 @@ python3 mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
 ---
 
 ## ══════════════════════════════════════════
-## COMPLETE FLAG REFERENCE
+## REFERÊNCIA COMPLETA DE FLAGS
 ## ══════════════════════════════════════════
 
-| Flag | Type | Default | Description |
+| Flag | Tipo | Default | Descrição |
 |---|---|---|---|
-| `--wizard` | flag | — | Launch interactive wizard |
-| `-d` / `--dork` | string | — | Single dork string or `.txt` file |
-| `-u` / `--url` | string | — | Direct URL for SQLi / XSS test |
-| `-f` / `--file` | string | — | Load results from saved `.json` / `.txt` |
-| `-o` / `--output` | string | auto | Output filename (saved in `Dump/`) |
-| `-c` / `--count` | int | 50 | Results per dork |
-| `--config` | string | — | Custom YAML/JSON config file |
-| `--create-config` | flag | — | Generate sample `mappingexpo_config.yaml` |
-| `--sqli` | flag | off | Enable SQL injection detection |
-| `--xss` | flag | off | Enable XSS detection (reflected, stored, DOM, header) |
-| `--xss-type` | string | `all` | XSS scope: `reflected` / `stored` / `dom` / `header` / `all` |
-| `--stealth` | flag | off | Enable stealth mode |
-| `--no-fingerprint` | flag | off | Disable HTTP fingerprinting |
-| `--no-analyze` | flag | off | Disable file analysis (HEAD requests) |
-| `--blacklist` | list | — | Extensions to exclude (e.g., `.jpg .png`) |
-| `--whitelist` | list | — | Extensions to include exclusively |
-| `--dg` | string | — | Activate dork generator (`all` or category) |
-| `--dg-max` | int | 800 | Max dork combinations per template |
-| `--mode` | string | soft | Generation mode: `soft` / `medium` / `aggressive` |
-| `--templates` | string | default | Template file in `Templates/` (use `=` syntax) |
-| `--analyze` | flag | off | Run post-search analysis pipeline |
-| `--analyze-fetch` | flag | off | Download pages during analysis |
-| `--analyze-fetch-max` | int | 20 | Max pages to download |
-| `--analyze-fmt` | string | html | Report format: `html` / `md` / `json` / `txt` |
-| `--analyze-out` | string | auto | Custom analysis report path |
-| `--crawl` | flag | off | Enable adaptive recursive crawl |
-| `--crawl-rounds` | int | — | Max crawl refinement rounds |
-| `--crawl-max` | int | — | Max total crawl results |
-| `--crawl-per-dork` | int | — | Results per generated crawl dork |
-| `--crawl-stealth` | flag | off | Stealth delays during crawl |
-| `--crawl-report` | flag | off | Generate crawl HTML report |
-| `--crawl-out` | string | auto | Custom crawl report path |
+| `--wizard` | flag | — | Abre o wizard interativo |
+| `-d` / `--dork` | string | — | String de dork única ou arquivo `.txt` |
+| `-u` / `--url` | string | — | URL direta para teste SQLi / XSS |
+| `-f` / `--file` | string | — | Carrega resultados de `.json` / `.txt` salvo |
+| `-o` / `--output` | string | auto | Nome do arquivo de saída (salvo em `Dump/`) |
+| `-c` / `--count` | int | 50 | Resultados por dork |
+| `--config` | string | — | Arquivo de config YAML/JSON customizado |
+| `--create-config` | flag | — | Gera o `mappingexpo_config.yaml` de exemplo |
+| `--sqli` | flag | off | Habilita detecção de SQL injection |
+| `--xss` | flag | off | Habilita detecção XSS (reflected, stored, DOM, header) |
+| `--xss-type` | string | `all` | Escopo XSS: `reflected` / `stored` / `dom` / `header` / `all` |
+| `--stealth` | flag | off | Habilita modo stealth |
+| `--no-fingerprint` | flag | off | Desabilita fingerprinting HTTP |
+| `--no-analyze` | flag | off | Desabilita análise de arquivos (requisições HEAD) |
+| `--blacklist` | list | — | Extensões a excluir (ex.: `.jpg .png`) |
+| `--whitelist` | list | — | Extensões a incluir exclusivamente |
+| `--dg` | string | — | Ativa o gerador de dorks (`all` ou categoria) |
+| `--dg-max` | int | 800 | Máximo de combinações de dorks por template |
+| `--mode` | string | soft | Modo de geração: `soft` / `medium` / `aggressive` |
+| `--templates` | string | default | Arquivo de template em `Templates/` (use sintaxe `=`) |
+| `--analyze` | flag | off | Roda o pipeline de análise pós-busca |
+| `--analyze-fetch` | flag | off | Baixa páginas durante a análise |
+| `--analyze-fetch-max` | int | 20 | Máximo de páginas a baixar |
+| `--analyze-fmt` | string | html | Formato do relatório: `html` / `md` / `json` / `txt` |
+| `--analyze-out` | string | auto | Path customizado do relatório de análise |
+| `--crawl` | flag | off | Habilita crawl recursivo adaptativo |
+| `--crawl-rounds` | int | — | Máximo de rodadas de refinamento do crawl |
+| `--crawl-max` | int | — | Máximo total de resultados do crawl |
+| `--crawl-per-dork` | int | — | Resultados por dork de crawl gerado |
+| `--crawl-stealth` | flag | off | Delays stealth durante o crawl |
+| `--crawl-report` | flag | off | Gera relatório HTML do crawl |
+| `--crawl-out` | string | auto | Path customizado do relatório de crawl |
 
 ---
 
-## ⚠️ Legal Reminder
+## ⚠️ Aviso Legal
 
-Use **only** on:
+Use **somente** em:
 
-- Authorized targets
-- Public data
-- Educational / research environments
+- Alvos autorizados
+- Dados públicos
+- Ambientes educacionais / de pesquisa
 
-Attacking targets without prior mutual consent is illegal.
-It is the end user's responsibility to obey all applicable local, state and federal laws.
+Atacar alvos sem consentimento mútuo prévio é ilegal.
+É responsabilidade do usuário final obedecer a todas as leis locais, estaduais e federais aplicáveis.
 
-Power without control is noise. Stay precise. Stay ethical.
+Poder sem controle é ruído. Seja preciso. Seja ético.
