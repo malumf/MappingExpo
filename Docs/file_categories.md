@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/642bbee1-c6f3-4bd5-98b7-4c7186089fd8" />
+ 
 
 # File Categories — MappingExpo Project
 
