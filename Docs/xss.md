@@ -1,4 +1,3 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/4c45212e-a457-43fe-ac6e-11ebe3757188" />
 
 # XSS Detection — MappingExpo Project
 
