@@ -43,9 +43,7 @@ Este projeto é uma versão abrasileirada do [DorkEye](https://github.com/xPloit
 <!-- BANNER 2 — DIVISOR — 1280x200 px -->
 <!-- Substitua abaixo -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x200/0D1117/39FF14?text=Recursos+de+ASM+Defensivo" width="1280" height="200" alt="Divisor" />
-</div>
+
 
 ---
 
@@ -65,9 +63,7 @@ Este projeto é uma versão abrasileirada do [DorkEye](https://github.com/xPloit
 <!-- BANNER 3 — DEMO (wizard/CLI) — 1280x720 px -->
 <!-- Substitua abaixo com print do seu terminal rodando o wizard -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Print+do+Wizard+MappingExpo+em+PT-BR" width="1280" height="720" alt="Wizard MappingExpo PT-BR" />
-</div>
+
 
 ---
 
@@ -124,9 +120,6 @@ python3 mappingexpo.py --wizard
 <!-- BANNER 3B — PRINT DO WIZARD — 1280x720 px -->
 <!-- Substitua abaixo com print do wizard em execução -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Wizard+MappingExpo+em+a%C3%A7%C3%A3o" width="1280" height="720" alt="Wizard em execução" />
-</div>
 
 ---
 
@@ -146,9 +139,6 @@ rm -rf mappingexpo_env
 <!-- BANNER 3C — PRINT DA CLI — 1280x720 px -->
 <!-- Substitua abaixo com print da CLI com --help -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=CLI+MappingExpo+%28--help%29" width="1280" height="720" alt="CLI --help" />
-</div>
 
 ---
 
@@ -199,10 +189,6 @@ python3 mappingexpo.py --ui
 <!-- BANNER 3D — PRINT DO CONSOLE WEB — 1280x720 px -->
 <!-- Substitua abaixo com print do dashboard web -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x720/0D1117/39FF14?text=Console+Web+MappingExpo" width="1280" height="720" alt="Console Web" />
-</div>
-
 ## 🇧🇷 LGPD — Regionalização BR e Tratamento de Dados Pessoais
 
 O MappingExpo inclui recursos específicos para a realidade brasileira:
@@ -236,9 +222,6 @@ O MappingExpo inclui recursos específicos para a realidade brasileira:
 <!-- BANNER 5 — LEGAL — 1280x300 px -->
 <!-- Substitua abaixo se quiser um aviso legal visual -->
 
-<div align="center">
-<img src="https://via.placeholder.com/1280x300/8B0000/FFFFFF?text=USO+AUTORIZADO+APENAS" width="1280" height="300" alt="Aviso Legal" />
-</div>
 
 ## Aviso Legal
 
