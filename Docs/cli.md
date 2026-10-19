@@ -1,415 +1,416 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/72f403df-8e85-4fb0-9985-8e4e2c6d9716" />
 
-# CLI Reference — MappingExpo Project
+# Referência CLI — Projeto MappingExpo
 
-> All flags, all accepted values, all combinations.
-> Single-page cheat sheet — keep it open while you hunt.
+> Todas as flags, todos os valores aceitos, todas as combinações.
+> Cheat sheet de página única — deixe aberto enquanto você opera.
 
 -----
 
-## Input Sources — one required
+## Fontes de entrada — uma obrigatória
 
-|Flag               |Type|Description                                                                       |
+|Flag               |Tipo|Descrição                                                                       |
 |-------------------|----|----------------------------------------------------------------------------------|
-|`--wizard`         |bool|Launch the interactive guided session (menus for everything)                      |
-|`-d DORK`, `--dork`|str |Single dork string **or** path to a `.txt` file (one dork per line, `#` = comment)|
-|`-u URL`, `--url`  |str |Single URL — direct vulnerability test (SQLi + XSS), no search performed          |
-|`-f FILE`, `--file`|str |Load saved MappingExpo results (`.json` or `.txt`) for re-processing                  |
-|`--dg[=CATEGORY]`  |str |Activate Dork Generator; value = category name or `all` (default if omitted)      |
-|`--create-config`  |bool|Write sample `mappingexpo_config.yaml` to disk and exit                               |
-|`--ui`             |bool|Launch the Web Console (Flask dashboard) — see **Web Console** section            |
+|`--wizard`         |bool|Abre a sessão interativa guiada (menus para tudo)                      |
+|`-d DORK`, `--dork`|str |String de dork única **ou** caminho para arquivo `.txt` (um dork por linha, `#` = comentário)|
+|`-u URL`, `--url`  |str |URL única — teste direto de vulnerabilidade (SQLi + XSS), sem busca          |
+|`-f FILE`, `--file`|str |Carrega resultados salvos do MappingExpo (`.json` ou `.txt`) para reprocessamento                  |
+|`--dg[=CATEGORY]`  |str |Ativa o Gerador de Dorks; valor = nome da categoria ou `all` (default se omitido)      |
+|`--create-config`  |bool|Grava o `mappingexpo_config.yaml` de exemplo em disco e sai                               |
+|`--ui`             |bool|Abre o Console Web (dashboard Flask) — ver seção **Console Web**            |
 
 -----
 
-## Output
+## Saída
 
-|Flag                 |Default                      |Description                                                |
+|Flag                 |Default                      |Descrição                                                |
 |---------------------|-----------------------------|-----------------------------------------------------------|
-|`-o FILE`, `--output`|`report_YYYYMMDD_HHMMSS.html`|Output file — extension determines format (see table below)|
-|`-c N`, `--count`    |`50`                         |Max results per dork from DuckDuckGo                       |
+|`-o FILE`, `--output`|`report_YYYYMMDD_HHMMSS.html`|Arquivo de saída — a extensão determina o formato (ver tabela abaixo)|
+|`-c N`, `--count`    |`50`                         |Máximo de resultados por dork no DuckDuckGo                       |
 
-All output files are saved inside the `Dump/` folder (auto-created).
+Todos os arquivos de saída são salvos na pasta `Dump/` (criada automaticamente).
 
 -----
 
-## Configuration
+## Configuração
 
-|Flag             |Description                                                    |
+|Flag             |Descrição                                                    |
 |-----------------|---------------------------------------------------------------|
-|`--config FILE`  |Load a custom YAML or JSON configuration (merged with defaults)|
-|`--create-config`|Generate sample `mappingexpo_config.yaml` and exit                 |
+|`--config FILE`  |Carrega uma configuração YAML ou JSON customizada (mesclada com os defaults)|
+|`--create-config`|Gera o `mappingexpo_config.yaml` de exemplo e sai                 |
 
 -----
 
-## Scan Behaviour
+## Comportamento do scan
 
-|Flag              |Default|Description                                                        |
+|Flag              |Default|Descrição                                                        |
 |------------------|-------|-------------------------------------------------------------------|
-|`--sqli`          |off    |Enable multi-method SQL injection detection on every result        |
-|`--xss`           |off    |Enable multi-method XSS detection on every result                  |
-|`--stealth`       |off    |Stealth mode — 1.4×–1.8× longer delays, extended rate-limit pauses |
-|`--no-analyze`    |off    |Skip HEAD-request file analysis (no size / content-type / status)  |
-|`--no-fingerprint`|off    |Disable HTTP fingerprint rotation (falls back to basic UA rotation)|
-|`--blacklist EXT…`|none   |Space-separated extensions to exclude (e.g. `.jpg .png .gif`)      |
-|`--whitelist EXT…`|none   |Space-separated extensions — only these are kept                   |
+|`--sqli`          |off    |Habilita detecção multi-método de SQL injection em cada resultado        |
+|`--xss`           |off    |Habilita detecção multi-método de XSS em cada resultado                  |
+|`--stealth`       |off    |Modo stealth — delays 1,4×–1,8× mais longos, pausas estendidas em rate limit |
+|`--no-analyze`    |off    |Pula a análise HEAD de arquivos (sem tamanho / content-type / status)  |
+|`--no-fingerprint`|off    |Desabilita a rotação de fingerprint HTTP (fallback para rotação básica de UA)|
+|`--blacklist EXT…`|none   |Extensões separadas por espaço a excluir (ex.: `.jpg .png .gif`)      |
+|`--whitelist EXT…`|none   |Extensões separadas por espaço — apenas estas são mantidas                   |
 
 -----
 
-## XSS Detection
+## Detecção XSS
 
-Requires `Tools/xss.py`. Activated via `--xss`. All methods run by default (`--xss-type all`).
+Requer `Tools/xss.py`. Ativado via `--xss`. Todos os métodos rodam por default (`--xss-type all`).
 
-|Flag             |Default|Description                                                      |
+|Flag             |Default|Descrição                                                      |
 |-----------------|-------|-----------------------------------------------------------------|
-|`--xss`          |off    |Enable XSS detection pipeline (reflected + stored + dom + header)|
-|`--xss-type TYPE`|`all`  |Detection method(s) to run — see **XSS Types** table below       |
+|`--xss`          |off    |Habilita o pipeline de detecção XSS (reflected + stored + dom + header)|
+|`--xss-type TYPE`|`all`  |Método(s) de detecção a executar — ver tabela **Tipos de XSS** abaixo       |
 
-### XSS Types (`--xss-type`)
+### Tipos de XSS (`--xss-type`)
 
-|Value      |Method                                                                                             |
+|Valor      |Método                                                                                             |
 |-----------|---------------------------------------------------------------------------------------------------|
-|`reflected`|Inject payloads into GET params; check for unescaped reflection in response                        |
-|`stored`   |POST payload per individual param, refetch via GET, check if marker persists                       |
-|`dom`      |Static analysis of JS source-to-sink patterns (inline scripts + up to 5 external scripts)          |
-|`header`   |Inject marker into `X-Forwarded-For`, `Referer`, `User-Agent`, `X-Forwarded-Host`, `X-Original-URL`|
-|`all`      |Run all four methods in sequence (default)                                                         |
+|`reflected`|Injeta payloads em parâmetros GET; verifica reflexão sem escape na resposta                        |
+|`stored`   |POST de payload por parâmetro individual, refetch via GET, verifica se o marker persiste                       |
+|`dom`      |Análise estática de padrões source-to-sink em JS (scripts inline + até 5 scripts externos)          |
+|`header`   |Injeta marker em `X-Forwarded-For`, `Referer`, `User-Agent`, `X-Forwarded-Host`, `X-Original-URL`|
+|`all`      |Executa os quatro métodos em sequência (default)                                                         |
 
-### XSS Confidence Levels
+### Níveis de Confiança XSS
 
-|Level     |Meaning                                                            |
+|Nível     |Significado                                                            |
 |----------|-------------------------------------------------------------------|
-|`NONE`    |No XSS detected                                                    |
-|`LOW`     |DOM static analysis: 3–5 co-occurring source/sink pairs            |
-|`MEDIUM`  |DOM analysis: 6+ pairs; or reflected/stored with CSP header present|
-|`HIGH`    |Unescaped reflection confirmed (reflected/stored/header), no CSP   |
-|`CRITICAL`|Multiple methods confirmed — combined confidence score ≥ 5         |
+|`NONE`    |Nenhum XSS detectado                                                    |
+|`LOW`     |Análise estática de DOM: 3–5 pares source/sink coocorrentes            |
+|`MEDIUM`  |Análise de DOM: 6+ pares; ou reflected/stored com header CSP presente|
+|`HIGH`    |Reflexão sem escape confirmada (reflected/stored/header), sem CSP   |
+|`CRITICAL`|Múltiplos métodos confirmados — pontuação de confiança combinada ≥ 5         |
 
 
-> **Note** — DOM analysis never reaches HIGH/CRITICAL on its own; modern SPAs (React/Vue/Angular)
-> produce source/sink pairs from framework internals. Results below the 3-pair threshold are
-> recorded as informational only.
+> **Nota** — A análise de DOM sozinha nunca chega a HIGH/CRITICAL; SPAs modernos (React/Vue/Angular)
+> produzem pares source/sink das internals do framework. Resultados abaixo do limiar de 3 pares são
+> registrados apenas como informativos.
 
 -----
 
-## SQL Injection Detection
+## Detecção de SQL Injection
 
-|Flag    |Default|Description                                                |
+|Flag    |Default|Descrição                                                |
 |--------|-------|-----------------------------------------------------------|
-|`--sqli`|off    |Enable multi-method SQL injection detection on every result|
+|`--sqli`|off    |Habilita detecção multi-método de SQL injection em cada resultado|
 
-### SQLi Confidence Levels
+### Níveis de Confiança SQLi
 
-|Level     |Meaning                                                 |
+|Nível     |Significado                                                 |
 |----------|--------------------------------------------------------|
-|`NONE`    |No injection detected                                   |
-|`LOW`     |Weak signal (e.g. UNION col-mismatch only)              |
-|`MEDIUM`  |Boolean blind differential or time-based confirmed      |
-|`HIGH`    |DB error signature matched or strong UNION evidence     |
-|`CRITICAL`|Multiple methods confirmed across parameters (score ≥ 5)|
+|`NONE`    |Nenhuma injeção detectada                                   |
+|`LOW`     |Sinal fraco (ex.: apenas col-mismatch de UNION)              |
+|`MEDIUM`  |Diferencial booleano blind ou time-based confirmado      |
+|`HIGH`    |Assinatura de erro de banco casada ou evidência forte de UNION     |
+|`CRITICAL`|Múltiplos métodos confirmados entre parâmetros (pontuação ≥ 5)|
 
-### WAF Detection
+### Detecção de WAF
 
-Detected automatically during SQLi and XSS testing. Supported signatures:
+Detectado automaticamente durante os testes de SQLi e XSS. Assinaturas suportadas:
 
 Cloudflare · ModSecurity · Wordfence · Sucuri · Imperva · Akamai · F5 BigIP · Barracuda ·
-FortiWeb · AWS WAF · DenyAll · Reblaze · generic (403/406/419/429 with short body)
+FortiWeb · AWS WAF · DenyAll · Reblaze · genérico (403/406/419/429 com corpo curto)
 
 -----
 
-## Dork Generator
+## Gerador de Dorks
 
-|Flag              |Default               |Description                                                           |
+|Flag              |Default               |Descrição                                                           |
 |------------------|----------------------|----------------------------------------------------------------------|
-|`--dg[=CATEGORY]` |`all`                 |Category to generate (`all` = every category in template)             |
-|`--dg-max N`      |`800`                 |Max dork combinations per template file                               |
-|`--mode MODE`     |`soft`                |Generation intensity: `soft` / `medium` / `aggressive`                |
-|`--templates=FILE`|`dorks_templates.yaml`|Template file inside `Templates/`; `all` = every `.yaml` in the folder|
+|`--dg[=CATEGORY]` |`all`                 |Categoria a gerar (`all` = todas as categorias do template)             |
+|`--dg-max N`      |`800`                 |Máximo de combinações de dorks por arquivo de template                               |
+|`--mode MODE`     |`soft`                |Intensidade de geração: `soft` / `medium` / `aggressive`                |
+|`--templates=FILE`|`dorks_templates.yaml`|Arquivo de template dentro de `Templates/`; `all` = todo `.yaml` da pasta|
 
-⚠ `--templates` requires `=` syntax: `--templates=file.yaml` ✓ — `--templates file.yaml` ✗
+⚠ `--templates` exige sintaxe com `=`: `--templates=arquivo.yaml` ✓ — `--templates arquivo.yaml` ✗
 
 -----
 
-## Agents — Integrated Post-Search Analysis
+## Agents — Análise Integrada Pós-Busca
 
-|Flag                   |Default|Description                                               |
+|Flag                   |Default|Descrição                                               |
 |-----------------------|-------|----------------------------------------------------------|
-|`--analyze`            |off    |Run the full analysis pipeline (triage → secrets → report)|
-|`--analyze-fetch`      |off    |Download page content for HIGH / CRITICAL results         |
-|`--analyze-fetch-max N`|`20`   |Max pages to download during analysis                     |
-|`--analyze-fmt FORMAT` |`html` |Analysis report format: `html` / `md` / `json` / `txt`    |
-|`--analyze-out FILE`   |auto   |Custom path for the analysis report                       |
+|`--analyze`            |off    |Executa o pipeline completo de análise (triage → segredos → relatório)|
+|`--analyze-fetch`      |off    |Baixa o conteúdo das páginas dos resultados HIGH / CRITICAL         |
+|`--analyze-fetch-max N`|`20`   |Máximo de páginas a baixar durante a análise                     |
+|`--analyze-fmt FORMAT` |`html` |Formato do relatório de análise: `html` / `md` / `json` / `txt`    |
+|`--analyze-out FILE`   |auto   |Path customizado para o relatório de análise                       |
 
-Requires `mappingexpo_agents.py` in `Tools/`. If missing, `--analyze` and `--crawl` are silently disabled.
+Requer `mappingexpo_agents.py` em `Tools/`. Se ausente, `--analyze` e `--crawl` são silenciosamente desabilitados.
 
 -----
 
-## Adaptive Recursive Crawl
+## Crawl Recursivo Adaptativo
 
-|Flag                |Default|Description                                               |
+|Flag                |Default|Descrição                                               |
 |--------------------|-------|----------------------------------------------------------|
-|`--crawl`           |off    |Enable multi-round adaptive crawl after the initial search|
-|`--crawl-rounds N`  |`4`    |Maximum refinement rounds                                 |
-|`--crawl-max N`     |`300`  |Total result cap across all rounds                        |
-|`--crawl-per-dork N`|`20`   |DuckDuckGo results per generated dork per round           |
-|`--crawl-stealth`   |off    |Longer delays between crawl searches                      |
-|`--crawl-report`    |off    |Generate a dedicated crawl HTML report                    |
-|`--crawl-out FILE`  |auto   |Custom path for the crawl report                          |
+|`--crawl`           |off    |Habilita crawl adaptativo de múltiplas rodadas após a busca inicial|
+|`--crawl-rounds N`  |`4`    |Máximo de rodadas de refinamento                                 |
+|`--crawl-max N`     |`300`  |Limite total de resultados em todas as rodadas                        |
+|`--crawl-per-dork N`|`20`   |Resultados do DuckDuckGo por dork gerado por rodada           |
+|`--crawl-stealth`   |off    |Delays mais longos entre buscas do crawl                      |
+|`--crawl-report`    |off    |Gera um relatório HTML dedicado ao crawl                    |
+|`--crawl-out FILE`  |auto   |Path customizado para o relatório do crawl                          |
 
-The crawler analyzes initial results (domains, paths, technologies, extensions), generates
-refined dorks, searches again, and repeats until diminishing returns.
+O crawler analisa os resultados iniciais (domínios, paths, tecnologias, extensões), gera
+dorks refinados, busca de novo e repete até retornos decrescentes.
 
 -----
 
-## DB Port Scanner
+## Varredura de Portas DB
 
-Requires `Tools/db_portscan.py`. Activated via `--dbscan` in the main pipeline,
-or run standalone as `python Tools/db_portscan.py`.
+Requer `Tools/db_portscan.py`. Ativado via `--dbscan` no pipeline principal,
+ou executado standalone como `python Tools/db_portscan.py`.
 
-### Integrated flags (via `mappingexpo.py`)
+### Flags integradas (via `mappingexpo.py`)
 
-|Flag                  |Default|Description                                                        |
+|Flag                  |Default|Descrição                                                        |
 |----------------------|-------|-------------------------------------------------------------------|
-|`--dbscan`            |off    |Run DB port scan on all unique hosts extracted from results        |
-|`--dbscan-timeout N`  |`2.5`  |TCP connect timeout per port in seconds                            |
-|`--dbscan-threads N`  |`60`   |Worker threads per host (max 200)                                  |
-|`--dbscan-max-hosts N`|`200`  |Maximum hosts to scan (private/loopback IPs automatically excluded)|
+|`--dbscan`            |off    |Executa a varredura de portas DB em todos os hosts únicos extraídos dos resultados        |
+|`--dbscan-timeout N`  |`2.5`  |Timeout de conexão TCP por porta, em segundos                            |
+|`--dbscan-threads N`  |`60`   |Threads de trabalho por host (máx. 200)                                  |
+|`--dbscan-max-hosts N`|`200`  |Máximo de hosts a escanear (IPs privados/loopback excluídos automaticamente)|
 
-### Standalone flags (`python Tools/db_portscan.py`)
+### Flags standalone (`python Tools/db_portscan.py`)
 
-|Flag          |Default     |Description                                           |
+|Flag          |Default     |Descrição                                           |
 |--------------|------------|------------------------------------------------------|
-|`results_file`|*(required)*|MappingExpo `.json` results file                          |
-|`--timeout`   |`2.5`       |TCP connect timeout in seconds                        |
-|`--threads`   |`60`        |Worker threads per host                               |
-|`--ports N…`  |all DB ports|Space-separated port list to scan                     |
-|`--max-hosts` |`200`       |Max hosts to scan                                     |
-|`--stealth`   |off         |Add inter-host delay (1.5–3.5 s)                      |
-|`--out FILE`  |auto        |Output base path (writes `_dbscan_<ts>.json` + `.txt`)|
+|`results_file`|*(required)*|Arquivo de resultados `.json` do MappingExpo                          |
+|`--timeout`   |`2.5`       |Timeout de conexão TCP em segundos                        |
+|`--threads`   |`60`        |Threads de trabalho por host                               |
+|`--ports N…`  |all DB ports|Lista de portas separadas por espaço                     |
+|`--max-hosts` |`200`       |Máximo de hosts a escanear                                     |
+|`--stealth`   |off         |Adiciona delay entre hosts (1,5–3,5 s)                      |
+|`--out FILE`  |auto        |Path base de saída (grava `_dbscan_<ts>.json` + `.txt`)|
 
-### Detected services and ports
+### Serviços e portas detectados
 
-|Service      |Port(s)     |Probe method                                       |
+|Serviço      |Porta(s)     |Método de probe                                       |
 |-------------|------------|---------------------------------------------------|
 |MySQL        |3306        |TCP banner                                         |
 |PostgreSQL   |5432        |TCP banner                                         |
 |MongoDB      |27017/18/19 |OP_MSG isMaster handshake                          |
-|Redis        |6379        |`PING` → `+PONG` = no-auth                         |
-|Elasticsearch|9200 / 9300 |HTTP GET `/` — checks `cluster_name` in response   |
-|CouchDB      |5984        |HTTP GET `/` — checks `couchdb` in response        |
-|InfluxDB     |8086        |HTTP GET `/ping` — 204 = alive                     |
-|Neo4j        |7474        |HTTP GET `/` — checks `neo4j`/`bolt` in response   |
+|Redis        |6379        |`PING` → `+PONG` = sem autenticação                         |
+|Elasticsearch|9200 / 9300 |HTTP GET `/` — verifica `cluster_name` na resposta   |
+|CouchDB      |5984        |HTTP GET `/` — verifica `couchdb` na resposta        |
+|InfluxDB     |8086        |HTTP GET `/ping` — 204 = vivo                     |
+|Neo4j        |7474        |HTTP GET `/` — verifica `neo4j`/`bolt` na resposta   |
 |MSSQL        |1433        |TCP banner                                         |
 |Oracle       |1521        |TCP banner                                         |
 |Cassandra    |9042        |TCP banner                                         |
-|Memcached    |11211       |`stats\r\n` → `STAT` = no-auth                     |
+|Memcached    |11211       |`stats\r\n` → `STAT` = sem autenticação                     |
 |RethinkDB    |28015 / 5000|TCP banner                                         |
-|DB2          |50000       |TCP banner *(non-default, not in default scan set)*|
+|DB2          |50000       |TCP banner *(não padrão — fora do set de scan default)*|
 |Riak HTTP    |8098        |HTTP GET `/`                                       |
 
-### DBScan Severity Levels
+### Níveis de Severidade do DBScan
 
-|Level     |Meaning                                                  |
+|Nível     |Significado                                                  |
 |----------|---------------------------------------------------------|
-|`CRITICAL`|Port open **and** unauthenticated access confirmed       |
-|`HIGH`    |Port open and service confirmed via banner/protocol probe|
-|`MEDIUM`  |Port open, service identity unclear                      |
-|`INFO`    |Port closed / filtered / timeout                         |
+|`CRITICAL`|Porta aberta **e** acesso sem autenticação confirmado       |
+|`HIGH`    |Porta aberta e serviço confirmado via probe de banner/protocolo|
+|`MEDIUM`  |Porta aberta, identidade do serviço incerta                      |
+|`INFO`    |Porta fechada / filtrada / timeout                         |
 
-Port hints are automatically extracted from dork strings, URL paths, and page titles to
-prioritise relevant ports (e.g. a result containing “phpmyadmin” will scan port 3306 first).
+Hints de porta são extraídos automaticamente de strings de dork, paths de URL e títulos de
+página para priorizar portas relevantes (ex.: um resultado contendo "phpmyadmin" escaneia a porta 3306 primeiro).
 
 -----
 
-## Web Console
+## Console Web
 
-Requires Flask (`pip install flask`). Launches a local Matrix-themed dashboard
-that wraps the full `mappingexpo.py` pipeline in a browser UI.
+Requer Flask (`pip install flask`). Abre um dashboard local com tema Matrix
+que envolve o pipeline completo do `mappingexpo.py` numa interface de navegador.
 
 ### Flags (via `mappingexpo.py`)
 
-|Flag      |Default|Description                                                     |
+|Flag      |Default|Descrição                                                     |
 |----------|-------|----------------------------------------------------------------|
-|`--ui`    |off    |Start the Web Console and open the browser                      |
-|`--port N`|`8080` |Preferred port; auto-increments up to +100 if the port is in use|
+|`--ui`    |off    |Inicia o Console Web e abre o navegador                      |
+|`--port N`|`8080` |Porta preferida; auto-incrementa em até +100 se a porta estiver em uso|
 
 ### Standalone (`python Tools/mappingexpo_web.py`)
 
-|Flag          |Default|Description                             |
+|Flag          |Default|Descrição                             |
 |--------------|-------|----------------------------------------|
-|`--port N`    |`8080` |Starting port                           |
-|`--no-browser`|off    |Start server without opening the browser|
+|`--port N`    |`8080` |Porta inicial                           |
+|`--no-browser`|off    |Inicia o servidor sem abrir o navegador|
 
-The console auto-detects a free port, binds to `127.0.0.1` only, streams
-subprocess output via SSE, and exposes all pipeline options through a
-form-based interface (Scan, URL Tester, Dork Gen, Jobs, Results).
-The `Dump/` folder is browsable and files can be opened or downloaded directly.
+O console detecta automaticamente uma porta livre, binda apenas em `127.0.0.1`, faz
+stream da saída do subprocess via SSE e expõe todas as opções do pipeline numa
+interface baseada em formulários (Scan, Testador de URL, DorkGen, Jobs, Resultados).
+A pasta `Dump/` é navegável e os arquivos podem ser abertos ou baixados diretamente.
 
 -----
 
-## Accepted Values
+## Valores Aceitos
 
 ### `--mode`
 
-|Value       |Behaviour                                         |Footprint|
+|Valor       |Comportamento                                         |Pegada|
 |------------|--------------------------------------------------|---------|
-|`soft`      |Low-risk dorks only — minimal variable expansion  |Minimal  |
-|`medium`    |Soft + medium coverage patterns                   |Moderate |
-|`aggressive`|All dork combinations — maximum variable expansion|Maximum  |
+|`soft`      |Apenas dorks de baixo risco — expansão mínima de variáveis  |Mínima  |
+|`medium`    |Padrões de cobertura soft + medium                   |Moderada |
+|`aggressive`|Todas as combinações de dorks — expansão máxima de variáveis|Máxima  |
 
-### `-o` / `--output` — format by extension
+### `-o` / `--output` — formato por extensão
 
-|Extension|Format                       |Notes                                                                                                                                                                   |
+|Extensão|Formato                       |Observações                                                                                                                                                                   |
 |---------|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|`.html`  |Interactive dark-theme report|Matrix rain, filter bar, search panel, export panels (TXT/JSON/CSV), file browser, ⓘ detail popup, WAF badges                                                           |
-|`.json`  |Structured JSON              |Full metadata + statistics block. **Triggers interactive analysis prompt**                                                                                              |
-|`.csv`   |Spreadsheet CSV              |All columns: url, title, snippet, dork, timestamp, extension, category, file_size, content_type, accessible, status_code, sqli_vulnerable, sqli_confidence, waf_detected|
-|`.txt`   |Numbered plain text          |Per-result details (title, category, SQLi status, XSS status, WAF)                                                                                                      |
+|`.html`  |Relatório interativo com tema escuro|Matrix rain, barra de filtros, painel de busca, painéis de export (TXT/JSON/CSV), navegador de arquivos, popup de detalhes ⓘ, badges de WAF                                                           |
+|`.json`  |JSON estruturado              |Bloco completo de metadados + estatísticas. **Dispara o prompt interativo de análise**                                                                                              |
+|`.csv`   |CSV de planilha              |Todas as colunas: url, title, snippet, dork, timestamp, extension, category, file_size, content_type, accessible, status_code, sqli_vulnerable, sqli_confidence, waf_detected|
+|`.txt`   |Texto puro numerado          |Detalhes por resultado (título, categoria, status SQLi, status XSS, WAF)                                                                                                      |
 
-If no extension is provided, `.json` is appended automatically.
+Se nenhuma extensão for informada, `.json` é anexado automaticamente.
 
 ### `--analyze-fmt`
 
-|Value |Output                                                         |
+|Valor |Saída                                                         |
 |------|---------------------------------------------------------------|
-|`html`|Full dark-theme HTML with triage, secrets, credentials sections|
-|`md`  |Markdown with tables                                           |
-|`json`|Structured JSON (pii, emails, subdomains, cve_dorks keys)      |
-|`txt` |Plain text summary                                             |
+|`html`|HTML completo com tema escuro e seções de triage, segredos e credenciais|
+|`md`  |Markdown com tabelas                                           |
+|`json`|JSON estruturado (chaves pii, emails, subdomains, cve_dorks)      |
+|`txt` |Resumo em texto puro                                             |
 
 -----
 
-## Compatibility Rules
+## Regras de Compatibilidade
 
-### Mutually exclusive inputs
+### Entradas mutuamente exclusivas
 
 ```
 --wizard  ←→  -d  ←→  -u  ←→  -f  ←→  --dg  ←→  --create-config  ←→  --ui
 ```
 
-Only one input source per invocation.
+Apenas uma fonte de entrada por invocação.
 
-### `-u` constraints
+### Restrições de `-u`
 
-- `--sqli` and `--xss` are auto-enabled even if not specified
-- Not compatible with `--analyze`, `--crawl`, `-d`, `-f`, `--dg`
-- Execution stops immediately after the vulnerability tests
-- Result is saved to `-o` if provided
+- `--sqli` e `--xss` são auto-habilitados mesmo sem serem especificados
+- Incompatível com `--analyze`, `--crawl`, `-d`, `-f`, `--dg`
+- A execução para imediatamente após os testes de vulnerabilidade
+- O resultado é salvo em `-o`, se informado
 
-### `--xss` constraints
+### Restrições de `--xss`
 
-- `--xss-type` only takes effect when `--xss` is active
-- Compatible with `-d`, `-u`, `-f`, `--dg`
-- Requires `Tools/xss.py` — otherwise silently skipped
-- WAF pre-detected by the SQLi probe is shared with the XSS engine automatically
+- `--xss-type` só tem efeito quando `--xss` está ativo
+- Compatível com `-d`, `-u`, `-f`, `--dg`
+- Requer `Tools/xss.py` — caso contrário, é pulado silenciosamente
+- WAF pré-detectado pelo probe SQLi é compartilhado automaticamente com o engine XSS
 
-### `--dbscan` constraints
+### Restrições de `--dbscan`
 
-- `--dbscan-timeout`, `--dbscan-threads`, `--dbscan-max-hosts` only take effect when `--dbscan` is active
-- Works with `-d`, `-f`, `--dg` — not with `-u` (no URL pool to extract hosts from)
-- Skips private/loopback IPs automatically (192.168.x, 10.x, 127.x, etc.)
-- Saves a separate `_dbscan_<ts>.json` + `_dbscan_<ts>.txt` file alongside the main output
+- `--dbscan-timeout`, `--dbscan-threads`, `--dbscan-max-hosts` só têm efeito quando `--dbscan` está ativo
+- Funciona com `-d`, `-f`, `--dg` — não com `-u` (sem pool de URLs de onde extrair hosts)
+- Pula IPs privados/loopback automaticamente (192.168.x, 10.x, 127.x etc.)
+- Salva um arquivo `_dbscan_<ts>.json` + `_dbscan_<ts>.txt` separado junto da saída principal
 
-### `--dg` constraints
+### Restrições de `--dg`
 
-- One `--dg` value only — `--dg=sqli` ✓, two `--dg` flags ✗
-- Must use `--templates=FILE` syntax (with `=`, no space)
-- `-c` / `--count` is **ignored** — the generator uses a fixed 50 results per dork
+- Apenas um valor de `--dg` — `--dg=sqli` ✓, duas flags `--dg` ✗
+- Deve usar a sintaxe `--templates=ARQUIVO` (com `=`, sem espaço)
+- `-c` / `--count` é **ignorado** — o gerador usa 50 resultados fixos por dork
 
-### `--analyze` constraints
+### Restrições de `--analyze`
 
-- `--analyze-fetch-max` only takes effect when `--analyze-fetch` is also set
-- `--analyze-out` requires `--analyze` to be active (or `.json` output)
-- Requires `mappingexpo_agents.py` in `Tools/` — otherwise silently skipped
+- `--analyze-fetch-max` só tem efeito quando `--analyze-fetch` também está definido
+- `--analyze-out` exige `--analyze` ativo (ou saída `.json`)
+- Requer `mappingexpo_agents.py` em `Tools/` — caso contrário, é pulado silenciosamente
 
-### `--ui` constraints
+### Restrições de `--ui`
 
-- Cannot be combined with any other input flag in the same invocation
-- Flask must be installed (`pip install flask`)
-- Binds to `127.0.0.1` only — not exposed on LAN
-- All scans launched from the UI are queued as background jobs with live SSE streaming
+- Não pode ser combinado com nenhuma outra flag de entrada na mesma invocação
+- O Flask precisa estar instalado (`pip install flask`)
+- Binda apenas em `127.0.0.1` — não exposto na LAN
+- Todos os scans iniciados pela UI são enfileirados como jobs em background com streaming SSE ao vivo
 
-### `.json` output special behaviour
+### Comportamento especial da saída `.json`
 
-When `-o` ends in `.json` and `--analyze` is **not** explicitly set, MappingExpo displays an interactive prompt:
+Quando `-o` termina em `.json` e `--analyze` **não** está definido explicitamente,
+o MappingExpo exibe um prompt interativo:
 
 ```
-Run analysis on results? [y/N]:
+Executar análise nos resultados? [y/N]:
 ```
 
-Use `--analyze` to force yes and skip the prompt (useful for scripting).
+Use `--analyze` para forçar sim e pular o prompt (útil para scripting).
 
-### `-f` / `--file` behaviour
+### Comportamento de `-f` / `--file`
 
-- Searches current directory first, then `Dump/`
-- `.json` supports both `{"results": [...]}` and raw `[...]` formats
-- `.txt` reads one URL per line (lines starting with `http`)
-- Combine freely with `--sqli`, `--xss`, `--analyze`, `--crawl`, `--dbscan`
-- Existing URL hashes are reconstructed to avoid false duplicates
+- Busca primeiro no diretório atual, depois em `Dump/`
+- `.json` aceita os formatos `{"results": [...]}` e `[...]` cru
+- `.txt` lê uma URL por linha (linhas começando com `http`)
+- Combine livremente com `--sqli`, `--xss`, `--analyze`, `--crawl`, `--dbscan`
+- Hashes de URLs existentes são reconstruídos para evitar falsos duplicados
 
 -----
 
-## Interrupt Control
+## Controle de Interrupção
 
-|Action                         |Effect                                     |
+|Ação                         |Efeito                                     |
 |-------------------------------|-------------------------------------------|
-|**Single Ctrl+C**              |Skip current dork / task → continue to next|
-|**Double Ctrl+C** (within 1.5s)|Exit immediately → save partial results    |
+|**Ctrl+C único**              |Pula o dork / tarefa atual → continua para o próximo|
+|**Ctrl+C duplo** (em até 1,5s)|Sai imediatamente → salva resultados parciais    |
 
-Works during: searches, file analysis, SQLi/XSS testing, inter-dork delays,
-analysis, crawl, DB port scan.
+Funciona durante: buscas, análise de arquivos, testes SQLi/XSS, delays entre dorks,
+análise, crawl, varredura de portas DB.
 
 -----
 
 ## Termux / Android
 
-Auto-detected — no flags needed. When running inside Termux:
+Auto-detectado — sem flags. Rodando dentro do Termux:
 
-- Connect timeout: 3s (vs 4s)
-- SQLi baseline samples: 1 (vs 2)
-- Probe samples: 2 (vs 3), Boolean samples: 2 (vs 3)
-- Time-based confirmations: 1 (vs 2)
-- Banner shows: `Platform: Android / Termux ⚡ battery-saver active`
+- Timeout de conexão: 3s (vs 4s)
+- Amostras de baseline SQLi: 1 (vs 2)
+- Amostras de probe: 2 (vs 3), amostras booleanas: 2 (vs 3)
+- Confirmações time-based: 1 (vs 2)
+- O banner exibe: `Android / Termux | economia de bateria ativa`
 
 -----
 
-## Common Combinations
+## Combinações Comuns
 
 ```bash
 # ── WIZARD ───────────────────────────────────────────────────────────────
 python mappingexpo.py --wizard
 
-# ── WEB CONSOLE ──────────────────────────────────────────────────────────
+# ── CONSOLE WEB ──────────────────────────────────────────────────────────
 python mappingexpo.py --ui
 python mappingexpo.py --ui --port 9090
 python Tools/mappingexpo_web.py --port 9090 --no-browser
 
-# ── DORK SEARCH ──────────────────────────────────────────────────────────
+# ── BUSCA DE DORKS ──────────────────────────────────────────────────────────
 python mappingexpo.py -d "site:example.com filetype:pdf" -o results.html
 python mappingexpo.py -d dorks.txt -c 100 -o results.json
 python mappingexpo.py -d "inurl:.php?id=" --sqli --stealth -o results.json
 python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
 python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
-python mappingexpo.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # full pipeline
+python mappingexpo.py -d dorks.txt --sqli --xss --analyze --crawl -o results.json  # pipeline completo
 
-# ── DORK GENERATOR ───────────────────────────────────────────────────────
+# ── GERADOR DE DORKS ───────────────────────────────────────────────────────
 python mappingexpo.py --dg=all
 python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
 python mappingexpo.py --dg=all --mode=aggressive --dg-max=10000 -o results.json
 python mappingexpo.py --dg=sqli --sqli --xss --analyze --analyze-fetch -o results.json
 
-# ── DIRECT URL TEST ──────────────────────────────────────────────────────
+# ── TESTE DIRETO DE URL ──────────────────────────────────────────────────
 python mappingexpo.py -u "https://target.com/page.php?id=1"
 python mappingexpo.py -u "https://target.com/page.php?id=1" --sqli --xss --stealth -o out.json
 python mappingexpo.py -u "https://target.com/page.php?id=1" --xss --xss-type reflected -o out.json
 
-# ── FILE RE-PROCESSING ────────────────────────────────────────────────────
+# ── REPROCESSAMENTO DE ARQUIVO ────────────────────────────────────────────
 python mappingexpo.py -f Dump/results.json --sqli -o retest.json
 python mappingexpo.py -f Dump/results.json --sqli --xss -o retest.json
 python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o reanalysis.json
 python mappingexpo.py -f Dump/results.json --sqli --xss --analyze --crawl -o full.json
 python mappingexpo.py -f Dump/results.json --dbscan --dbscan-timeout 3 -o dbscan.json
 
-# ── DB PORT SCAN ─────────────────────────────────────────────────────────
+# ── VARREDURA DE PORTAS DB ─────────────────────────────────────────────────
 python mappingexpo.py -d dorks.txt --dbscan -o results.json
 python mappingexpo.py -d dorks.txt --dbscan --dbscan-timeout 3 --dbscan-threads 80 -o results.json
 python Tools/db_portscan.py Dump/results.json
@@ -417,14 +418,14 @@ python Tools/db_portscan.py Dump/results.json --timeout 3 --threads 80
 python Tools/db_portscan.py Dump/results.json --ports 3306 5432 27017 6379
 python Tools/db_portscan.py Dump/results.json --stealth --max-hosts 50
 
-# ── XSS-ONLY SCAN ────────────────────────────────────────────────────────
+# ── SCAN SOMENTE XSS ────────────────────────────────────────────────────────
 python mappingexpo.py -d dorks.txt --xss --xss-type reflected -o results.json
 python mappingexpo.py -d dorks.txt --xss --xss-type dom -o results.json
 
-# ── STANDALONE AGENTS ────────────────────────────────────────────────────
+# ── AGENTS STANDALONE ────────────────────────────────────────────────────
 python mappingexpo_analyze.py Dump/results.json --fetch --fmt=html
 
-# ── FULL PIPELINE (generate + search + sqli + xss + analyze + crawl + dbscan) ──
+# ── PIPELINE COMPLETO (gerar + buscar + sqli + xss + análise + crawl + dbscan) ──
 python mappingexpo.py \
   --dg=sqli \
   --mode=aggressive \

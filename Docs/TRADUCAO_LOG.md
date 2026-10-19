@@ -682,6 +682,14 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Verificação** (suíte 38 checks: 35 OK + 3 deltas explicados): code blocks 12=12/3=3 · comandos python/pkg/git-clone/git-pull/rm idênticos · multiset de flags idêntico · linhas de tabela idênticas · pip install: 11→8 = exatamente as 2 remoções PyPI aprovadas + 1 prosa refeita ("global pip installs") — 8 comandos restantes idênticos · links 12→11 = entrada TOC morta removida · zero `xPloits3c/DorkEye.(git|releases|issues)` · zero inglês em headings (1 falso positivo: "Menu Principal" é a string real do CLI PT) · wizard mock contém as 6 strings do MAIN_MENU real · pyproject/setup.py/Permission-Errors/CLI-Command-Mode/PyPI ausentes
 - **Não tocado**: linhas de comando em code blocks, paths/flags/valores `y`/`n`/modos, `<img>` banners, emoji de headings, `Ctrl+C` literal
 
+## 2026-10-16 — f4b: cli.md (commit f4b)
+- **Backup**: `cli.md.20261018_222931.pre_f4b.bak` (446→447 linhas — 1 linha a mais por quebra de parágrafo no Comportamento Especial)
+- **Tradução integral PT-BR** (diff aprovado em 2 blocos): headers de tabela (Flag/Tipo/Descrição, Nível/Significado, Valor/Comportamento/Pegada etc.) · células-descritivas de todas as ~110 linhas de tabela · 21 seções de "Restrições de"/comportamentos · comentários dos code blocks de Combinações Comuns (9 cabeçalhos de seção + "# pipeline completo")
+- **Preservado (verificado programáticamente)**: multiset de flags/valores idêntico · code blocks 9=9 · comandos python/db_portscan/mappingexpo_web idênticos · linhas de tabela idênticas · defaults numéricos ×11 (`50`/`20`/`60`/`200`/`2.5`/`300`/`4`/`800`/`8080`/`9090`/`10000`) · colunas CSV literais intactas · box-drawing de exclusividade · enum values (NONE/LOW/MEDIUM/HIGH/CRITICAL, soft/medium/aggressive, all/reflected/stored/dom/header, html/md/json/txt)
+- **Correções de consistência doc↔código (aprovadas)**: L336 prompt `Run analysis on results? [y/N]:` → **`Executar análise nos resultados? [y/N]:`** (string real, mappingexpo.py L2754 — o EN já estava desatualizado) · L371 banner `Platform: Android / Termux ⚡ battery-saver active` → **`Android / Termux | economia de bateria ativa`** (string real, mappingexpo.py L200 — "Platform:" e ⚡ não existem no CLI atual)
+- **Verificação** (suíte 36 checks: 35 OK + 1 falso positivo do teste — "Crawl"/"Console" na lista EN, mas são termos técnicos mantidos em PT por glossário e constavam do diff aprovado)
+- **Rescan de italiano (lista ampla)** revelou 2 resíduos reais fora do f4b, corrigidos nos sublotes seguintes: crawler.md L94–107 (mock "Avvio crawl ricorsivo adattivo..."/"risultati fin qui"/"Completato" — string PT real no f4g) · output_formats.md L78 (`"Vuoi analizzare i risultati? [y/N]"` — prompt italiano → string PT real no f4h) · webconsole.md L262 referencia o prompt EN antigo (corrigir no f4d)
+
 
 
 
