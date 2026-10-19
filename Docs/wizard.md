@@ -1,81 +1,82 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/e99120da-b52b-44b5-ad50-c2b7d9d1c46a" />
 
-# Wizard — MappingExpo Project
+# Wizard — Projeto MappingExpo
 
-The wizard is an interactive guided session that walks through every option without requiring any CLI knowledge. Recommended for first use or exploratory sessions.
+O wizard é uma sessão interativa guiada que percorre todas as opções sem exigir conhecimento de CLI. Recomendado para primeiro uso ou sessões exploratórias.
 
 ---
 
-## Launch
+## Iniciar
 
 ```bash
 python mappingexpo.py --wizard
 ```
 
-No other flags are needed — the wizard ignores them all.
+Nenhuma outra flag é necessária — o wizard ignora todas.
 
 ---
 
-## Main Menu
+## Menu Principal
 
 ```
-┌─[ MappingExpo Wizard ]
-│  1) Dork Search         — search with a dork or dork file
-│  2) Dork Generator      — generate dorks from YAML templates
-│  0) Exit
+┌─[ MENU PRINCIPAL ]
+│  1) Busca de Google Dorks      Buscar no DuckDuckGo com dork(s)
+│  2) Gerador de Dorks          Gerar dorks automaticamente a partir de templates
+│  3) Criar config de exemplo   Gravar mappingexpo_config.yaml em disco
+│  4) Sair
 └─>
 ```
 
 ---
 
-## Choice 1 — Dork Search
+## Opção 1 — Busca de Google Dorks
 
-The wizard asks for each option in sequence:
+O wizard pergunta cada opção em sequência:
 
-| Prompt | What to enter | Example |
+| Pergunta | O que informar | Exemplo |
 |--------|--------------|---------|
-| Dork string or file | A dork or path to `.txt` file | `site:example.com filetype:pdf` |
-| Result count | Number of results per dork | `50` |
-| Enable SQLi? | `y` / `n` | `y` |
-| Enable stealth? | `y` / `n` | `n` |
-| Output file | Filename with extension | `results.json` |
-| Run analysis? | `y` / `n` (shown if output is `.json`) | `y` |
-| Run crawl? | `y` / `n` | `n` |
+| String de dork ou arquivo | Um dork ou caminho para arquivo `.txt` | `site:example.com filetype:pdf` |
+| Quantidade de resultados | Número de resultados por dork | `50` |
+| Habilitar SQLi? | `y` / `n` | `y` |
+| Habilitar stealth? | `y` / `n` | `n` |
+| Arquivo de saída | Nome com extensão | `results.json` |
+| Executar análise? | `y` / `n` (exibida se a saída for `.json`) | `y` |
+| Executar crawl? | `y` / `n` | `n` |
 
-All prompts have sensible defaults — press Enter to accept.
+Todos os prompts têm defaults sensatos — pressione Enter para aceitar.
 
 ---
 
-## Choice 2 — Dork Generator
+## Opção 2 — Gerador de Dorks
 
-| Prompt | Options |
+| Pergunta | Opções |
 |--------|---------|
-| Template source | Default / All templates / Specific file |
-| Category | All categories, or pick one by number |
-| Generation mode | `soft` / `medium` / `aggressive` |
-| Output file | Filename with extension |
-| Run analysis? | `y` / `n` |
-| Run crawl? | `y` / `n` |
+| Origem dos templates | Padrão / Todos os templates / Arquivo específico |
+| Categoria | Todas as categorias, ou escolha uma por número |
+| Modo de geração | `soft` / `medium` / `aggressive` |
+| Arquivo de saída | Nome com extensão |
+| Executar análise? | `y` / `n` |
+| Executar crawl? | `y` / `n` |
 
 ---
 
-## Keyboard Shortcuts During Search
+## Atalhos de Teclado Durante a Busca
 
-| Key | Action |
+| Tecla | Ação |
 |-----|--------|
-| `Ctrl+C` (once) | Skip current dork and move to next |
-| `Ctrl+C` (twice, within 1.5s) | Stop the session entirely |
+| `Ctrl+C` (uma vez) | Pula o dork atual e vai para o próximo |
+| `Ctrl+C` (duas vezes, em até 1,5s) | Encerra a sessão completamente |
 
-These work at any point during the search — mid-delay, mid-dork, or during SQLi testing.
+Funcionam em qualquer ponto da busca — no meio de um delay, de um dork ou de um teste SQLi.
 
 ---
 
-## When to Use the Wizard vs CLI
+## Quando Usar o Wizard vs CLI
 
-| Situation | Use |
+| Situação | Use |
 |-----------|-----|
-| First time running MappingExpo | Wizard |
-| Exploring options interactively | Wizard |
-| Repeatable / scriptable tasks | CLI flags |
-| CI/CD or automation | CLI flags |
-| All options known in advance | CLI flags |
+| Primeira execução do MappingExpo | Wizard |
+| Explorar opções interativamente | Wizard |
+| Tarefas repetíveis / scriptáveis | Flags CLI |
+| CI/CD ou automação | Flags CLI |
+| Todas as opções conhecidas de antemão | Flags CLI |

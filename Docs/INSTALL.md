@@ -1,177 +1,174 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/6f4db1bb-6d7b-4225-af92-31060c14989d" />
 
-# 📦 MappingExpo — Installation Guide
+# 📦 MappingExpo — Guia de Instalação
 
 -----
 
-## 🔗 Download (Source)
+## 🔗 Download (código-fonte)
 
-Clone the repository:
+Clone o repositório:
 
 ```
-git clone https://github.com/xPloits3c/DorkEye.git
+git clone https://github.com/malumf/MappingExpo.git
 ```
 
-Or download the latest release:
-👉 [github.com/xPloits3c/DorkEye/releases](https://github.com/xPloits3c/DorkEye/releases/)
+Ou baixe a última release:
+👉 [github.com/malumf/MappingExpo/releases](https://github.com/malumf/MappingExpo/releases)
 
 -----
 
-## 📋 Table of Contents
+## 📋 Sumário
 
-1. [Prerequisites](#-prerequisites)
-1. [Quick Installation (Recommended)](#-quick-installation-recommended)
-1. [Termux / Android Installation](#-termux--android-installation)
-1. [CLI Command Mode (Optional)](#-cli-command-mode-optional)
-1. [Verification](#-verification)
-1. [Project Structure](#-project-structure)
-1. [Troubleshooting](#-troubleshooting)
-1. [Updating MappingExpo](#-updating-mappingexpo)
-1. [Uninstallation](#-uninstallation)
-1. [Support](#-support)
+1. [Pré-requisitos](#-pré-requisitos)
+1. [Instalação Rápida (Recomendada)](#-instalação-rápida-recomendada)
+1. [Instalação Termux / Android](#-instalação-termux--android)
+1. [Verificação](#-verificação)
+1. [Estrutura do Projeto](#-estrutura-do-projeto)
+1. [Solução de Problemas](#-solução-de-problemas)
+1. [Atualizando o MappingExpo](#-atualizando-o-mappingexpo)
+1. [Desinstalação](#-desinstalação)
+1. [Suporte](#-suporte)
 
 -----
 
-## 🔧 Prerequisites
+## 🔧 Pré-requisitos
 
-|Required Software|Check Command      |
+|Software necessário|Comando de verificação|
 |-----------------|-------------------|
 |Python 3.9+      |`python3 --version`|
-|pip (latest)     |`pip3 --version`   |
+|pip (mais recente)|`pip3 --version`   |
 |git              |`git --version`    |
 
 
-> **Note:** `git` is only required for source installation. If you install via `pip install mappingexpo`, you only need Python and pip.
+> **Nota:** o `git` só é necessário para instalação via código-fonte. Para instalar via `requirements.txt`, você precisa apenas de Python e pip.
 
-**System Requirements:**
+**Requisitos de sistema:**
 
 - Linux / Windows 10+ / macOS 10.14+ / Android (Termux)
-- 512 MB RAM minimum
-- 100 MB free disk space
-- Internet connection
+- 512 MB de RAM no mínimo
+- 100 MB de espaço livre em disco
+- Conexão com a internet
 
-**Key Python Dependencies** (installed automatically via `pip install mappingexpo` or `requirements.txt`):
+**Principais dependências Python** (instaladas automaticamente via `requirements.txt`):
 
-- `ddgs` — DuckDuckGo search engine
-- `requests` — HTTP client
-- `rich` — Terminal formatting and progress bars
-- `pyyaml` — Configuration and template parsing
-- `urllib3` — Low-level HTTP
+- `ddgs` — motor de busca DuckDuckGo
+- `requests` — cliente HTTP
+- `rich` — formatação de terminal e barras de progresso
+- `pyyaml` — parsing de configuração e templates
+- `urllib3` — HTTP de baixo nível
 
-**Optional Dependencies** (for full feature support):
+**Dependências opcionais** (para suporte completo aos recursos):
 
-- `mappingexpo_agents.py` in `Tools/` — Enables `--analyze` and `--crawl` features
-- `dork_generator.py` in `Tools/` — Enables `--dg` dork generator
-- `http_fingerprints.json` — Enables HTTP fingerprint rotation
+- `mappingexpo_agents.py` em `Tools/` — habilita `--analyze` e `--crawl`
+- `dork_generator.py` em `Tools/` — habilita o gerador de dorks `--dg`
+- `http_fingerprints.json` — habilita a rotação de fingerprint HTTP
 
 -----
 
-## 🐧 Quick Installation 
-This method works on **Linux**, **macOS**, and **Windows**.
+## 🐧 Instalação Rápida
+Este método funciona em **Linux**, **macOS** e **Windows**.
 
 ```
-# Clone the repository
-git clone https://github.com/xPloits3c/DorkEye.git
+# Clone o repositório
+git clone https://github.com/malumf/MappingExpo.git
 cd MappingExpo
 
-# Create virtual environment
+# Crie o ambiente virtual
 python3 -m venv mappingexpo_env
 
-# Activate virtual environment
+# Ative o ambiente virtual
 # Linux / macOS:
 source mappingexpo_env/bin/activate
 
 # Windows:
 # mappingexpo_env\Scripts\activate
 
-# Upgrade pip
+# Atualize o pip
 pip install --upgrade pip
 
-# Install dependencies
+# Instale as dependências
 pip install -r requirements.txt
 
-# Verify installation
+# Verifique a instalação
 python mappingexpo.py -h
 ```
 
 -----
 
-## 📱 Termux / Android Installation
+## 📱 Instalação Termux / Android
 
-MappingExpo auto-detects Termux and activates battery-saver mode (reduced timeouts, fewer probe samples). No additional flags needed.
+O MappingExpo detecta o Termux automaticamente e ativa o modo economia de bateria (timeouts reduzidos, menos amostras de probe). Nenhuma flag adicional é necessária.
 
-### From Source
+### Via código-fonte
 
 ```
-# Install Python and git
+# Instale Python e git
 pkg update && pkg upgrade
 pkg install python git
 
-# Clone and install
-git clone https://github.com/xPloits3c/DorkEye.git
+# Clone e instale
+git clone https://github.com/malumf/MappingExpo.git
 cd MappingExpo
 
-# Create virtual environment (recommended to avoid Termux package conflicts)
+# Crie o ambiente virtual (recomendado para evitar conflitos de pacotes no Termux)
 python -m venv mappingexpo_env
 source mappingexpo_env/bin/activate
 
-# Install dependencies
+# Instale as dependências
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Run
+# Execute
 python mappingexpo.py --wizard
 ```
 
-💡 On Termux, MappingExpo automatically:
+💡 No Termux, o MappingExpo automaticamente:
 
-- Reduces connect timeouts (3s vs 4s)
-- Lowers SQLi probe/boolean/time-based sample counts
-- Displays a `Platform: Android / Termux ⚡ battery-saver active` badge in the banner
+- Reduz os timeouts de conexão (3s vs 4s)
+- Reduz a contagem de amostras de probe SQLi (booleanas/time-based)
+- Exibe no banner um badge de plataforma indicando Android / Termux com economia de bateria ativa
 
 -----
 
-## ✅ Verification
+## ✅ Verificação
 
-### From source:
+### Via código-fonte:
 
 ```
-# Show help and all available flags
+# Exibe a ajuda e todas as flags
 python mappingexpo.py -h
 
-# Create a sample config file
+# Cria um arquivo de config de exemplo
 python mappingexpo.py --create-config
 
-# Quick test search
+# Busca de teste rápida
 python mappingexpo.py -d "python programming" -c 5 -o test.html
 
-# Test dork generator (if templates are present)
+# Testa o gerador de dorks (se houver templates)
 python mappingexpo.py --dg=all --mode=soft -c 5 -o dg_test.html
 
-# Launch the interactive wizard
+# Abre o wizard interativo
 python mappingexpo.py --wizard
 ```
 -----
 
-## 📁 Project Structure
+## 📁 Estrutura do Projeto
 
 ```
 MappingExpo/
-├── mappingexpo.py                  # Main script
-├── pyproject.toml              # PyPI package configuration
-├── requirements.txt            # Python dependencies
-├── setup.py                    # CLI install config (editable mode)
-├── mappingexpo_config.yaml         # Config (generated with --create-config)
-├── http_fingerprints.json      # Browser fingerprint profiles
+├── mappingexpo.py                  # Script principal
+├── requirements.txt            # Dependências Python
+├── mappingexpo_config.yaml         # Config (gerada com --create-config)
+├── http_fingerprints.json      # Perfis de fingerprint de navegador
 ├── Tools/
-│   ├── dork_generator.py       # Dork Generator engine (--dg)
-│   ├── mappingexpo_agents.py       # Analysis + Crawl agents (--analyze, --crawl)
-│   ├── mappingexpo_analyze.py      # Standalone analysis script (executable directly)
-│   └── mappingexpo_patterns.py     # Pattern matching utilities
+│   ├── dork_generator.py       # Motor do Gerador de Dorks (--dg)
+│   ├── mappingexpo_agents.py       # Agents de análise + crawl (--analyze, --crawl)
+│   ├── mappingexpo_analyze.py      # Script de análise standalone (executável diretamente)
+│   └── mappingexpo_patterns.py     # Utilitários de pattern matching
 ├── Templates/
-│   ├── dorks_templates.yaml    # Default dork templates
-│   └── *.yaml                  # Additional template files
-└── Dump/                       # Output folder (auto-created)
+│   ├── dorks_templates.yaml    # Templates de dorks padrão
+│   └── *.yaml                  # Arquivos de template adicionais
+└── Dump/                       # Pasta de saída (criada automaticamente)
     ├── results.json
     ├── report.html
     └── ...
@@ -179,11 +176,11 @@ MappingExpo/
 
 -----
 
-## 🐛 Troubleshooting
+## 🐛 Solução de Problemas
 
 ### `ModuleNotFoundError: ddgs`
 
-The search engine module has been renamed. Fix:
+O módulo do motor de busca foi renomeado. Correção:
 
 ```
 pip uninstall duckduckgo-search -y
@@ -192,7 +189,7 @@ pip install ddgs
 
 ### `Externally Managed Environment` (Kali Linux / Debian 12+)
 
-Modern Debian-based systems block global pip installs. Use a virtual environment:
+Sistemas modernos baseados em Debian bloqueiam instalações globais do pip. Use um ambiente virtual:
 
 ```
 python3 -m venv mappingexpo_env
@@ -200,43 +197,42 @@ source mappingexpo_env/bin/activate
 pip install -r requirements.txt
 ```
 
-### Permission Errors
 
-### `--templates=filename.yaml` syntax error
+### Erro de sintaxe com `--templates=arquivo.yaml`
 
-The `--templates` flag requires `=` syntax (no space):
+A flag `--templates` exige a sintaxe com `=` (sem espaço):
 
 ```
-# ✅ Correct
+# ✅ Correto
 python mappingexpo.py --dg=sqli --templates=dorks_templates.yaml
 
-# ❌ Wrong
+# ❌ Errado
 python mappingexpo.py --dg=sqli --templates dorks_templates.yaml
 ```
 
-### `mappingexpo_agents.py not found` warning
+### Aviso `mappingexpo_agents.py not found`
 
-The `--analyze` and `--crawl` features require `mappingexpo_agents.py` in the `Tools/` directory. If missing, MappingExpo runs normally but these features are disabled. Ensure your clone is up to date:
+Os recursos `--analyze` e `--crawl` exigem `mappingexpo_agents.py` no diretório `Tools/`. Se estiver ausente, o MappingExpo roda normalmente, mas esses recursos ficam desabilitados. Certifique-se de que seu clone está atualizado:
 
 ```
 git pull origin master
 ```
 
-> **Note:** When installed via PyPI, the `Tools/` directory is not included. For full feature support (agents, dork generator), use the source installation.
+> **Nota:** para suporte completo aos recursos (agents, gerador de dorks), use a instalação via código-fonte — é ela que garante o diretório `Tools/` completo.
 
-### HTTP Fingerprinting disabled warning
+### Aviso de fingerprint HTTP desabilitado
 
-If `http_fingerprints.json` is missing or malformed, MappingExpo falls back to basic User-Agent rotation. Re-download the file from the repository.
+Se `http_fingerprints.json` estiver ausente ou malformado, o MappingExpo faz fallback para a rotação básica de User-Agent. Baixe o arquivo novamente do repositório.
 
-### SSL/TLS warnings
+### Avisos de SSL/TLS
 
-MappingExpo disables SSL verification for maximum compatibility during OSINT scanning. `InsecureRequestWarning` messages are suppressed automatically.
+O MappingExpo desabilita a verificação de SSL para máxima compatibilidade durante varreduras OSINT. Mensagens de `InsecureRequestWarning` são suprimidas automaticamente.
 
 -----
 
-## 🔄 Updating MappingExpo
+## 🔄 Atualizando o MappingExpo
 
-### Source install:
+### Instalação via código-fonte:
 
 ```
 cd MappingExpo
@@ -245,7 +241,7 @@ pip install --upgrade -r requirements.txt
 ```
 -----
 
-## 🗑️ Uninstallation
+## 🗑️ Desinstalação
 
 ```
 rm -rf MappingExpo
@@ -257,13 +253,13 @@ rm -rf MappingExpo
 rmdir /s /q MappingExpo
 ```
 
-**Remove only the virtual environment:**
+**Remover apenas o ambiente virtual:**
 
 ```
 rm -rf mappingexpo_env
 ```
 
-**If installed in CLI mode (source):**
+**Se instalado no modo CLI (código-fonte):**
 
 ```
 pip uninstall mappingexpo
@@ -271,37 +267,37 @@ pip uninstall mappingexpo
 
 -----
 
-## 📞 Support
+## 📞 Suporte
 
-If you encounter issues, open an issue on GitHub:
-👉 [github.com/xPloits3c/DorkEye/issues](https://github.com/xPloits3c/DorkEye/issues)
+Se encontrar problemas, abra uma issue no GitHub:
+👉 [github.com/malumf/MappingExpo/issues](https://github.com/malumf/MappingExpo/issues)
 
-Please include:
+Inclua, por favor:
 
-- Operating system + version
-- Python version (`python3 --version`)
-- Installation method (PyPI or source)
-- Full error message / traceback
-- Steps to reproduce the issue
-- Whether you’re using a virtual environment
+- Sistema operacional + versão
+- Versão do Python (`python3 --version`)
+- Método de instalação (código-fonte)
+- Mensagem de erro completa / traceback
+- Passos para reproduzir o problema
+- Se você está usando um ambiente virtual
 
 -----
 
-## ✅ Post-Installation Checklist
+## ✅ Checklist Pós-Instalação
 
-**Source install:**
+**Instalação via código-fonte:**
 
 - ✔ Python 3.9+
-- ✔ Virtual environment active
-- ✔ Dependencies installed (`pip install -r requirements.txt`)
-- ✔ `python mappingexpo.py -h` shows help
-- ✔ `python mappingexpo.py --create-config` creates config
-- ✔ Test search works (`-d "test" -c 5 -o test.html`)
-- ✔ Dork generator works (`--dg=all -c 5 -o dg_test.html`)
-- ✔ Wizard launches (`--wizard`)
+- ✔ Ambiente virtual ativo
+- ✔ Dependências instaladas (`pip install -r requirements.txt`)
+- ✔ `python mappingexpo.py -h` exibe a ajuda
+- ✔ `python mappingexpo.py --create-config` cria a config
+- ✔ Busca de teste funciona (`-d "test" -c 5 -o test.html`)
+- ✔ Gerador de dorks funciona (`--dg=all -c 5 -o dg_test.html`)
+- ✔ Wizard abre (`--wizard`)
 
 -----
 
-## 🎯 Installation Complete
+## 🎯 Instalação Concluída
 
-MappingExpo is ready! Happy hunting. 🔍
+O MappingExpo está pronto! Boa caçada. 🔍

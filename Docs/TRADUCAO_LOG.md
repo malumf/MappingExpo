@@ -664,6 +664,24 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Verificações**: diff README 100% aditivo (o único "-" era o header `--- a/README.md`) · todos os dorks citados em dorks_br.md existem no YAML (cross-check programático UTF-8 ×7, incluindo os acentuados — o "False" inicial era encoding do pipeline PS, não do arquivo) · links cruzados dorks_br↔validators_br e README→Docs
 - **Pendência p/ Fase 4 (Docs/*.md)**: `Docs/agents.md` seção PiiDetectorAgent (L326) ainda lista os tipos pré-F2.1 — atualizar para incluir CPF/CNPJ/CEP/PIX BR quando a Fase 4 abrir
 
+---
+
+# FASE 4 — DOCUMENTAÇÃO (Docs/*.md)
+
+## Plano aprovado (decisão do mantenedor, 2026-10-16)
+- **Inventário** (24 arquivos): 18 docs EN (~5.930 linhas) + dorks_br/validators_br (PT, F2) + README/.github PT-BR (exceto pull_request_template EN, 16 linhas) · italiano real ZERO (todos os hits = prefixo EN "non-") · `dorkeye_`/`python dorkeye.py` ZERO · links internos quebrados ZERO
+- **Sublotes**: f4a INSTALL+wizard (ALTA) · f4b cli (ALTA) · f4c USAGE (ALTA, 2-3 blocos) · f4d webconsole+termux+DDGSEE · f4e agents (+pendência F2.3 PiiDetectorAgent) · f4f sqli+xss (markers/payloads verbatim) · f4g dork_generator+crawler+dbscan · f4h fingerprinting+http_fingerprints+output_formats+file_categories+REPORT_HTML · f4i PR template + verificação global · f4j ARCHITECTURE.md + ROADMAP.md (novos, aprovados); CONTRIBUTING_BR REJEITADO (redundante)
+- **Mecânica**: ≤350 linhas → diff por linha; >350 → seções + verificação programática de estrutura (code blocks, comandos, links, flags, tabelas)
+- **URLs aprovadas**: clone/releases/issues xPloits3c/DorkEye → malumf/MappingExpo nos arquivos traduzidos (INSTALL L12/16/74/111/277, termux L52); atribuição pura MANTIDA (termux L395/396, README, LICENSE)
+- **Regra**: inconsistências doc↔código reportadas e corrigidas só via aprovação no diff (marca ⚠)
+
+## 2026-10-16 — f4a: INSTALL.md + wizard.md (commit f4a)
+- **Backups**: `INSTALL.md.20261018_213611.pre_f4a.bak`, `wizard.md.20261018_213611.pre_f4a.bak`
+- **INSTALL.md** (307→303 linhas): tradução integral PT-BR · URL clone ×3 + releases + issues → malumf/MappingExpo (aprovado) · TOC reancorada para os headings PT (slugs com acentos, GitHub-style) · **4 correções de inconsistência aprovadas no diff (⚠)**: (1) entrada TOC morta "CLI Command Mode (Optional)" — seção não existe no corpo; (2) heading vazio "Permission Errors"; (3) `pyproject.toml` e (4) `setup.py` no diagrama de estrutura — arquivos não existem no repo; menções `pip install mappingexpo` (PyPI, pacote não publicado) neutralizadas ×3 (L44/L53/L225→nota de código-fonte) · "Boa caçada. 🔍" literal (consistente com EXIT_MESSAGES; reenquadramento = Fase 0)
+- **wizard.md** (81→82 linhas): tradução integral · **mock do menu corrigido para espelhar o CLI real (mappingexpo.py L2390–2402)**: `MENU PRINCIPAL` + 4 opções com labels/descrições reais pós-Fase 1 ("Busca de Google Dorks"/"Gerador de Dorks"/"Criar config de exemplo"/"Sair" — o original mostrava 3 opções com "0) Exit"; no CLI real "Sair" é a 4ª)
+- **Verificação** (suíte 38 checks: 35 OK + 3 deltas explicados): code blocks 12=12/3=3 · comandos python/pkg/git-clone/git-pull/rm idênticos · multiset de flags idêntico · linhas de tabela idênticas · pip install: 11→8 = exatamente as 2 remoções PyPI aprovadas + 1 prosa refeita ("global pip installs") — 8 comandos restantes idênticos · links 12→11 = entrada TOC morta removida · zero `xPloits3c/DorkEye.(git|releases|issues)` · zero inglês em headings (1 falso positivo: "Menu Principal" é a string real do CLI PT) · wizard mock contém as 6 strings do MAIN_MENU real · pyproject/setup.py/Permission-Errors/CLI-Command-Mode/PyPI ausentes
+- **Não tocado**: linhas de comando em code blocks, paths/flags/valores `y`/`n`/modos, `<img>` banners, emoji de headings, `Ctrl+C` literal
+
 
 
 
