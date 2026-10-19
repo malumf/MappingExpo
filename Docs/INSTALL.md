@@ -1,4 +1,3 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/6f4db1bb-6d7b-4225-af92-31060c14989d" />
 
 # 📦 MappingExpo — Guia de Instalação
 
@@ -20,13 +19,11 @@ Ou baixe a última release:
 ## 📋 Sumário
 
 1. [Pré-requisitos](#-pré-requisitos)
-1. [Instalação Rápida (Recomendada)](#-instalação-rápida-recomendada)
 1. [Instalação Termux / Android](#-instalação-termux--android)
 1. [Verificação](#-verificação)
 1. [Estrutura do Projeto](#-estrutura-do-projeto)
 1. [Solução de Problemas](#-solução-de-problemas)
 1. [Atualizando o MappingExpo](#-atualizando-o-mappingexpo)
-1. [Desinstalação](#-desinstalação)
 1. [Suporte](#-suporte)
 
 -----
