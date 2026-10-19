@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/72f403df-8e85-4fb0-9985-8e4e2c6d9716" />
+
 
 # Referência CLI — Projeto MappingExpo
 
