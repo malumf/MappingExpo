@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/e99120da-b52b-44b5-ad50-c2b7d9d1c46a" />
+
 
 # Wizard — Projeto MappingExpo
 
