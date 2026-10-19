@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/391a4aeb-a91d-44e5-b493-ad4821f0c606" />
+
 
 # AI Agents | MappingExpo Project
 
