@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/c0c1fd19-e570-4185-8529-56f138a067e7" />
+
 
 # HTTP Fingerprinting — MappingExpo Project
 
