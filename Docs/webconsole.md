@@ -1,44 +1,45 @@
 <img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/286d4893-e1e6-4dc4-b112-03f0c19287c6" />
 
-# Web Console — MappingExpo
+# Console Web — MappingExpo
 
-> Matrix-themed local web dashboard for all MappingExpo operations.
-> Run scans, preview dorks, stream live output, and browse results — all from the browser.
-
------
-
-## Overview
-
-`mappingexpo_web.py` is a Flask-based web interface that wraps the entire `mappingexpo.py` pipeline
-in a browser UI. It launches a local server (bound to `127.0.0.1` only), spawns scans as
-background jobs, and streams their output in real time via **Server-Sent Events (SSE)**.
-
-No data leaves the machine. The dashboard is a local tool — it is not designed to be
-exposed on a network interface.
-
-**Lives in:** `MappingExpo/Tools/mappingexpo_web.py`
+> Dashboard web local com tema Matrix para todas as operações do MappingExpo.
+> Rode scans, pré-visualize dorks, acompanhe a saída ao vivo e navegue pelos resultados — tudo pelo navegador.
 
 -----
 
-## Requirements
+## Visão Geral
+
+`mappingexpo_web.py` é uma interface web baseada em Flask que envolve todo o pipeline do
+`mappingexpo.py` numa UI de navegador. Ela abre um servidor local (bind apenas em
+`127.0.0.1`), spawna scans como jobs em background e faz stream da saída deles em tempo
+real via **Server-Sent Events (SSE)**.
+
+Nenhum dado sai da máquina. O dashboard é uma ferramenta local — não foi projetado
+para ser exposto numa interface de rede.
+
+**Vive em:** `MappingExpo/Tools/mappingexpo_web.py`
+
+-----
+
+## Requisitos
 
 ```bash
 pip install flask
 ```
 
-`requests` and `rich` are used by the underlying modules but not required by the web layer itself.
+`requests` e `rich` são usados pelos módulos subjacentes, mas não são exigidos pela camada web em si.
 
 -----
 
-## Usage
+## Uso
 
-### Via `mappingexpo.py` (recommended)
+### Via `mappingexpo.py` (recomendado)
 
 ```bash
-# Start on default port 8080
+# Inicia na porta padrão 8080
 python mappingexpo.py --ui
 
-# Start on a custom port
+# Inicia numa porta customizada
 python mappingexpo.py --ui --port 9090
 ```
 
@@ -56,196 +57,196 @@ python Tools/mappingexpo_web.py --port 9090 --no-browser
 
 ### Via `mappingexpo.py`
 
-|Flag      |Default|Description                                                      |
+|Flag      |Default|Descrição                                                      |
 |----------|-------|-----------------------------------------------------------------|
-|`--ui`    |off    |Launch the Web Console and open the browser automatically        |
-|`--port N`|`8080` |Preferred port — auto-increments up to +100 if the port is in use|
+|`--ui`    |off    |Inicia o Console Web e abre o navegador automaticamente        |
+|`--port N`|`8080` |Porta preferida — auto-incrementa em até +100 se a porta estiver em uso|
 
 ### Standalone (`python Tools/mappingexpo_web.py`)
 
-|Flag          |Default|Description                             |
+|Flag          |Default|Descrição                             |
 |--------------|-------|----------------------------------------|
-|`--port N`    |`8080` |Starting port                           |
-|`--no-browser`|off    |Start server without opening the browser|
+|`--port N`    |`8080` |Porta inicial                           |
+|`--no-browser`|off    |Inicia o servidor sem abrir o navegador|
 
 -----
 
-## Auto Port Selection
+## Seleção Automática de Porta
 
-If the preferred port is in use, the server scans ports `start` through `start + 100`
-and binds to the first free one. The actual URL is printed on startup:
+Se a porta preferida estiver em uso, o servidor varre as portas de `start` até
+`start + 100` e binda na primeira livre. A URL real é impressa na inicialização:
 
 ```
   ▸ URL     →  http://127.0.0.1:8082
-  ▸ Port    →  8082  (auto-selected)
+  ▸ Porta   →  8082  (selecionada automaticamente)
 ```
 
-The socket is created with `SO_REUSEADDR` so the port is released immediately on shutdown,
-even after a force kill (`TIME_WAIT` is not an issue).
+O socket é criado com `SO_REUSEADDR`, então a porta é liberada imediatamente no
+encerramento, mesmo após um kill forçado (`TIME_WAIT` não é problema).
 
 -----
 
-## Dashboard Sections
+## Seções do Dashboard
 
 ### ◈ Dashboard
 
-Home screen with at-a-glance stats and quick-action buttons:
+Tela inicial com estatísticas de relance e botões de ação rápida:
 
-|Card        |Shows                                |
-|------------|-------------------------------------|
-|Active Jobs |Number of currently running scan jobs|
-|Total Jobs  |All jobs launched this session       |
-|Result Files|Number of files in `Dump/`           |
-|Dump Size   |Total disk usage of `Dump/`          |
+|Card                |Mostra                                      |
+|------------        |-------------------------------------        |
+|Jobs Ativos         |Número de jobs de scan rodando agora         |
+|Total de Jobs       |Todos os jobs lançados nesta sessão          |
+|Arquivos de Resultado|Número de arquivos em `Dump/`               |
+|Tamanho do Dump     |Uso total de disco de `Dump/`                |
 
-Quick-action buttons jump directly to: **New Scan**, **URL Tester**, **Dork Gen**, **DB Scan**, **Results**.
+Os botões de ação rápida levam direto a: **Novo Scan**, **Testador de URL**, **DorkGen**, **Varredura DB**, **Resultados**.
 
-The **Recent Jobs** table shows the last 6 jobs with status badges and a TERM button
-to attach the terminal to any of them.
+A tabela **Jobs Recentes** mostra os últimos 6 jobs com badges de status e um
+botão TERM para anexar o terminal a qualquer um deles.
 
 -----
 
-### ◉ New Scan
+### ◉ Novo Scan
 
-Full-featured scan form covering every `mappingexpo.py` pipeline option.
+Formulário de scan completo cobrindo toda opção do pipeline do `mappingexpo.py`.
 
-**Target**
+**Alvo**
 
-- Dork string — single or multiline (one per line). Multiline input is automatically
-  written to a temporary `.txt` file in `Dump/` and passed via `-d`.
-- Max results per dork (`-c`)
-- Output file name (`-o`) — extension determines format; defaults to `.html`
+- String de dork — única ou multilinha (uma por linha). A entrada multilinha é
+  escrita automaticamente num arquivo `.txt` temporário em `Dump/` e passada via `-d`.
+- Máximo de resultados por dork (`-c`)
+- Nome do arquivo de saída (`-o`) — a extensão determina o formato; default `.html`
 
-**Mode & Options**
+**Modo & Opções**
 
-|Toggle        |Flag mapped       |
-|--------------|------------------|
-|Stealth       |`--stealth`       |
-|SQLi Detection|`--sqli`          |
-|XSS Detection |`--xss`           |
-|Skip Analysis |`--no-analyze`    |
-|No Fingerprint|`--no-fingerprint`|
+|Toggle          |Flag mapeada      |
+|--------------  |------------------|
+|Stealth         |`--stealth`       |
+|Detecção SQLi   |`--sqli`          |
+|Detecção XSS    |`--xss`           |
+|Pular Análise   |`--no-analyze`    |
+|Sem Fingerprint |`--no-fingerprint`|
 
-XSS type selector (`--xss-type`): `all` / `reflected` / `stored` / `dom`.
+Seletor de tipo XSS (`--xss-type`): `all` / `reflected` / `stored` / `dom`.
 
-**Mode selector** (`--mode`): `soft` / `medium` / `aggressive` (default: aggressive in the UI).
+**Seletor de modo** (`--mode`): `soft` / `medium` / `aggressive` (default: aggressive na UI).
 
-**Collapsible sections** (expand as needed):
+**Seções recolhíveis** (expanda conforme precisar):
 
-|Section            |Flags exposed                                                                                                     |
+|Seção              |Flags expostas                                                                                                     |
 |-------------------|------------------------------------------------------------------------------------------------------------------|
-|⊞ Dork Generator   |`--dg=CAT`, `--templates`, `--dg-max`                                                                             |
-|◧ Filters          |`--blacklist`, `--whitelist`, `--config`                                                                          |
-|🔬 Analysis Pipeline|`--analyze`, `--analyze-fetch`, `--analyze-fetch-max`, `--analyze-fmt`, `--analyze-out`                           |
-|🕸 Adaptive Crawl   |`--crawl`, `--crawl-rounds`, `--crawl-max`, `--crawl-per-dork`, `--crawl-stealth`, `--crawl-report`, `--crawl-out`|
-|🗄 DB Port Scan     |`--dbscan`, `--dbscan-timeout`, `--dbscan-threads`, `--dbscan-max-hosts`                                          |
+|⊞ Gerador de Dorks |`--dg=CAT`, `--templates`, `--dg-max`                                                                             |
+|◧ Filtros          |`--blacklist`, `--whitelist`, `--config`                                                                          |
+|🔬 Pipeline de Análise|`--analyze`, `--analyze-fetch`, `--analyze-fetch-max`, `--analyze-fmt`, `--analyze-out`                           |
+|🕸 Crawl Adaptativo |`--crawl`, `--crawl-rounds`, `--crawl-max`, `--crawl-per-dork`, `--crawl-stealth`, `--crawl-report`, `--crawl-out`|
+|🗄 Varredura de Portas DB |`--dbscan`, `--dbscan-timeout`, `--dbscan-threads`, `--dbscan-max-hosts`                                          |
 
 -----
 
-### ◎ URL Tester
+### ◎ Testador de URL
 
-Direct vulnerability test on a single target URL — maps to `mappingexpo.py -u`.
+Teste direto de vulnerabilidade numa URL única — mapeia para `mappingexpo.py -u`.
 
-|Field     |Flag mapped |
+|Campo     |Flag mapeada |
 |----------|------------|
-|Target URL|`-u`        |
-|SQLi Test |`--sqli`    |
-|XSS Test  |`--xss`     |
-|XSS type  |`--xss-type`|
+|URL alvo  |`-u`        |
+|Teste SQLi|`--sqli`    |
+|Teste XSS |`--xss`     |
+|Tipo XSS  |`--xss-type`|
 |Stealth   |`--stealth` |
-|Output    |`-o`        |
+|Saída     |`-o`        |
 
 -----
 
-### ⊞ Dork Generator
+### ⊞ Gerador de Dorks
 
-Preview and export dork combinations without launching a scan.
+Pré-visualize e exporte combinações de dorks sem rodar um scan.
 
-|Control       |Description                                                                     |
+|Controle       |Descrição                                                                     |
 |--------------|--------------------------------------------------------------------------------|
-|Templates     |Dropdown populated from all `.yaml` files in `Templates/`                       |
-|Category      |Populated dynamically from the selected template via `/api/templates/categories`|
-|Mode          |`soft` / `medium` / `aggressive`                                                |
-|Max combos    |Cap on generated combinations (10–10,000)                                       |
-|PREVIEW button|Fetches up to 200 dorks inline for review                                       |
-|EXPORT TXT    |Downloads the full set as `mappingexpo_dorks_<ts>.txt`                              |
+|Templates     |Dropdown populado com todos os arquivos `.yaml` de `Templates/`                       |
+|Categoria     |Populada dinamicamente do template selecionado via `/api/templates/categories`|
+|Modo          |`soft` / `medium` / `aggressive`                                                |
+|Máx. de combinações|Limite de combinações geradas (10–10.000)                                       |
+|Botão PREVIEW |Busca até 200 dorks inline para revisão                                       |
+|EXPORT TXT    |Baixa o conjunto completo como `mappingexpo_dorks_<ts>.txt`                              |
 
-Template resolution order:
+Ordem de resolução de template:
 
-1. `default` / empty → `Templates/dorks_templates.yaml` if present, else first `.yaml` found
-1. `all` → every `.yaml` in `Templates/`
-1. Specific filename → that file; falls back to default if not found
+1. `default` / vazio → `Templates/dorks_templates.yaml` se presente, senão o primeiro `.yaml` encontrado
+1. `all` → todo `.yaml` em `Templates/`
+1. Nome específico → aquele arquivo; fallback para o default se não encontrado
 
 -----
 
 ### ▣ Jobs
 
-Table of all jobs launched this session:
+Tabela de todos os jobs lançados nesta sessão:
 
-|Column |Description                                       |
+|Coluna |Descrição                                       |
 |-------|--------------------------------------------------|
-|ID     |8-character hex job ID                            |
-|Label  |Human-readable description of the job             |
-|Status |`running` (animated) / `done` / `error` / `killed`|
-|Started|Timestamp                                         |
-|Ended  |Timestamp (or `—` if still running)               |
-|Output |Output filename                                   |
-|Actions|TERM / VIEW / KILL buttons                        |
+|ID     |Hex de 8 caracteres (job ID)                     |
+|Label  |Descrição legível do job                         |
+|Status |`running` (animado) / `done` / `error` / `killed`|
+|Iniciado|Timestamp                                       |
+|Encerrado|Timestamp (ou `—` se ainda rodando)             |
+|Saída  |Nome do arquivo de saída                          |
+|Ações  |Botões TERM / VIEW / KILL                        |
 
-- **TERM** — attaches the terminal bar to that job’s live output stream
-- **VIEW** — opens the `.html` report in a new browser tab (only for `.html` outputs)
-- **KILL** — sends `SIGTERM` to the subprocess
+- **TERM** — anexa a barra de terminal ao stream ao vivo daquele job
+- **VIEW** — abre o relatório `.html` numa nova aba do navegador (só para saídas `.html`)
+- **KILL** — envia `SIGTERM` ao subprocess
 
 -----
 
-### ◧ Results
+### ◧ Resultados
 
-File browser for the `Dump/` directory. Shows all `.html`, `.json`, `.txt`, `.csv`, `.md` files
-(temp files starting with `_` are hidden).
+Navegador de arquivos do diretório `Dump/`. Mostra todos os arquivos `.html`, `.json`,
+`.txt`, `.csv`, `.md` (arquivos temporários começando com `_` ficam ocultos).
 
-|Column   |Description                                 |
+|Coluna   |Descrição                                        |
 |---------|--------------------------------------------|
-|Name     |File name — click to open `.html` in browser|
-|Size     |Human-readable file size                    |
-|Modified |Last modified timestamp                     |
-|FILE MODE|Re-process with `mappingexpo.py -f`             |
-|↓ DL     |Download the file                           |
-|OPEN     |Open `.html` reports in a new tab           |
+|Nome     |Nome do arquivo — clique para abrir `.html` no navegador|
+|Tamanho  |Tamanho legível                                 |
+|Modificado|Timestamp da última modificação                 |
+|FILE MODE|Reprocessar com `mappingexpo.py -f`             |
+|↓ DL     |Baixar o arquivo                                |
+|OPEN     |Abrir relatórios `.html` numa nova aba           |
 
 -----
 
-## Terminal Bar
+## Barra de Terminal
 
-Persistent terminal strip at the bottom of the page. Streams output from the
-active job via SSE.
+Faixa de terminal persistente no rodapé da página. Faz stream da saída do
+job ativo via SSE.
 
-|Control     |Action                                                   |
+|Controle     |Ação                                                       |
 |------------|---------------------------------------------------------|
-|Click header|Toggle between normal (200px) and expanded (400px) height|
-|COPY        |Copy all terminal text to clipboard                      |
-|CLEAR       |Clear terminal contents                                  |
-|KILL        |Kill the active job (visible only while running)         |
+|Clique no cabeçalho|Alterna entre altura normal (200px) e expandida (400px)|
+|COPY         |Copia todo o texto do terminal para a área de transferência  |
+|CLEAR        |Limpa o conteúdo do terminal                                |
+|KILL         |Mata o job ativo (visível só durante execução)         |
 
-**Line colouring:**
+**Coloração de linhas** (ordem de precedência do `colorLine`):
 
-|Colour|Pattern matched                                        |
-|------|-------------------------------------------------------|
-|Green |`[✓]`, `SAFE`, `saved`, `done`, `completed`, `[ Open ]`|
-|Yellow|`[~]`, `WARNING`, `WAF`, `skipping`                    |
-|Red   |`[!]`, `VULNERABLE`, `CRITICAL`, `error`, `[ Closed ]` |
-|Blue  |`[*]`, `Searching`, `Analyzing`, `Loading`, `DBScan`   |
-|Dim   |Empty lines, separators                                |
+|Cor      |Padrões casados                                                                       |
+|------    |---------------------------------------------------------------------------------------|
+|Verde    |`[✓]`, `SAFE`, ` saved `, `done`, `completed`, `salvo`, `salvos`, `Concluíd`, `[ Open ]` — classe default para linhas sem match|
+|Amarelo  |`[~]`, `WARNING`, `WAF`, `skipping`, `Pulando`, `pulad`, `Interrompid`                  |
+|Vermelho |`[!]`, `VULNERABLE`, `CRITICAL`, `error`, `Erro`, `potential`, `found`, `vuln`, `payload`, `potencial`, `encontrad`, `[ Closed ]` |
+|Azul     |`[*]`, `Searching`, `Analyz`, `Loading`, `Starting`, `Buscando`, `Analisando`, `Carregando`, `Iniciando`, `Processando`, `DBScan`, `db.port`, `portscan`, box-drawing |
+|Dim      |Linhas vazias                                                                          |
 
-ANSI escape codes and Rich markup are stripped from subprocess output before display.
+Códigos ANSI e rich markup são removidos da saída do subprocess antes da exibição.
 
 -----
 
-## Job System
+## Sistema de Jobs
 
-Each scan is launched as a background subprocess via `subprocess.Popen`. The web layer
-does not block — multiple jobs can run concurrently.
+Cada scan roda como subprocess em background via `subprocess.Popen`. A camada web
+não bloqueia — múltiplos jobs podem rodar concorrentemente.
 
-**Job lifecycle:**
+**Ciclo de vida do job:**
 
 ```
 api/run POST  →  JobManager.spawn()  →  Popen(mappingexpo.py ...)
@@ -256,88 +257,88 @@ api/run POST  →  JobManager.spawn()  →  Popen(mappingexpo.py ...)
                                         ↓
                               /api/stream/<jid>  (SSE)
                                         ↓
-                              Terminal bar in browser
+                              Barra de terminal no navegador
 ```
 
-- `stdin` is pre-seeded with `n\n` to auto-answer the `Run analysis? [y/N]` prompt
-  (prevents the job from hanging on an interactive checkpoint)
-- `PYTHONUNBUFFERED=1`, `NO_COLOR=1`, `FORCE_COLOR=0` are set in the subprocess environment
-- Subprocess `cwd` is set to the project root so relative paths resolve correctly
+- O `stdin` é pré-alimentado com `n\n` para auto-responder o prompt
+  `Executar análise nos resultados? [y/N]` (evita o job travar num prompt interativo)
+- `PYTHONUNBUFFERED=1`, `NO_COLOR=1`, `FORCE_COLOR=0` são definidos no ambiente do subprocess
+- O `cwd` do subprocess é a raiz do projeto, para que paths relativos resolvam corretamente
 
 -----
 
-## API Endpoints
+## Endpoints da API
 
-|Method|Endpoint                   |Description                                    |
+|Método|Endpoint                   |Descrição                                    |
 |------|---------------------------|-----------------------------------------------|
-|GET   |`/`                        |Main dashboard HTML                            |
-|GET   |`/api/status`              |Server status: version, port, running job count|
-|GET   |`/api/jobs`                |List all jobs (summary)                        |
-|GET   |`/api/jobs/<jid>`          |Job detail + full output lines                 |
-|DELETE|`/api/jobs/<jid>`          |Kill a running job                             |
-|GET   |`/api/stream/<jid>`        |SSE stream of job output                       |
-|POST  |`/api/run`                 |Launch a new job (scan / urltest / file)       |
-|GET   |`/api/dump`                |List files in `Dump/`                          |
-|GET   |`/api/templates/list`      |List `.yaml` files in `Templates/`             |
-|GET   |`/api/templates/categories`|List categories from a template file           |
-|POST  |`/api/dorkgen/preview`     |Generate and return up to 200 dorks            |
-|POST  |`/api/dorkgen/export`      |Generate and return full dork list as `.txt`   |
-|GET   |`/dump/<filename>`         |Serve a file from `Dump/`                      |
+|GET   |`/`                        |HTML principal do dashboard                    |
+|GET   |`/api/status`              |Status do servidor: versão, porta, contagem de jobs ativos|
+|GET   |`/api/jobs`                |Lista todos os jobs (resumo)                  |
+|GET   |`/api/jobs/<jid>`          |Detalhe do job + linhas completas de saída     |
+|DELETE|`/api/jobs/<jid>`          |Mata um job em execução                       |
+|GET   |`/api/stream/<jid>`        |Stream SSE da saída do job                    |
+|POST  |`/api/run`                 |Lança um novo job (scan / urltest / file)     |
+|GET   |`/api/dump`                |Lista arquivos em `Dump/`                     |
+|GET   |`/api/templates/list`      |Lista arquivos `.yaml` em `Templates/`        |
+|GET   |`/api/templates/categories`|Lista categorias de um arquivo de template    |
+|POST  |`/api/dorkgen/preview`     |Gera e retorna até 200 dorks                  |
+|POST  |`/api/dorkgen/export`      |Gera e retorna a lista completa de dorks como `.txt`|
+|GET   |`/dump/<filename>`         |Serve um arquivo de `Dump/`                    |
 
 -----
 
-## Path Resolution
+## Resolução de Paths
 
-The web module resolves the project root at startup by walking up the directory tree
-from `mappingexpo_web.py` looking for `mappingexpo.py`:
+O módulo web resolve a raiz do projeto na inicialização subindo a árvore de
+diretórios a partir de `mappingexpo_web.py` procurando por `mappingexpo.py`:
 
 ```
 MappingExpo/
-    mappingexpo.py          ← root anchor
-    Dump/               ← output directory
-    Templates/          ← dork templates
+    mappingexpo.py          ← âncora da raiz
+    Dump/               ← diretório de saída
+    Templates/          ← templates de dorks
     Tools/
-        mappingexpo_web.py  ← starts here
+        mappingexpo_web.py  ← começa aqui
 ```
 
-This works whether `mappingexpo_web.py` is run directly from `Tools/` or from the project root.
+Funciona tanto se `mappingexpo_web.py` for executado direto de `Tools/` quanto da raiz do projeto.
 
 -----
 
-## Security Notes
+## Notas de Segurança
 
-- The server binds exclusively to `127.0.0.1` — it is **not reachable from other machines**
-  on the network.
-- Template path resolution includes a **directory traversal guard**: any path that resolves
-  outside `Templates/` is rejected and falls back to the default template.
-- SIGINT is restored to the default handler before starting Flask so that Ctrl+C correctly
-  shuts down the Werkzeug server (MappingExpo installs a custom SIGINT handler that would
-  otherwise intercept the signal and prevent clean shutdown).
+- O servidor binda exclusivamente em `127.0.0.1` — ele **não é alcançável de outras
+  máquinas** da rede.
+- A resolução de path de template inclui um **guard de directory traversal**: qualquer
+  path que resolva fora de `Templates/` é rejeitado, com fallback para o template default.
+- O SIGINT é restaurado ao handler default antes de iniciar o Flask, para que o Ctrl+C
+  encerre corretamente o servidor Werkzeug (o MappingExpo instala um handler SIGINT
+  customizado que, de outro modo, interceptaria o sinal e impediria o encerramento limpo).
 
 -----
 
-## Shutdown
+## Encerramento
 
 ```
 Ctrl+C
 ```
 
-The server closes cleanly, releases the port immediately (SO_REUSEADDR), and prints:
+O servidor encerra limpo, libera a porta imediatamente (SO_REUSEADDR) e imprime:
 
 ```
-  [!] Server stopped. Port released.
+  [!] Servidor parado. Porta liberada.
 ```
 
 -----
 
-## Dependencies
+## Dependências
 
-|Package   |Required                |Used for                          |
+|Pacote    |Exigida                 |Usada para                          |
 |----------|------------------------|----------------------------------|
-|`flask`   |**yes**                 |HTTP server, routing, SSE         |
-|`werkzeug`|yes (bundled with Flask)|`make_server`, SO_REUSEADDR socket|
-|`requests`|optional                |Used by underlying scan modules   |
-|`rich`    |optional                |Used by underlying scan modules   |
+|`flask`   |**sim**                 |Servidor HTTP, rotas, SSE         |
+|`werkzeug`|sim (bundled com Flask) |`make_server`, socket SO_REUSEADDR|
+|`requests`|opcional                |Usada pelos módulos de scan       |
+|`rich`    |opcional                |Usada pelos módulos de scan       |
 
 ```bash
 pip install flask requests rich

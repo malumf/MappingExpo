@@ -1,158 +1,158 @@
-# MappingExpo on Termux
+# MappingExpo no Termux
 
-> Run the full MappingExpo pipeline directly from your Android device.
-> Termux is auto-detected — no extra flags needed. Battery-saver tuning activates automatically.
-
------
-
-## Requirements
-
-- Android 7.0 or higher
-- [Termux](https://f-droid.org/packages/com.termux/) installed from **F-Droid** (the Play Store version is deprecated and unsupported)
-- Internet connection
-
-> **Do not use the Play Store version of Termux.** It is outdated and will cause dependency errors.
+> Rode o pipeline completo do MappingExpo direto do seu aparelho Android.
+> O Termux é auto-detectado — sem flags extras. O tuning de economia de bateria ativa sozinho.
 
 -----
 
-## Installation
+## Requisitos
 
-### Step 1 — Update Termux packages
+- Android 7.0 ou superior
+- [Termux](https://f-droid.org/packages/com.termux/) instalado via **F-Droid** (a versão da Play Store está deprecada e sem suporte)
+- Conexão com a internet
+
+> **Não use a versão da Play Store do Termux.** Está desatualizada e causará erros de dependência.
+
+-----
+
+## Instalação
+
+### Passo 1 — Atualizar os pacotes do Termux
 
 ```bash
 pkg update && pkg upgrade -y
 ```
 
-Run this first, every time, on a fresh Termux install.
+Rode isto primeiro, sempre, numa instalação limpa do Termux.
 
 -----
 
-### Step 2 — Install system dependencies
+### Passo 2 — Instalar as dependências do sistema
 
 ```bash
 pkg install -y python git libxml2 libxslt
 ```
 
-|Package  |Why it’s needed                               |
+|Pacote   |Por que é necessário                           |
 |---------|----------------------------------------------|
-|`python` |Runtime for MappingExpo                           |
-|`git`    |Clone the repository                          |
-|`libxml2`|Required by `lxml` (HTML parser) — C extension|
-|`libxslt`|Required by `lxml` — C extension              |
+|`python` |Runtime do MappingExpo                           |
+|`git`    |Clonar o repositório                          |
+|`libxml2`|Exigido pelo `lxml` (parser HTML) — extensão C|
+|`libxslt`|Exigido pelo `lxml` — extensão C              |
 
 
-> **Important:** `libxml2` and `libxslt` must be installed via `pkg` **before** running `pip install`.
-> Skipping this step will cause the `lxml` build to fail with a `fatal error` during requirements installation.
+> **Importante:** `libxml2` e `libxslt` devem ser instalados via `pkg` **antes** do `pip install`.
+> Pular este passo faz o build do `lxml` falhar com um `fatal error` durante a instalação dos requirements.
 
 -----
 
-### Step 3 — Clone MappingExpo
+### Passo 3 — Clonar o MappingExpo
 
 ```bash
-git clone https://github.com/xPloits3c/DorkEye
+git clone https://github.com/malumf/MappingExpo.git
 cd MappingExpo
 ```
 
 -----
 
-### Step 4 — Install Python dependencies
+### Passo 4 — Instalar as dependências Python
 
 ```bash
 pip install -r requirements.txt
 ```
 
-This installs all required libraries:
+Isto instala todas as bibliotecas exigidas:
 
-|Library                  |Purpose                        |
+|Biblioteca               |Finalidade                     |
 |-------------------------|-------------------------------|
-|`requests` / `urllib3`   |HTTP engine                    |
-|`PyYAML`                 |Config and template parsing    |
-|`beautifulsoup4` / `lxml`|HTML parsing                   |
-|`rich`                   |Terminal UI and formatting     |
-|`colorama`               |Color support                  |
-|`ddgs`                   |DuckDuckGo search integration  |
-|`flask`                  |Web Console (`--ui`) — optional|
+|`requests` / `urllib3`   |Motor HTTP                     |
+|`PyYAML`                 |Parsing de config e template   |
+|`beautifulsoup4` / `lxml`|Parsing HTML                   |
+|`rich`                   |UI de terminal e formatação    |
+|`colorama`               |Suporte a cores                |
+|`ddgs`                   |Integração de busca DuckDuckGo |
+|`flask`                  |Console Web (`--ui`) — opcional |
 
 -----
 
-### Step 5 — Verify the installation
+### Passo 5 — Verificar a instalação
 
 ```bash
 python mappingexpo.py -h
 ```
 
-Expected output: the full help banner with all available flags.
-If you see it, MappingExpo is ready.
+Saída esperada: o banner de ajuda completo com todas as flags disponíveis.
+Se você o vir, o MappingExpo está pronto.
 
 -----
 
-## Termux Auto-Detection
+## Auto-Detecção do Termux
 
-When MappingExpo detects it is running inside Termux, the banner displays:
+Quando o MappingExpo detecta que está rodando dentro do Termux, o banner exibe:
 
 ```
-Platform: Android / Termux ⚡ battery-saver active
+Android / Termux | economia de bateria ativa
 ```
 
-The following parameters are automatically reduced to preserve battery and avoid timeouts on mobile connections:
+Os parâmetros a seguir são reduzidos automaticamente para poupar bateria e evitar timeouts em conexões móveis:
 
-|Parameter               |Desktop|Termux|
+|Parâmetro                |Desktop|Termux|
 |------------------------|-------|------|
-|Connect timeout         |4 s    |3 s   |
-|SQLi baseline samples   |2      |1     |
-|Probe samples           |3      |2     |
-|Boolean blind samples   |3      |2     |
-|Time-based confirmations|2      |1     |
+|Timeout de conexão       |4 s    |3 s   |
+|Amostras de baseline SQLi|2      |1     |
+|Amostras de probe        |3      |2     |
+|Amostras booleanas blind |3      |2     |
+|Confirmações time-based  |2      |1     |
 
-No flags required — this tuning is applied automatically.
+Nenhuma flag exigida — este tuning é aplicado automaticamente.
 
 -----
 
-## Basic Usage
+## Uso Básico
 
-### Interactive wizard (recommended for beginners)
+### Wizard interativo (recomendado para iniciantes)
 
 ```bash
 python mappingexpo.py --wizard
 ```
 
-Guided menus for every option. The easiest way to start.
+Menus guiados para cada opção. O jeito mais fácil de começar.
 
 -----
 
-### Single dork search
+### Busca com dork único
 
 ```bash
 python mappingexpo.py -d "inurl:login.php" -o results.html
 ```
 
-Searches DuckDuckGo for the dork and saves an interactive HTML report in `Dump/`.
+Busca no DuckDuckGo pelo dork e salva um relatório HTML interativo em `Dump/`.
 
 -----
 
-### Load dorks from a file
+### Carregar dorks de um arquivo
 
 ```bash
 python mappingexpo.py -d dorks.txt -c 100 -o results.json
 ```
 
-`dorks.txt` — one dork per line, lines starting with `#` are ignored.
-`-c 100` — fetch up to 100 results per dork (default: 50).
+`dorks.txt` — um dork por linha; linhas começando com `#` são ignoradas.
+`-c 100` — busca até 100 resultados por dork (default: 50).
 
 -----
 
-### Direct URL test (SQLi + XSS, no search)
+### Teste direto de URL (SQLi + XSS, sem busca)
 
 ```bash
 python mappingexpo.py -u "https://target.com/page.php?id=1"
 ```
 
-Runs the full vulnerability pipeline directly against a single URL.
-`--sqli` and `--xss` are auto-enabled in this mode.
+Roda o pipeline completo de vulnerabilidades direto contra uma URL única.
+`--sqli` e `--xss` são auto-habilitados neste modo.
 
 -----
 
-## Vulnerability Scanning
+## Varredura de Vulnerabilidades
 
 ### SQL Injection
 
@@ -166,99 +166,99 @@ python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.json
 python mappingexpo.py -d "inurl:search.php?q=" --xss -o results.json
 ```
 
-### SQLi + XSS combined
+### SQLi + XSS combinados
 
 ```bash
 python mappingexpo.py -d "inurl:.php?id=" --sqli --xss -o results.json
 ```
 
-### With stealth mode
+### Com modo stealth
 
 ```bash
 python mappingexpo.py -d "inurl:.php?id=" --sqli --xss --stealth -o results.json
 ```
 
-`--stealth` adds longer delays between requests (1.4×–1.8×) to reduce detection and rate-limiting.
-Recommended on mobile connections where reconnections are costly.
+`--stealth` adiciona delays mais longos entre requisições (1,4×–1,8×) para reduzir detecção e rate limit.
+Recomendado em conexões móveis, onde reconexões custam caro.
 
 -----
 
-## Output Formats
+## Formatos de Saída
 
-All output files are saved inside the `Dump/` folder (auto-created).
+Todos os arquivos de saída são salvos dentro da pasta `Dump/` (criada automaticamente).
 
-|Extension|Format                                                            |
-|---------|------------------------------------------------------------------|
-|`.html`  |Interactive dark-theme report — filterable, searchable, exportable|
-|`.json`  |Full structured data + statistics — triggers analysis prompt      |
-|`.csv`   |Spreadsheet-compatible, all columns included                      |
-|`.txt`   |Plain text, one result per block                                  |
+|Extensão|Formato                                                            |
+|--------|-------------------------------------------------------------------|
+|`.html` |Relatório interativo com tema escuro — filtrável, pesquisável, exportável|
+|`.json` |Dados estruturados completos + estatísticas — dispara o prompt de análise|
+|`.csv`  |Compatível com planilha, todas as colunas incluídas               |
+|`.txt`  |Texto puro, um resultado por bloco                                 |
 
 ```bash
-# HTML report (default, recommended for reading)
+# Relatório HTML (default, recomendado para leitura)
 python mappingexpo.py -d "inurl:config.php" -o report.html
 
-# JSON (required for --analyze, --crawl, --dbscan re-processing)
+# JSON (exigido para reprocessar com --analyze, --crawl, --dbscan)
 python mappingexpo.py -d "inurl:config.php" -o results.json
 ```
 
-If no extension is provided, `.json` is appended automatically.
+Se nenhuma extensão for informada, `.json` é anexado automaticamente.
 
 -----
 
-## Re-processing Saved Results
+## Reprocessando Resultados Salvos
 
 ```bash
-# Add SQLi scan to existing results
+# Adicionar scan SQLi a resultados existentes
 python mappingexpo.py -f Dump/results.json --sqli -o retest.json
 
-# Add XSS scan
+# Adicionar scan XSS
 python mappingexpo.py -f Dump/results.json --xss -o retest.json
 
-# Run full analysis on saved results
+# Rodar análise completa em resultados salvos
 python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
 ```
 
-Useful to avoid repeating the search — reuse results and add new scan layers.
+Útil para não repetir a busca — reutilize os resultados e adicione novas camadas de scan.
 
 -----
 
-## Dork Generator
+## Gerador de Dorks
 
-Generate dorks from built-in templates and search immediately.
+Gere dorks a partir dos templates embutidos e busque imediatamente.
 
 ```bash
-# Generate all categories, search, detect SQLi
+# Gerar todas as categorias, buscar, detectar SQLi
 python mappingexpo.py --dg=all --sqli -o results.json
 
-# Generate SQLi-focused dorks, medium intensity
+# Gerar dorks focados em SQLi, intensidade média
 python mappingexpo.py --dg=sqli --mode=medium --sqli -o results.json
 ```
 
-|`--mode` value|Behaviour                                  |
+|Valor de `--mode`|Comportamento                               |
 |--------------|-------------------------------------------|
-|`soft`        |Low-risk dorks, minimal expansion (default)|
-|`medium`      |Broader coverage patterns                  |
-|`aggressive`  |Maximum combinations — high result volume  |
+|`soft`        |Dorks de baixo risco, expansão mínima (default)|
+|`medium`      |Padrões de cobertura mais amplos            |
+|`aggressive`  |Máximo de combinações — alto volume de resultados|
 
 
-> On mobile, `soft` or `medium` is recommended. `aggressive` can generate thousands of requests.
+> No celular, `soft` ou `medium` é o recomendado. `aggressive` pode gerar milhares de requisições.
 
 -----
 
-## Analysis Pipeline
+## Pipeline de Análise
 
-Requires `Tools/mappingexpo_agents.py`. Automatically skipped if the file is missing.
+Requer `Tools/mappingexpo_agents.py`. Pulado automaticamente se o arquivo estiver ausente.
 
 ```bash
 python mappingexpo.py -d dorks.txt --analyze -o results.json
 python mappingexpo.py -d dorks.txt --analyze --analyze-fetch -o results.json
 ```
 
-`--analyze` — runs triage, secrets detection, and generates a report after the search.
-`--analyze-fetch` — also downloads page content for HIGH / CRITICAL results.
+`--analyze` — roda triage, detecção de segredos e gera um relatório após a busca.
+`--analyze-fetch` — também baixa o conteúdo das páginas dos resultados HIGH / CRITICAL.
 
-Output format options: `html` (default), `md`, `json`, `txt`.
+Opções de formato de saída: `html` (default), `md`, `json`, `txt`.
 
 ```bash
 python mappingexpo.py -d dorks.txt --analyze --analyze-fmt md -o results.json
@@ -266,131 +266,131 @@ python mappingexpo.py -d dorks.txt --analyze --analyze-fmt md -o results.json
 
 -----
 
-## DB Port Scanner
+## Varredura de Portas DB
 
-Requires `Tools/db_portscan.py`. Scans hosts extracted from results for exposed database ports.
+Requer `Tools/db_portscan.py`. Escaneia hosts extraídos dos resultados procurando portas de banco expostas.
 
 ```bash
-# Integrated — runs after the search
+# Integrado — roda depois da busca
 python mappingexpo.py -d dorks.txt --dbscan -o results.json
 
-# Standalone — on saved results
+# Standalone — em resultados salvos
 python Tools/db_portscan.py Dump/results.json
 python Tools/db_portscan.py Dump/results.json --timeout 3 --threads 40
 ```
 
-> **Termux note:** The default `--dbscan-threads 60` may be high for some Android devices.
-> If you experience instability, reduce it: `--dbscan-threads 30` or `--dbscan-threads 40`.
-> Private and loopback IPs are automatically excluded from the scan.
+> **Nota Termux:** O default `--dbscan-threads 60` pode ser alto para alguns aparelhos Android.
+> Se houver instabilidade, reduza: `--dbscan-threads 30` ou `--dbscan-threads 40`.
+> IPs privados e de loopback são excluídos do scan automaticamente.
 
 -----
 
-## Web Console (`--ui`)
+## Console Web (`--ui`)
 
-Launches a local Flask-based dashboard in your browser.
+Abre um dashboard local baseado em Flask no seu navegador.
 
 ```bash
 python mappingexpo.py --ui
 ```
 
-> **Termux note:** The browser will not open automatically on Android.
-> After launching, open your browser manually and navigate to:
-> 
+> **Nota Termux:** O navegador não abre automaticamente no Android.
+> Depois de iniciar, abra o navegador manualmente e acesse:
+>
 > ```
 > http://127.0.0.1:8080
 > ```
-> 
-> If port 8080 is busy, MappingExpo auto-increments. Check the terminal output for the actual port.
+>
+> Se a porta 8080 estiver ocupada, o MappingExpo auto-incrementa. Confira a saída do terminal para a porta real.
 
-`--ui` cannot be combined with any other input flag (`-d`, `-u`, `-f`, `--dg`) in the same command.
-
------
-
-## Interrupt Control
-
-|Action                                           |Effect                                 |
-|-------------------------------------------------|---------------------------------------|
-|Single **Ctrl+C** (or **Vol Down + C** in Termux)|Skip current task → continue to next   |
-|Double **Ctrl+C** within 1.5 s                   |Exit immediately → save partial results|
+`--ui` não pode ser combinado com nenhuma outra flag de entrada (`-d`, `-u`, `-f`, `--dg`) no mesmo comando.
 
 -----
 
-## Common Combinations for Termux
+## Controle de Interrupção
+
+|Ação                                                |Efeito                                  |
+|----------------------------------------------------|----------------------------------------|
+|**Ctrl+C** único (ou **Vol Down + C** no Termux)   |Pula a tarefa atual → continua para a próxima|
+|**Ctrl+C** duplo em até 1,5 s                       |Sai imediatamente → salva resultados parciais|
+
+-----
+
+## Combinações Comuns para Termux
 
 ```bash
-# Quickest start — guided wizard
+# Começo mais rápido — wizard guiado
 python mappingexpo.py --wizard
 
-# Search + SQLi + HTML report
+# Busca + SQLi + relatório HTML
 python mappingexpo.py -d "inurl:.php?id=" --sqli -o results.html
 
-# Search + SQLi + XSS + stealth
+# Busca + SQLi + XSS + stealth
 python mappingexpo.py -d dorks.txt --sqli --xss --stealth -o results.json
 
-# Direct URL vulnerability test
+# Teste direto de vulnerabilidade em URL
 python mappingexpo.py -u "https://target.com/page.php?id=1"
 
-# Generate dorks + scan + analyze
+# Gerar dorks + scan + analisar
 python mappingexpo.py --dg=sqli --mode=medium --sqli --analyze -o results.json
 
-# Re-process saved results — add analysis
+# Reprocessar resultados salvos — adicionar análise
 python mappingexpo.py -f Dump/results.json --analyze --analyze-fetch -o analysis.json
 
-# DB port scan on saved results (reduced threads for mobile)
+# Varredura de portas DB em resultados salvos (threads reduzidas para celular)
 python Tools/db_portscan.py Dump/results.json --threads 40 --timeout 3
 ```
 
 -----
 
-## Troubleshooting
+## Solução de Problemas
 
-**`lxml` build fails during `pip install`**
+**Build do `lxml` falha durante o `pip install`**
 
 ```bash
 pkg install libxml2 libxslt
 pip install -r requirements.txt
 ```
 
-**`ModuleNotFoundError` for any package**
+**`ModuleNotFoundError` de qualquer pacote**
 
 ```bash
 pip install -r requirements.txt --force-reinstall
 ```
 
-**`git clone` is slow or fails**
+**`git clone` lento ou falha**
 
-Check your connection or try:
+Verifique a conexão ou tente:
 
 ```bash
 pkg install wget
 ```
 
-and download the ZIP from GitHub manually.
+e baixe o ZIP do GitHub manualmente.
 
-**`--ui` — browser does not open**
+**`--ui` — navegador não abre**
 
-Expected on Android. Open `http://127.0.0.1:8080` manually in any browser.
+Esperado no Android. Abra `http://127.0.0.1:8080` manualmente em qualquer navegador.
 
-**Double Ctrl+C not working**
+**Ctrl+C duplo não funciona**
 
-In Termux, use the keyboard shortcut **Vol Down + C** as the Ctrl key equivalent.
-
------
-
-## Next Steps
-
-For the full list of 38 flags, advanced combinations, and detailed module documentation:
-
-- [`Docs/cli.md`](cli.md) — complete CLI reference
-- [`Docs/xss.md`](xss.md) — XSS detection engine
-- [`Docs/sqli.md`](sqli.md) — SQL injection engine
-- [`Docs/dbscan.md`](dbscan.md) — DB port scanner
-- [`Docs/agents.md`](agents.md) — analysis pipeline
-- [`Docs/webconsole.md`](webconsole.md) — Web Console (`--ui`)
+No Termux, use o atalho de teclado **Vol Down + C** como equivalente da tecla Ctrl.
 
 -----
 
-## Community & Support
+## Próximos Passos
+
+Para a lista completa das 38 flags, combinações avançadas e documentação detalhada de módulos:
+
+- [`Docs/cli.md`](cli.md) — referência completa da CLI
+- [`Docs/xss.md`](xss.md) — engine de detecção XSS
+- [`Docs/sqli.md`](sqli.md) — engine de SQL injection
+- [`Docs/dbscan.md`](dbscan.md) — varredura de portas DB
+- [`Docs/agents.md`](agents.md) — pipeline de análise
+- [`Docs/webconsole.md`](webconsole.md) — Console Web (`--ui`)
+
+-----
+
+## Comunidade & Suporte
 
 - **GitHub:** [github.com/xPloits3c/DorkEye](https://github.com/xPloits3c/DorkEye)
 - **Telegram:** [t.me/DorkEye](https://t.me/DorkEye)

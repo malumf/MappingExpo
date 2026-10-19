@@ -701,6 +701,18 @@ preservados. Backups em `.traducao_backup/`. Nada commitado.
 - **Mantido fiel (reportado, sem correção)**: "51 payloads" (29+16+6) — não bate com `_REFLECTED`=44/`_BYPASS`=26 do xss.py; staleness herdado do original; **pendência de auditoria registrada para Fase 6**
 - **Verificação** (suíte 41/41): code blocks e comandos idênticos · linhas de tabela idênticas · **deltas de flags = exatamente os 2 aprovados** (`-oob-url` removida, `-dbscan` adicionada — confirmado via Counter com strip de âncoras; nota metodológica: inline `python -c` no PS 5.1 corrompe regex com backtick por ser char de escape — arquivo de suíte é a autoridade) · divisores ═══ idênticos · 11 âncoras PT · keys técnicos intactos ×13 (`xss_detection_enabled`, `best >= 6`, `report_YYYYMMDD_HHMMSS.html`, `SQLiDetector.test_post_sqli()` etc.) · vereditos SAFE/VULNERABLE e escada NONE→CRITICAL intactos · MPXSS7x intacto · zero inglês em headings
 
+## 2026-10-16 — f4d: webconsole.md + termux.md + DDGSEE.md (commit f4d)
+- **Backups**: `*.20261019_000507.pre_f4d.bak` ×3 (incidente menor: backtick do PS escapou o `$ts` nos nomes → renomeados)
+- **Tradução integral PT-BR** dos 3 arquivos (344+396+65 linhas): webconsole (seções do dashboard com labels reais do UI — Novo Scan, Testador de URL, Gerador de Dorks, Resultados, Varredura de Portas DB; 14 rotas `/api/*` intactas; diagrama de ciclo de vida intacto) · termux (5 passos de instalação, tuning, troubleshooting; links Docs/*.md e F-Droid intactos) · DDGSEE (tabela comparativa, !bangs intactos)
+- **Correções de consistência doc↔código (aprovadas)**:
+  - webconsole L79–81: mock de startup EN → **strings reais** (`▸ Porta → 8082 (selecionada automaticamente)` — web.py L1167–1168)
+  - webconsole L229–237: **tabela de coloração EN estagnada → tabela REAL do colorLine** (web.py L930–942): padrões PT acrescidos na Fase 1 (Pulando/pulad/Interrompid, salvo/salvos/Concluíd, Buscando/Analisando/Carregando/Iniciando/Processando, potencial/encontrad, Erro) + potencial/found/vuln/payload (t-e), DBScan/db.port/portscan + box-drawing (t-i), linhas vazias (t-d), nota de que verde é a classe default
+  - webconsole L262: prompt `Run analysis? [y/N]` → **`Executar análise nos resultados? [y/N]`** (string real, mappingexpo.py L2754)
+  - webconsole L328: `[!] Server stopped. Port released.` → **`[!] Servidor parado. Porta liberada.`** (string real, web.py L1187)
+  - termux L52: clone URL → **malumf/MappingExpo.git** (decisão #2 do mantenedor) · termux L94: banner EN estagnado → **`Android / Termux | economia de bateria ativa`** (string real, mappingexpo.py L200)
+- **Atribuição preservada**: termux L395–396 (GitHub/Telegram do autor original) — intacta
+- **Verificação** (suíte 37 checks: 36 OK + 1 falso positivo — expectativa errada do teste: classes CSS `t-*` nunca estiveram no doc original, a tabela usa nomes de cor): code blocks/comandos/linhas de tabela idênticos ×3 · rotas `/api/*` idênticas · 10 padrões reais do colorLine presentes na tabela nova · strings reais PT ×5 presentes, EN antigos ×3 ausentes · clone URL correta + zero xPloits3c em clone · valores do tuning (4s/3s, 2/1, 3/2, 3/2, 2/1) intactos · atribuição intacta
+
 
 
 
