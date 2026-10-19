@@ -1,4 +1,4 @@
-<img width="1264" height="843" alt="image" src="https://github.com/user-attachments/assets/3f4cdecf-78ac-4fe6-aefe-2d6d85118378" />
+
 
 # Output Formats — MappingExpo Project
 
